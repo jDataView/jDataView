@@ -62,7 +62,7 @@ Shortcomings
 
 Example
 ======
-
+First we need a file. Either you get it through XHR or use the createBuffer utility.
 	var file = cDataView.createBuffer(
 		0x10, 0x01, 0x00, 0x00, // Int32 - 272
 		0x90, 0xcf, 0x1b, 0x47, // Float32 - 39887.5625
