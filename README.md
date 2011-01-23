@@ -92,4 +92,10 @@ The wrapper extends the specification to make the DataView easier to use.
     var tag = view.getString(undefined, 4); // MD20
     var char = view.getChar(); // a
 
+
+==== Demos
+
+A World of Warcraft Model Parser and Viewer. It uses jDataView to read the binary file and then WebGL to display it.
+<a href="http://fooo.fr/~vjeux/github/jsWoWModelViewer/modelviewer.html"><img src="http://fooo.fr/~vjeux/github/jsWoWModelViewer/images/modelviewer.png"></a>
+
 Licence: [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/)
