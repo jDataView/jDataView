@@ -1,15 +1,20 @@
 [jsDataView](http://blog.vjeux.com/) - Wrapper for DataView API
 ================================
 
-WebGL came with a [Specification](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6) for reading binary data called Typed Arrays:
+There are three ways to read a binary file from the browser.
 
-* **Array Buffer** - Stores a binary file.
-* **Array Buffer Views** (Typed Arrays such as Int32Array or Float64Array) - Access the binary file through a typed array.
-* **Data View** - Read a binary file through usual BinaryReader functions.
+The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a string, and you have to rewrite all the decoding functions (getUint16, getFloat32, ...).
 
-As of end of January 2011, only Chrome 9 offers the ability to use the DataView  API. The goal of this wrapper is to be able to read binary data using the DataView API even if the browser does not support it yet.
+Then WebGL came with [Typed Arrays](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6) and the file is now stored as an **ArrayBuffer*. 
 
-The official DataView API requires an ArrayBuffer as a data source, the wrapper is extended to support a plain string as a source (obtained with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data)). 
+The default implemented way to read data from an array buffer is to use a **Typed Array**(Int32Array, Float64Array, ...). If your file contains many different data types, it is not handy to use as you have to create many arrays around your buffer. Also, it imposes the data to be aligned.
+
+The best way to read binary data is through a **DataView**. It is a view around your buffer that can read arbitrary data types through well named functions: getUint32, getFloat64 ...
+
+
+As of end of January 2011, the string way works on all browsers but Internet Explorer. Firefox 4 and Chrome 7 have Typed Arrays and only Chrome 9 has DataViews.
+
+The wrapper provides the DataView API to all the existing browsers. It uses the latest available way to read from the source. It even adds handy helpers to make the API easier to use.
 
 Licence: [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/)
 
