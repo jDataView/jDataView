@@ -12,7 +12,7 @@ Now we use the DataView as defined in the specification, the only thing that cha
     var float = view.getFloat32(4); // 39887.5625
 
 The wrapper extends the specification to make the DataView easier to use.
-
+    var view = new cDataView(file);
     // A position counter is managed. Remove the argument to read right after the last read.
     version = view.getInt32(); // 272
     float = view.getFloat32(); // 39887.5625
