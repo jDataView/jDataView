@@ -1,7 +1,7 @@
 [jsDataView](http://blog.vjeux.com/) - Wrapper for DataView API
 ================================
 
-WebGL came with a (Specification)[http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html] for reading binary data called Typed Arrays:
+WebGL came with a [Specification](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6) for reading binary data called Typed Arrays:
 
 * **Array Buffer** - Stores a binary file.
 * **Array Buffer Views** (Typed Arrays such as Int32Array or Float64Array) - Access the binary file through a typed array.
@@ -15,7 +15,7 @@ Licence: [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/
 
 API
 ===
-See the specification for a detailed API. (http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html)[http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html]
+See the specification for a detailed API. [http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6)
 
 Constructor
 -----------------
