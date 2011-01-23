@@ -38,17 +38,21 @@ The wrapper satisfies all the specification getters.
 
 Extended Specification
 ---------------------------------
-The byteOffset parameter is optional. If you omit it, it will read right after the latest read offset. You can interact with the internal pointer with those two functions.
+The byteOffset parameter is now optional. If you omit it, it will read right after the latest read offset. You can interact with the internal pointer with those two functions.
 
 * **seek**(byteOffset)
     * Moves the internal pointer to the position
 * **tell**()
     * Returns the current position
 
-Added getChar and getString utilities.
+Addition of getChar and getString utilities.
 
 * **getChar**(byteOffset)
 * **getString**(byteOffset, length)
+
+Addition of createBuffer, a utility to easily create buffers with the latest available storage type (String or ArrayBuffer).
+
+* **createBuffer**(byte1, byte2, ...)
 
 Shortcomings
 ==========
@@ -59,7 +63,7 @@ Shortcomings
 Example
 ======
 
-	var file = cDataView.createBinaryStream(
+	var file = cDataView.createBuffer(
 		0x10, 0x01, 0x00, 0x00, // Int32 - 272
 		0x90, 0xcf, 0x1b, 0x47, // Float32 - 39887.5625
 		0, 0, 0, 0, 0, 0, 0, 0, // 8 blank bytes
