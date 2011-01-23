@@ -8,15 +8,13 @@ Explanation
 
 There are three ways to read a binary file from the browser.
 
-* The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a **String**, and you have to rewrite all the decoding functions (getUint16, getFloat32, ...).
+* The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a **String**, and you have to rewrite all the decoding functions (getUint16, getFloat32, ...). All the browsers support this.
 
-* Then WebGL came with [Typed Arrays](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6) and the file is now stored as an **ArrayBuffer**. **TypedArray**(Int32Array, Float64Array, ...) is the default implemented way to read data from an ArrayBuffer. If your file contains many different data types, it is not handy to use as you have to create many arrays around your buffer. Also, it can't read non-aligned data.
+* Then browsers that implemented WebGL also added **ArrayBuffers**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. Also, it can't read non-aligned data. It is supported by Firefox 4 and Chrome 7.
 
-* The best way to read binary data is through a **DataView**. It is a view around your buffer that can read arbitrary data types through well named functions: getUint32, getFloat64 ...
+* A new revision of the specification added **DataViews**. It is a view around your buffer that can read arbitrary data types directly through functions: getUint32, getFloat64 ... Only Chrome 9 supports it.
 
-As of end of January 2011, the Strings work on all browsers. Firefox 4 and Chrome 7 support Typed Arrays and Chrome 9 is the only browser to implement DataViews.
-
-jDataView provides the DataView API for all the browsers. Under the hood it uses the best possible available option between Strings, TypedArrays and DataViews.
+jDataView provides the DataView API for all the browsers using the best available option between Strings, TypedArrays and DataViews.
 
 API
 ===
