@@ -15,7 +15,7 @@ Licence: [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/
 
 API
 ===
-See the specification for a detailed API. [http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6]
+See the specification for a detailed API. (http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html)[http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6]
 
 Constructor
 -----------------
