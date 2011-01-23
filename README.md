@@ -13,6 +13,40 @@ The official DataView API requires an ArrayBuffer as a data source, the wrapper 
 
 Licence: [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/)
 
+API
+===
+See the specification for a detailed API. http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6
+
+Constructor
+-----------------
+* new **cDataView**(buffer, offset, length)
+    * buffer can be either a String or an ArrayBuffer
+
+Specification API
+-------------------------
+The wrapper satisfies all the specification getters.
+* **getInt8**(byteOffset)
+* **getUint8**(byteOffset)
+* **getInt16**(byteOffset, littleEndian)
+* **getUint16**(byteOffset, littleEndian)
+* **getInt32**(byteOffset, littleEndian)
+* **getUint32**(byteOffset, littleEndian)
+* **getFloat32**(byteOffset, littleEndian)
+* **getFloat64**(byteOffset, littleEndian)
+
+
+Extended Specification
+---------------------------------
+The byteOffset parameter is optional. If you omit it, it will read right after the latest read offset. You can interact with the internal pointer with those two functions.
+* **seek**(byteOffset)
+    * Moves the internal pointer to the position
+* **tell**()
+   * Returns the current position
+
+Added getChar and getString utilities.
+* **getChar**(byteOffset)
+* **getString**(byteOffset, length)
+
 Shortcomings
 ==========
 * Only the Read API is being wrapped, cDataView does not provide any set method.
