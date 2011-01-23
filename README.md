@@ -1,5 +1,10 @@
-[jsDataView](http://blog.vjeux.com/) - Wrapper for DataView API
+[jDataView](http://blog.vjeux.com/) - A unique way to read a binary file in the browser.
 ================================
+
+jDataView provides a standard way to read binary files in all the browsers. It follows the DataView standard and even extends it for a more practical use. The best available option is being used under the hood.
+
+Explanation
+=========
 
 There are three ways to read a binary file from the browser.
 
@@ -11,12 +16,7 @@ The default implemented way to read data from an array buffer is to use a **Type
 
 The best way to read binary data is through a **DataView**. It is a view around your buffer that can read arbitrary data types through well named functions: getUint32, getFloat64 ...
 
-
 As of end of January 2011, the string way works on all browsers but Internet Explorer. Firefox 4 and Chrome 7 have Typed Arrays and only Chrome 9 has DataViews.
-
-The wrapper provides the DataView API to all the existing browsers. It uses the latest available way to read from the source. It even adds handy helpers to make the API easier to use.
-
-Licence: [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/)
 
 API
 ===
@@ -24,7 +24,7 @@ See the specification for a detailed API. [http://www.khronos.org/registry/webgl
 
 Constructor
 -----------------
-* new **cDataView**(buffer, offset, length)
+* new **jDataView**(buffer, offset, length)
     * buffer can be either a String or an ArrayBuffer
 
 Specification API
@@ -62,13 +62,13 @@ Addition of createBuffer, a utility to easily create buffers with the latest ava
 Shortcomings
 ==========
 
-* Only the Read API is being wrapped, cDataView does not provide any set method.
+* Only the Read API is being wrapped, jDataView does not provide any set method.
 * The Float64 implementation on strings does not have full precision.
 
 Example
 ======
 First we need a file. Either you get it through XHR or use the createBuffer utility.
-	var file = cDataView.createBuffer(
+	var file = jDataView.createBuffer(
 		0x10, 0x01, 0x00, 0x00, // Int32 - 272
 		0x90, 0xcf, 0x1b, 0x47, // Float32 - 39887.5625
 		0, 0, 0, 0, 0, 0, 0, 0, // 8 blank bytes
@@ -76,13 +76,13 @@ First we need a file. Either you get it through XHR or use the createBuffer util
 		0x61                    // Char - a
 	);
 
-Now we use the DataView as defined in the specification, the only thing that changes is the c before cDataView.
-    var view = new cDataView(file);
+Now we use the DataView as defined in the specification, the only thing that changes is the c before jDataView.
+    var view = new jDataView(file);
     var version = view.getInt32(0); // 272
     var float = view.getFloat32(4); // 39887.5625
 
 The wrapper extends the specification to make the DataView easier to use.
-    var view = new cDataView(file);
+    var view = new jDataView(file);
     // A position counter is managed. Remove the argument to read right after the last read.
     version = view.getInt32(); // 272
     float = view.getFloat32(); // 39887.5625
@@ -93,3 +93,5 @@ The wrapper extends the specification to make the DataView easier to use.
     // Two helpers: getChar and getString will make your life easier
     var tag = view.getString(undefined, 4); // MD20
     var char = view.getChar(); // a
+
+Licence: [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/)
