@@ -1,4 +1,13 @@
 
+//
+// jDataView by Vjeux - Jan 2010
+//
+// A unique way to read a binary file in the browser
+// http://github.com/vjeux/jsDataView
+// http://blog.vjeux.com/ <vjeuxx@gmail.com>
+// 
+
+
 (function () {
 
 var compatibility = {
@@ -6,7 +15,7 @@ var compatibility = {
 	DataView: typeof DataView !== 'undefined'
 }
 
-var cDataView = function (buffer, byteOffset, byteLength) {
+var jDataView = function (buffer, byteOffset, byteLength) {
 	this._buffer = buffer;
 
 	// Handle Type Errors
@@ -60,8 +69,20 @@ var cDataView = function (buffer, byteOffset, byteLength) {
 	this._length = byteLength;
 };
 
+jDataView.createBuffer = function () {
+	if (typeof ArrayBuffer !== 'undefined') {
+		var buffer = new ArrayBuffer(arguments.length);
+		var view = new Int8Array(buffer);
+		for (var i = 0; i < arguments.length; ++i) {
+			view[i] = arguments[i];
+		}
+		return buffer;
+	}
 
-cDataView.prototype = {
+	return String.fromCharCode.apply(null, arguments);
+};
+
+jDataView.prototype = {
 
 	// Helpers
 
@@ -105,7 +126,7 @@ cDataView.prototype = {
 			var byteOffset = this._offset;
 		}
 
-		if (this._isDataView) {
+		if (this._isArrayBuffer) {
 			// Use Int8Array and String.fromCharCode to extract a string
 			value = String.fromCharCode(this.getUint8(byteOffset));
 		} else {
@@ -216,7 +237,11 @@ cDataView.prototype = {
 	},
 
 	_getUint8: function (offset) {
-		return this._buffer.charCodeAt(offset) & 0xff;
+		if (this._isArrayBuffer) {
+			return new Int8Array(this._buffer, offset, 1)[0];
+		} else {
+			return this._buffer.charCodeAt(offset) & 0xff;
+		}
 	}
 };
 
@@ -239,7 +264,7 @@ for (var type in dataTypes) {
 		var size = dataTypes[type];
 
 		// Create the function
-		cDataView.prototype['get' + type] = 
+		jDataView.prototype['get' + type] = 
 			function (byteOffset, littleEndian) {
 				var value;
 
@@ -250,9 +275,13 @@ for (var type in dataTypes) {
 
 				// Dispatch on the good method
 				if (this._isDataView) {
+					// DataView: we use the direct method
 					value = this._view['get' + type](byteOffset, littleEndian);
 				}
-				else {
+				// ArrayBuffer: we use a typed array of size 1 if the alignment is good
+				else if (this._isArrayBuffer && byteOffset % size == 0) {
+					value = new window[type + 'Array'](this._buffer, byteOffset, 1)[0];
+				} else {
 					// Error Checking
 					if (typeof byteOffset !== 'number') {
 						throw new TypeError("Type error");
@@ -272,6 +301,6 @@ for (var type in dataTypes) {
 	})(type);
 }
 
-window.cDataView = cDataView;
+window.jDataView = jDataView;
 
 })();
