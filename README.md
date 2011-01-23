@@ -1,7 +1,7 @@
 [jDataView](http://blog.vjeux.com/) - A unique way to read a binary file in the browser.
 ================================
 
-jDataView provides a standard way to read binary files in all the browsers. It follows the DataView standard and even extends it for a more practical use. The best available option is being used under the hood.
+jDataView provides a standard way to read binary files in all the browsers. It follows the [DataView Specification](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6) and even extends it for a more practical use.
 
 Explanation
 =========
