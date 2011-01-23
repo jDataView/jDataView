@@ -15,7 +15,7 @@ Licence: [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/
 
 API
 ===
-See the specification for a detailed API. http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6
+See the specification for a detailed API. [http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6]
 
 Constructor
 -----------------
@@ -46,11 +46,13 @@ The byteOffset parameter is optional. If you omit it, it will read right after t
     * Returns the current position
 
 Added getChar and getString utilities.
+
 * **getChar**(byteOffset)
 * **getString**(byteOffset, length)
 
 Shortcomings
 ==========
+
 * Only the Read API is being wrapped, cDataView does not provide any set method.
 * The Float64 implementation on strings does not have full precision.
 
