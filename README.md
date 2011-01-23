@@ -25,6 +25,7 @@ Constructor
 Specification API
 -------------------------
 The wrapper satisfies all the specification getters.
+
 * **getInt8**(byteOffset)
 * **getUint8**(byteOffset)
 * **getInt16**(byteOffset, littleEndian)
@@ -38,10 +39,11 @@ The wrapper satisfies all the specification getters.
 Extended Specification
 ---------------------------------
 The byteOffset parameter is optional. If you omit it, it will read right after the latest read offset. You can interact with the internal pointer with those two functions.
+
 * **seek**(byteOffset)
     * Moves the internal pointer to the position
 * **tell**()
-   * Returns the current position
+    * Returns the current position
 
 Added getChar and getString utilities.
 * **getChar**(byteOffset)
