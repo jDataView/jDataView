@@ -8,15 +8,15 @@ Explanation
 
 There are three ways to read a binary file from the browser.
 
-The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a string, and you have to rewrite all the decoding functions (getUint16, getFloat32, ...).
+The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a **String**, and you have to rewrite all the decoding functions (getUint16, getFloat32, ...).
 
-Then WebGL came with [Typed Arrays](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6) and the file is now stored as an **ArrayBuffer*. 
+Then WebGL came with [Typed Arrays](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6) and the file is now stored as an **ArrayBuffer**. 
 
-The default implemented way to read data from an array buffer is to use a **Typed Array**(Int32Array, Float64Array, ...). If your file contains many different data types, it is not handy to use as you have to create many arrays around your buffer. Also, it imposes the data to be aligned.
+**TypedArray**(Int32Array, Float64Array, ...) is the default implemented way to read data from an ArrayBuffer. If your file contains many different data types, it is not handy to use as you have to create many arrays around your buffer. Also, it can't read non-aligned data.
 
 The best way to read binary data is through a **DataView**. It is a view around your buffer that can read arbitrary data types through well named functions: getUint32, getFloat64 ...
 
-As of end of January 2011, the string way works on all browsers but Internet Explorer. Firefox 4 and Chrome 7 have Typed Arrays and only Chrome 9 has DataViews.
+As of end of January 2011, the string way works on all browsers but Internet Explorer. Firefox 4 and Chrome 7 have Typed Arrays and only Chrome 9 has DataViews. jDataView provides the DataView interface, under the hood it uses the best possible available option between Strings, TypedArrays and DataViews.
 
 API
 ===
