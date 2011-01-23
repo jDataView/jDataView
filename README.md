@@ -13,6 +13,14 @@ The official DataView API requires an ArrayBuffer as a data source, the wrapper 
 
 Licence: [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/)
 
+Shortcomings
+==========
+* Only the Read API is being wrapped, cDataView does not provide any set method.
+* The Float64 implementation on strings does not have full precision.
+
+Example
+======
+
 	var file = cDataView.createBinaryStream(
 		0x10, 0x01, 0x00, 0x00, // Int32 - 272
 		0x90, 0xcf, 0x1b, 0x47, // Float32 - 39887.5625
