@@ -10,7 +10,7 @@ There are three ways to read a binary file from the browser.
 
 * The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a **String**, and you have to rewrite all the decoding functions (getUint16, getFloat32, ...). All the browsers support this.
 
-* Then browsers that implemented WebGL also added **ArrayBuffers**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. Also, it can't read non-aligned data. It is supported by Firefox 4 and Chrome 7.
+* Then browsers that implemented WebGL also added **ArrayBuffers**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. It has big drawback, it can't read non-aligned data. It is supported by Firefox 4 and Chrome 7.
 
 * A new revision of the specification added **DataViews**. It is a view around your buffer that can read arbitrary data types directly through functions: getUint32, getFloat64 ... Only Chrome 9 supports it.
 
