@@ -66,7 +66,7 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 		}
 	}
 	this._offset = 0;
-	this._length = byteLength;
+	this.length = byteLength;
 };
 
 jDataView.createBuffer = function () {
@@ -86,7 +86,7 @@ jDataView.prototype = {
 
 	// Helpers
 
-	getString: function (byteOffset, length) {
+	getString: function (length, byteOffset) {
 		var value;
 
 		// Handle the lack of byteOffset
@@ -98,7 +98,7 @@ jDataView.prototype = {
 		if (typeof byteOffset !== 'number') {
 			throw new TypeError("Type error");
 		}
-		if (length < 0 || byteOffset + length >= this._length) {
+		if (length < 0 || byteOffset + length >= this.length) {
 			throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
 		}
 
@@ -134,7 +134,7 @@ jDataView.prototype = {
 			if (typeof byteOffset !== 'number') {
 				throw new TypeError("Type error");
 			}
-			if (length < 0 || byteOffset + size >= this._length) {
+			if (length < 0 || byteOffset + size >= this.length) {
 				throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
 			}
 
@@ -153,7 +153,7 @@ jDataView.prototype = {
 		if (typeof byteOffset !== 'number') {
 			throw new TypeError("Type error");
 		}
-		if (byteOffset < 0 || byteOffset >= this._length) {
+		if (byteOffset < 0 || byteOffset >= this.length) {
 			throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
 		}
 
@@ -286,7 +286,7 @@ for (var type in dataTypes) {
 					if (typeof byteOffset !== 'number') {
 						throw new TypeError("Type error");
 					}
-					if (byteOffset + size >= this._length) {
+					if (byteOffset + size >= this.length) {
 						throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
 					}
 
