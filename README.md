@@ -95,11 +95,9 @@ The wrapper extends the specification to make the DataView easier to use.
 Demos
 ==== 
 
-A simple tar viewer. It is a demo of how easy it is to use the library.
-http://fooo.fr/~vjeux/github/jsDataView/demo/untar/untar.html
+* A <a href="http://fooo.fr/~vjeux/github/jsDataView/demo/untar/untar.html">simple tar viewer</a>. It is a "Hello World" demo of how easy it is to use the library.
 
-
-A <a href="http://fooo.fr/~vjeux/github/jsWoWModelViewer/modelviewer.html">World of Warcraft Model Viewer</a>. It uses jDataView to read the binary file and then WebGL to display it.
+* A <a href="http://fooo.fr/~vjeux/github/jsWoWModelViewer/modelviewer.html">World of Warcraft Model Viewer</a>. It uses jDataView to read the binary file and then WebGL to display it.
 <a href="http://fooo.fr/~vjeux/github/jsWoWModelViewer/modelviewer.html"><img src="http://fooo.fr/~vjeux/github/jsWoWModelViewer/images/modelviewer.png"></a>
 
 
