@@ -51,7 +51,7 @@ The byteOffset parameter is now optional. If you omit it, it will read right aft
 Addition of getChar and getString utilities.
 
 * **getChar**(byteOffset)
-* **getString**(byteOffset, length)
+* **getString**(length, byteOffset)
 
 Addition of createBuffer, a utility to easily create buffers with the latest available storage type (String or ArrayBuffer).
 
@@ -89,11 +89,15 @@ The wrapper extends the specification to make the DataView easier to use.
     view.seek(view.tell() + 8);
 
     // Two helpers: getChar and getString will make your life easier
-    var tag = view.getString(undefined, 4); // MD20
+    var tag = view.getString(4); // MD20
     var char = view.getChar(); // a
 
 Demos
 ==== 
+
+A simple tar viewer. It is a demo of how easy it is to use the library.
+http://fooo.fr/~vjeux/github/jsDataView/demo/untar/untar.html
+
 
 A <a href="http://fooo.fr/~vjeux/github/jsWoWModelViewer/modelviewer.html">World of Warcraft Model Viewer</a>. It uses jDataView to read the binary file and then WebGL to display it.
 <a href="http://fooo.fr/~vjeux/github/jsWoWModelViewer/modelviewer.html"><img src="http://fooo.fr/~vjeux/github/jsWoWModelViewer/images/modelviewer.png"></a>
