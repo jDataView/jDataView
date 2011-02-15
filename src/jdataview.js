@@ -205,8 +205,8 @@ jDataView.prototype = {
 		return sign * (1 + mantissa * Math.pow(2, -23)) * Math.pow(2, exponent);
 	},
 
-	_getInt32: function (offset) {
-		var b = this._getUint8(offset);
+	_getInt32: function (offset, littleEndian) {
+		var b = this._getUint32(offset, littleEndian);
 		return b > Math.pow(2, 31) - 1 ? b - Math.pow(2, 32) : b;
 	},
 
@@ -289,7 +289,6 @@ for (var type in dataTypes) {
 					if (byteOffset + size > this.length) {
 						throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
 					}
-
 					value = this['_get' + type](this._start + byteOffset, littleEndian);
 				}
 
