@@ -220,7 +220,7 @@ jDataView.prototype = {
 	},
 
 	_getInt16: function (offset) {
-		var b = this._getUint8(offset);
+		var b = this._getUint16(offset);
 		return b > Math.pow(2, 15) - 1 ? b - Math.pow(2, 16) : b;
 	},
 
@@ -238,7 +238,7 @@ jDataView.prototype = {
 
 	_getUint8: function (offset) {
 		if (this._isArrayBuffer) {
-			return new Int8Array(this._buffer, offset, 1)[0];
+			return new Uint8Array(this._buffer, offset, 1)[0];
 		} else {
 			return this._buffer.charCodeAt(offset) & 0xff;
 		}
@@ -279,9 +279,11 @@ for (var type in dataTypes) {
 					value = this._view['get' + type](byteOffset, littleEndian);
 				}
 				// ArrayBuffer: we use a typed array of size 1 if the alignment is good
-				else if (this._isArrayBuffer && byteOffset % size == 0) {
+				// ArrayBuffer does not support endianess flag (for size > 1)
+				else if (this._isArrayBuffer && byteOffset % size == 0 && (size == 1 || littleEndian)) {
 					value = new window[type + 'Array'](this._buffer, byteOffset, 1)[0];
-				} else {
+				}
+				else {
 					// Error Checking
 					if (typeof byteOffset !== 'number') {
 						throw new TypeError("Type error");
