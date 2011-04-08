@@ -106,8 +106,12 @@ You can use a <a href="http://blog.vjeux.com/2011/javascript/jquery-binary-ajax.
         var tag = view.getString(4); // 'MD20'
         var version = view.getUint32(); // 732
       },
-  'binary'
-);
+      'binary'
+    );
+
+Changelog
+========
+* **8 April 2011**: Added littleEndian argument on the constructor. Opera 11.50 does not fully implement DataView, improved check.
 
 Demos
 ==== 
