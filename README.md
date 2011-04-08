@@ -65,7 +65,7 @@ Addition of createBuffer, a utility to easily create buffers with the latest ava
 Shortcomings
 ==========
 
-* Only the Read API is being wrapped, jDataView does not provide any set method.
+* Only the Read API is being wrapped, jDataView does not provide any `set` method.
 * The Float64 implementation on strings does not have full precision.
 * I found that most files we want to read are in littleEndian due to x86 architecture. I changed the default behavior of getters to be littleEndian instead of bigEndian.
 
@@ -80,7 +80,7 @@ First we need a file. Either you get it through XHR or use the createBuffer util
 		0x61                    // Char - a
 	);
 
-Now we use the DataView as defined in the specification, the only thing that changes is the c before jDataView.
+Now we use the DataView as defined in the specification, the only thing that changes is the j before jDataView.
     var view = new jDataView(file);
     var version = view.getInt32(0); // 272
     var float = view.getFloat32(4); // 39887.5625
