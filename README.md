@@ -1,4 +1,4 @@
-[jDataView](http://blog.vjeux.com/) - A unique way to read a binary file in the browser.
+<a href="http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html">jDataView</a> - A unique way to read a binary file in the browser.
 ================================
 
 jDataView provides a standard way to read binary files in all the browsers. It follows the [DataView Specification](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6) and even extends it for a more practical use.
@@ -22,8 +22,9 @@ See the specification for a detailed API. [http://www.khronos.org/registry/webgl
 
 Constructor
 -----------------
-* new **jDataView**(buffer, offset, length)
+* new **jDataView**(buffer, offset, length, littleEndian=true)
     * buffer can be either a String or an ArrayBuffer
+    * littleEndian is a default value for the view
 
 Specification API
 -------------------------
@@ -41,6 +42,10 @@ The wrapper satisfies all the specification getters.
 
 Extended Specification
 ---------------------------------
+Addition of a littleEndian argument to the constructor. It will be the default value of the getters if their littleEndian value is undefined.
+
+* **jDataView**(buffer, offset, length, littleEndian=true)
+
 The byteOffset parameter is now optional. If you omit it, it will read right after the latest read offset. You can interact with the internal pointer with those two functions.
 
 * **seek**(byteOffset)
@@ -62,6 +67,7 @@ Shortcomings
 
 * Only the Read API is being wrapped, jDataView does not provide any set method.
 * The Float64 implementation on strings does not have full precision.
+* I found that most files we want to read are in littleEndian due to x86 architecture. I changed the default behavior of getters to be littleEndian instead of bigEndian.
 
 Example
 ======
@@ -92,6 +98,17 @@ The wrapper extends the specification to make the DataView easier to use.
     var tag = view.getString(4); // MD20
     var char = view.getChar(); // a
 
+You can use a <a href="http://blog.vjeux.com/2011/javascript/jquery-binary-ajax.html">patched version of jQuery</a> that supports ArrayBuffer for AJAX.
+    $.get(
+      'data.bin',
+      function (data) {
+        var view = new jDataView(data);
+        var tag = view.getString(4); // 'MD20'
+        var version = view.getUint32(); // 732
+      },
+  'binary'
+);
+
 Demos
 ==== 
 
@@ -100,6 +117,8 @@ Demos
 * A <a href="http://fooo.fr/~vjeux/github/jsWoWModelViewer/modelviewer.html">World of Warcraft Model Viewer</a>. It uses jDataView to read the binary file and then WebGL to display it.
 <a href="http://fooo.fr/~vjeux/github/jsWoWModelViewer/modelviewer.html"><img src="http://fooo.fr/~vjeux/github/jsWoWModelViewer/images/modelviewer.png"></a>
 
+* A <a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/">PhotoSynth WebGL Viewer</a> by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
+<a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/"><a href="http://www.visual-experiments.com/blog/wp-content/uploads/2011/04/WebGLPhotosynthViewer-1024x576.jpg"></a>
 
 Please tell me if you made something with jDataView :)
 
