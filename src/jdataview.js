@@ -198,7 +198,7 @@ jDataView.prototype = {
 			b3 = this._getUint8(this._endianness(offset, 3, 4, littleEndian)),
 
 			sign = 1 - (2 * (b0 >> 7)),
-			exponent = (((b0 << 1) & 0xff) | (b1 >> 7)) - 128,
+			exponent = (((b0 << 1) & 0xff) | (b1 >> 7)) - 127,
 			mantissa = ((b1 & 0x7f) << 16) | (b2 << 8) | b3;
 
 		if (mantissa == 0 && exponent == -127)
