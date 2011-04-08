@@ -118,7 +118,7 @@ Demos
 <a href="http://fooo.fr/~vjeux/github/jsWoWModelViewer/modelviewer.html"><img src="http://fooo.fr/~vjeux/github/jsWoWModelViewer/images/modelviewer.png"></a>
 
 * A <a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/">PhotoSynth WebGL Viewer</a> by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
-<a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/"><img src="http://www.visual-experiments.com/blog/wp-content/uploads/2011/04/WebGLPhotosynthViewer-1024x576.jpg"/></a>
+<a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/"><img src="http://i.imgur.com/HRHXo.jpg"/></a>
 
 Please tell me if you made something with jDataView :)
 
