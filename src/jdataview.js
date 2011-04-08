@@ -185,8 +185,13 @@ jDataView.prototype = {
 			mantissa = ((b1 & 0x0f) * Math.pow(2, 48)) + (b2 * Math.pow(2, 40)) + (b3 * Math.pow(2, 32))
 					+ (b4 * Math.pow(2, 24)) + (b5 * Math.pow(2, 16)) + (b6 * Math.pow(2, 8)) + b7;
 
-		if (mantissa == 0 && exponent == -(Math.pow(2, 10) - 1))
+		if (mantissa == 0 && exponent == -(Math.pow(2, 10) - 1)) {
 			return 0.0;
+		}
+
+		if (exponent == -1023) { // Denormalized
+			return sign * mantissa * Math.pow(2, -1022 - 52);
+		}
 
 		return sign * (1 + mantissa * Math.pow(2, -52)) * Math.pow(2, exponent);
 	},
@@ -201,8 +206,13 @@ jDataView.prototype = {
 			exponent = (((b0 << 1) & 0xff) | (b1 >> 7)) - 127,
 			mantissa = ((b1 & 0x7f) << 16) | (b2 << 8) | b3;
 
-		if (mantissa == 0 && exponent == -127)
+		if (mantissa == 0 && exponent == -127) {
 			return 0.0;
+		}
+
+		if (exponent == -127) { // Denormalized
+			return sign * mantissa * Math.pow(2, -126 - 23);
+		}
 
 		return sign * (1 + mantissa * Math.pow(2, -23)) * Math.pow(2, exponent);
 	},
