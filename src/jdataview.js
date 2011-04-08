@@ -12,10 +12,10 @@
 
 var compatibility = {
 	ArrayBuffer: typeof ArrayBuffer !== 'undefined',
-	DataView: typeof DataView !== 'undefined'
+	DataView: typeof DataView !== 'undefined' && 'getFloat64' in DataView.prototype
 }
 
-var jDataView = function (buffer, byteOffset, byteLength) {
+var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	this._buffer = buffer;
 
 	// Handle Type Errors
@@ -29,6 +29,8 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 	this._isDataView = compatibility.DataView && this._isArrayBuffer;
 
 	// Default Values
+	this._littleEndian = littleEndian === undefined ? true : littleEndian;
+
 	var bufferLength = this._isArrayBuffer ? buffer.byteLength : buffer.length;
 	if (byteOffset == undefined) {
 		byteOffset = 0;
@@ -196,7 +198,7 @@ jDataView.prototype = {
 			b3 = this._getUint8(this._endianness(offset, 3, 4, littleEndian)),
 
 			sign = 1 - (2 * (b0 >> 7)),
-			exponent = (((b0 << 1) & 0xff) | (b1 >> 7)) - 127,
+			exponent = (((b0 << 1) & 0xff) | (b1 >> 7)) - 128,
 			mantissa = ((b1 & 0x7f) << 16) | (b2 << 8) | b3;
 
 		if (mantissa == 0 && exponent == -127)
@@ -268,9 +270,14 @@ for (var type in dataTypes) {
 			function (byteOffset, littleEndian) {
 				var value;
 
+				// Handle the lack of endianness
+				if (littleEndian == undefined) {
+					littleEndian = this._littleEndian;
+				}
+
 				// Handle the lack of byteOffset
 				if (byteOffset === undefined) {
-					var byteOffset = this._offset;
+					byteOffset = this._offset;
 				}
 
 				// Dispatch on the good method
