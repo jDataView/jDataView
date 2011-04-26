@@ -228,7 +228,7 @@ jDataView.prototype = {
 			b1 = this._getUint8(this._endianness(offset, 2, 4, littleEndian)),
 			b0 = this._getUint8(this._endianness(offset, 3, 4, littleEndian));
 
-		return (b3 << 24) + (b2 << 16) + (b1 << 8) + b0;
+		return (b3 * Math.pow(2, 24)) + (b2 << 16) + (b1 << 8) + b0;
 	},
 
 	_getInt16: function (offset) {
