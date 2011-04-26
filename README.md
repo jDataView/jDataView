@@ -72,49 +72,53 @@ Shortcomings
 Example
 ======
 First we need a file. Either you get it through XHR or use the createBuffer utility.
+
 ```javascript
-	var file = jDataView.createBuffer(
-		0x10, 0x01, 0x00, 0x00, // Int32 - 272
-		0x90, 0xcf, 0x1b, 0x47, // Float32 - 39887.5625
-		0, 0, 0, 0, 0, 0, 0, 0, // 8 blank bytes
-		0x4d, 0x44, 0x32, 0x30, // String - MD20
-		0x61                    // Char - a
-	);
+var file = jDataView.createBuffer(
+	0x10, 0x01, 0x00, 0x00, // Int32 - 272
+	0x90, 0xcf, 0x1b, 0x47, // Float32 - 39887.5625
+	0, 0, 0, 0, 0, 0, 0, 0, // 8 blank bytes
+	0x4d, 0x44, 0x32, 0x30, // String - MD20
+	0x61                    // Char - a
+);
 ```
 
 Now we use the DataView as defined in the specification, the only thing that changes is the j before jDataView.
+
 ```javascript
-    var view = new jDataView(file);
-    var version = view.getInt32(0); // 272
-    var float = view.getFloat32(4); // 39887.5625
+var view = new jDataView(file);
+var version = view.getInt32(0); // 272
+var float = view.getFloat32(4); // 39887.5625
 ```
 
 The wrapper extends the specification to make the DataView easier to use.
+
 ```javascript
-    var view = new jDataView(file);
-    // A position counter is managed. Remove the argument to read right after the last read.
-    version = view.getInt32(); // 272
-    float = view.getFloat32(); // 39887.5625
+var view = new jDataView(file);
+// A position counter is managed. Remove the argument to read right after the last read.
+version = view.getInt32(); // 272
+float = view.getFloat32(); // 39887.5625
 
-    // You can move around with tell() and seek()
-    view.seek(view.tell() + 8);
+// You can move around with tell() and seek()
+view.seek(view.tell() + 8);
 
-    // Two helpers: getChar and getString will make your life easier
-    var tag = view.getString(4); // MD20
-    var char = view.getChar(); // a
+// Two helpers: getChar and getString will make your life easier
+var tag = view.getString(4); // MD20
+var char = view.getChar(); // a
 ```
 
 You can use a <a href="http://blog.vjeux.com/2011/javascript/jquery-binary-ajax.html">patched version of jQuery</a> that supports ArrayBuffer for AJAX.
+
 ```javascript
-    $.get(
-      'data.bin',
-      function (data) {
-        var view = new jDataView(data);
-        var tag = view.getString(4); // 'MD20'
-        var version = view.getUint32(); // 732
-      },
-      'binary'
-    );
+$.get(
+  'data.bin',
+  function (data) {
+    var view = new jDataView(data);
+    var tag = view.getString(4); // 'MD20'
+    var version = view.getUint32(); // 732
+  },
+  'binary'
+);
 ```
 
 Changelog
