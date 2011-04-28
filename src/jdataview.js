@@ -155,7 +155,7 @@ jDataView.prototype = {
 		if (typeof byteOffset !== 'number') {
 			throw new TypeError("Type error");
 		}
-		if (byteOffset < 0 || byteOffset + 1 > this.length) {
+		if (byteOffset < 0 || byteOffset > this.length) {
 			throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
 		}
 
