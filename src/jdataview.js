@@ -61,12 +61,11 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		this._view = new DataView(buffer, byteOffset, byteLength);
 		this._start = 0;
 	}
-	else {
-		this._start = byteOffset;
-		if (this._end >= bufferLength) {
-			throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
-		}
+	this._start = byteOffset;
+	if (this._end >= bufferLength) {
+		throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
 	}
+
 	this._offset = 0;
 	this.length = byteLength;
 };
@@ -106,7 +105,7 @@ jDataView.prototype = {
 
 		if (this._isArrayBuffer) {
 			// Use Int8Array and String.fromCharCode to extract a string
-			var int8array = new Int8Array(this._buffer, byteOffset, length);
+			var int8array = new Int8Array(this._buffer, this._start + byteOffset, length);
 			var stringarray = [];
 			for (var i = 0; i < length; ++i) {
 				stringarray[i] = int8array[i];
@@ -250,9 +249,9 @@ jDataView.prototype = {
 
 	_getUint8: function (offset) {
 		if (this._isArrayBuffer) {
-			return new Uint8Array(this._buffer, offset, 1)[0];
+			return new Uint8Array(this._buffer, this._start + offset, 1)[0];
 		} else {
-			return this._buffer.charCodeAt(offset) & 0xff;
+			return this._buffer.charCodeAt(this._start + offset) & 0xff;
 		}
 	}
 };
