@@ -62,7 +62,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		this._start = 0;
 	}
 	this._start = byteOffset;
-	if (this._end >= bufferLength) {
+	if (byteOffset >= bufferLength) {
 		throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
 	}
 
