@@ -62,7 +62,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		this._start = 0;
 	}
 	this._start = byteOffset;
-	if (this._end >= bufferLength) {
+	if (byteOffset >= bufferLength) {
 		throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
 	}
 
@@ -92,7 +92,7 @@ jDataView.prototype = {
 
 		// Handle the lack of byteOffset
 		if (byteOffset === undefined) {
-			var byteOffset = this._offset;
+			byteOffset = this._offset;
 		}
 
 		// Error Checking
@@ -124,7 +124,7 @@ jDataView.prototype = {
 
 		// Handle the lack of byteOffset
 		if (byteOffset === undefined) {
-			var byteOffset = this._offset;
+			byteOffset = this._offset;
 		}
 
 		if (this._isArrayBuffer) {
@@ -135,7 +135,7 @@ jDataView.prototype = {
 			if (typeof byteOffset !== 'number') {
 				throw new TypeError("Type error");
 			}
-			if (length < 0 || byteOffset + size > this.length) {
+			if (byteOffset + size > this.length) {
 				throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
 			}
 
