@@ -92,7 +92,7 @@ jDataView.prototype = {
 
 		// Handle the lack of byteOffset
 		if (byteOffset === undefined) {
-			var byteOffset = this._offset;
+			byteOffset = this._offset;
 		}
 
 		// Error Checking
@@ -124,7 +124,7 @@ jDataView.prototype = {
 
 		// Handle the lack of byteOffset
 		if (byteOffset === undefined) {
-			var byteOffset = this._offset;
+			byteOffset = this._offset;
 		}
 
 		if (this._isArrayBuffer) {
