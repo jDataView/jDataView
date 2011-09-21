@@ -1,4 +1,3 @@
-
 //
 // jDataView by Vjeux - Jan 2010
 //
@@ -230,8 +229,8 @@ jDataView.prototype = {
 		return (b3 * Math.pow(2, 24)) + (b2 << 16) + (b1 << 8) + b0;
 	},
 
-	_getInt16: function (offset) {
-		var b = this._getUint16(offset);
+	_getInt16: function (offset, littleEndian) {
+		var b = this._getUint16(offset, littleEndian);
 		return b > Math.pow(2, 15) - 1 ? b - Math.pow(2, 16) : b;
 	},
 
