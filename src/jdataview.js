@@ -128,7 +128,7 @@ jDataView.prototype = {
 
 		if (this._isArrayBuffer) {
 			// Use Int8Array and String.fromCharCode to extract a string
-			value = String.fromCharCode(this.getUint8(byteOffset));
+			value = String.fromCharCode(this._getUint8(byteOffset));
 		} else {
 			// Error Checking
 			if (typeof byteOffset !== 'number') {
