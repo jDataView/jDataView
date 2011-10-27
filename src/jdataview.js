@@ -12,14 +12,14 @@
 var compatibility = {
 	ArrayBuffer: typeof ArrayBuffer !== 'undefined',
 	DataView: typeof DataView !== 'undefined' && 'getFloat64' in DataView.prototype
-}
+};
 
 var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	this._buffer = buffer;
 
 	// Handle Type Errors
 	if (!(compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) &&
-		!(typeof buffer === 'string')) {
+		typeof buffer !== 'string') {
 		throw new TypeError("Type error");
 	}
 
@@ -31,7 +31,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	this._littleEndian = littleEndian === undefined ? true : littleEndian;
 
 	var bufferLength = this._isArrayBuffer ? buffer.byteLength : buffer.length;
-	if (byteOffset == undefined) {
+	if (byteOffset === undefined) {
 		byteOffset = 0;
 	}
 
@@ -180,10 +180,10 @@ jDataView.prototype = {
 			exponent = ((((b0 << 1) & 0xff) << 3) | (b1 >> 4)) - (Math.pow(2, 10) - 1),
 
 		// Binary operators such as | and << operate on 32 bit values, using + and Math.pow(2) instead
-			mantissa = ((b1 & 0x0f) * Math.pow(2, 48)) + (b2 * Math.pow(2, 40)) + (b3 * Math.pow(2, 32))
-					+ (b4 * Math.pow(2, 24)) + (b5 * Math.pow(2, 16)) + (b6 * Math.pow(2, 8)) + b7;
+			mantissa = ((b1 & 0x0f) * Math.pow(2, 48)) + (b2 * Math.pow(2, 40)) + (b3 * Math.pow(2, 32)) +
+					(b4 * Math.pow(2, 24)) + (b5 * Math.pow(2, 16)) + (b6 * Math.pow(2, 8)) + b7;
 
-		if (mantissa == 0 && exponent == -(Math.pow(2, 10) - 1)) {
+		if (mantissa === 0 && exponent == -(Math.pow(2, 10) - 1)) {
 			return 0.0;
 		}
 
@@ -204,7 +204,7 @@ jDataView.prototype = {
 			exponent = (((b0 << 1) & 0xff) | (b1 >> 7)) - 127,
 			mantissa = ((b1 & 0x7f) << 16) | (b2 << 8) | b3;
 
-		if (mantissa == 0 && exponent == -127) {
+		if (mantissa === 0 && exponent == -127) {
 			return 0.0;
 		}
 
@@ -279,7 +279,7 @@ for (var type in dataTypes) {
 				var value;
 
 				// Handle the lack of endianness
-				if (littleEndian == undefined) {
+				if (littleEndian === undefined) {
 					littleEndian = this._littleEndian;
 				}
 
@@ -295,7 +295,7 @@ for (var type in dataTypes) {
 				}
 				// ArrayBuffer: we use a typed array of size 1 if the alignment is good
 				// ArrayBuffer does not support endianess flag (for size > 1)
-				else if (this._isArrayBuffer && byteOffset % size == 0 && (size == 1 || littleEndian)) {
+				else if (this._isArrayBuffer && byteOffset % size === 0 && (size == 1 || littleEndian)) {
 					value = new self[type + 'Array'](this._buffer, byteOffset, 1)[0];
 				}
 				else {
