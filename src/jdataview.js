@@ -4,23 +4,23 @@
 // A unique way to read a binary file in the browser
 // http://github.com/vjeux/jsDataView
 // http://blog.vjeux.com/ <vjeuxx@gmail.com>
-// 
+//
 
 
-(function () {
+(function() {
 
 var compatibility = {
 	ArrayBuffer: typeof ArrayBuffer !== 'undefined',
 	DataView: typeof DataView !== 'undefined' && 'getFloat64' in DataView.prototype
-}
+};
 
-var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
+var jDataView = function(buffer, byteOffset, byteLength, littleEndian) {
 	this._buffer = buffer;
 
 	// Handle Type Errors
 	if (!(compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) &&
-		!(typeof buffer === 'string')) {
-		throw new TypeError("Type error");
+		typeof buffer !== 'string') {
+		throw new TypeError('Type error');
 	}
 
 	// Check parameters and existing functionnalities
@@ -31,7 +31,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	this._littleEndian = littleEndian === undefined ? true : littleEndian;
 
 	var bufferLength = this._isArrayBuffer ? buffer.byteLength : buffer.length;
-	if (byteOffset == undefined) {
+	if (byteOffset === undefined) {
 		byteOffset = 0;
 	}
 
@@ -42,16 +42,16 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	if (!this._isDataView) {
 		// Do additional checks to simulate DataView
 		if (typeof byteOffset !== 'number') {
-			throw new TypeError("Type error");
+			throw new TypeError('Type error');
 		}
 		if (typeof byteLength !== 'number') {
-			throw new TypeError("Type error");
+			throw new TypeError('Type error');
 		}
 		if (typeof byteOffset < 0) {
-			throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
+			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 		}
 		if (typeof byteLength < 0) {
-			throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
+			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 		}
 	}
 
@@ -62,14 +62,14 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	}
 	this._start = byteOffset;
 	if (byteOffset >= bufferLength) {
-		throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
+		throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 	}
 
 	this._offset = 0;
 	this.length = byteLength;
 };
 
-jDataView.createBuffer = function () {
+jDataView.createBuffer = function() {
 	if (typeof ArrayBuffer !== 'undefined') {
 		var buffer = new ArrayBuffer(arguments.length);
 		var view = new Int8Array(buffer);
@@ -86,7 +86,7 @@ jDataView.prototype = {
 
 	// Helpers
 
-	getString: function (length, byteOffset) {
+	getString: function(length, byteOffset) {
 		var value;
 
 		// Handle the lack of byteOffset
@@ -96,10 +96,10 @@ jDataView.prototype = {
 
 		// Error Checking
 		if (typeof byteOffset !== 'number') {
-			throw new TypeError("Type error");
+			throw new TypeError('Type error');
 		}
 		if (length < 0 || byteOffset + length > this.length) {
-			throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
+			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 		}
 
 		if (this._isArrayBuffer) {
@@ -118,7 +118,7 @@ jDataView.prototype = {
 		return value;
 	},
 
-	getChar: function (byteOffset) {
+	getChar: function(byteOffset) {
 		var value, size = 1;
 
 		// Handle the lack of byteOffset
@@ -128,14 +128,14 @@ jDataView.prototype = {
 
 		if (this._isArrayBuffer) {
 			// Use Int8Array and String.fromCharCode to extract a string
-			value = String.fromCharCode(this.getUint8(byteOffset));
+			value = String.fromCharCode(this._getUint8(byteOffset));
 		} else {
 			// Error Checking
 			if (typeof byteOffset !== 'number') {
-				throw new TypeError("Type error");
+				throw new TypeError('Type error');
 			}
 			if (byteOffset + size > this.length) {
-				throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
+				throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 			}
 
 			value = this._buffer.charAt(this._start + byteOffset);
@@ -145,16 +145,16 @@ jDataView.prototype = {
 		return value;
 	},
 
-	tell: function () {
+	tell: function() {
 		return this._offset;
 	},
-	
-	seek: function (byteOffset) {
+
+	seek: function(byteOffset) {
 		if (typeof byteOffset !== 'number') {
-			throw new TypeError("Type error");
+			throw new TypeError('Type error');
 		}
 		if (byteOffset < 0 || byteOffset > this.length) {
-			throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
+			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 		}
 
 		this._offset = byteOffset;
@@ -162,11 +162,11 @@ jDataView.prototype = {
 
 	// Compatibility functions on a String Buffer
 
-	_endianness: function (offset, pos, max, littleEndian) {
+	_endianness: function(offset, pos, max, littleEndian) {
 		return offset + (littleEndian ? max - pos - 1 : pos);
 	},
 
-	_getFloat64: function (offset, littleEndian) {
+	_getFloat64: function(offset, littleEndian) {
 		var b0 = this._getUint8(this._endianness(offset, 0, 8, littleEndian)),
 			b1 = this._getUint8(this._endianness(offset, 1, 8, littleEndian)),
 			b2 = this._getUint8(this._endianness(offset, 2, 8, littleEndian)),
@@ -180,10 +180,10 @@ jDataView.prototype = {
 			exponent = ((((b0 << 1) & 0xff) << 3) | (b1 >> 4)) - (Math.pow(2, 10) - 1),
 
 		// Binary operators such as | and << operate on 32 bit values, using + and Math.pow(2) instead
-			mantissa = ((b1 & 0x0f) * Math.pow(2, 48)) + (b2 * Math.pow(2, 40)) + (b3 * Math.pow(2, 32))
-					+ (b4 * Math.pow(2, 24)) + (b5 * Math.pow(2, 16)) + (b6 * Math.pow(2, 8)) + b7;
+			mantissa = ((b1 & 0x0f) * Math.pow(2, 48)) + (b2 * Math.pow(2, 40)) + (b3 * Math.pow(2, 32)) +
+					(b4 * Math.pow(2, 24)) + (b5 * Math.pow(2, 16)) + (b6 * Math.pow(2, 8)) + b7;
 
-		if (mantissa == 0 && exponent == -(Math.pow(2, 10) - 1)) {
+		if (mantissa === 0 && exponent == -(Math.pow(2, 10) - 1)) {
 			return 0.0;
 		}
 
@@ -194,7 +194,7 @@ jDataView.prototype = {
 		return sign * (1 + mantissa * Math.pow(2, -52)) * Math.pow(2, exponent);
 	},
 
-	_getFloat32: function (offset, littleEndian) {
+	_getFloat32: function(offset, littleEndian) {
 		var b0 = this._getUint8(this._endianness(offset, 0, 4, littleEndian)),
 			b1 = this._getUint8(this._endianness(offset, 1, 4, littleEndian)),
 			b2 = this._getUint8(this._endianness(offset, 2, 4, littleEndian)),
@@ -204,7 +204,7 @@ jDataView.prototype = {
 			exponent = (((b0 << 1) & 0xff) | (b1 >> 7)) - 127,
 			mantissa = ((b1 & 0x7f) << 16) | (b2 << 8) | b3;
 
-		if (mantissa == 0 && exponent == -127) {
+		if (mantissa === 0 && exponent == -127) {
 			return 0.0;
 		}
 
@@ -215,12 +215,12 @@ jDataView.prototype = {
 		return sign * (1 + mantissa * Math.pow(2, -23)) * Math.pow(2, exponent);
 	},
 
-	_getInt32: function (offset, littleEndian) {
+	_getInt32: function(offset, littleEndian) {
 		var b = this._getUint32(offset, littleEndian);
 		return b > Math.pow(2, 31) - 1 ? b - Math.pow(2, 32) : b;
 	},
 
-	_getUint32: function (offset, littleEndian) {
+	_getUint32: function(offset, littleEndian) {
 		var b3 = this._getUint8(this._endianness(offset, 0, 4, littleEndian)),
 			b2 = this._getUint8(this._endianness(offset, 1, 4, littleEndian)),
 			b1 = this._getUint8(this._endianness(offset, 2, 4, littleEndian)),
@@ -229,24 +229,24 @@ jDataView.prototype = {
 		return (b3 * Math.pow(2, 24)) + (b2 << 16) + (b1 << 8) + b0;
 	},
 
-	_getInt16: function (offset, littleEndian) {
+	_getInt16: function(offset, littleEndian) {
 		var b = this._getUint16(offset, littleEndian);
 		return b > Math.pow(2, 15) - 1 ? b - Math.pow(2, 16) : b;
 	},
 
-	_getUint16: function (offset, littleEndian) {
+	_getUint16: function(offset, littleEndian) {
 		var b1 = this._getUint8(this._endianness(offset, 0, 2, littleEndian)),
 			b0 = this._getUint8(this._endianness(offset, 1, 2, littleEndian));
 
 		return (b1 << 8) + b0;
 	},
 
-	_getInt8: function (offset) {
+	_getInt8: function(offset) {
 		var b = this._getUint8(offset);
 		return b > Math.pow(2, 7) - 1 ? b - Math.pow(2, 8) : b;
 	},
 
-	_getUint8: function (offset) {
+	_getUint8: function(offset) {
 		if (this._isArrayBuffer) {
 			return new Uint8Array(this._buffer, this._start + offset, 1)[0];
 		} else {
@@ -270,16 +270,16 @@ var dataTypes = {
 
 for (var type in dataTypes) {
 	// Bind the variable type
-	(function (type) {
+	(function(type) {
 		var size = dataTypes[type];
 
 		// Create the function
-		jDataView.prototype['get' + type] = 
-			function (byteOffset, littleEndian) {
+		jDataView.prototype['get' + type] =
+			function(byteOffset, littleEndian) {
 				var value;
 
 				// Handle the lack of endianness
-				if (littleEndian == undefined) {
+				if (littleEndian === undefined) {
 					littleEndian = this._littleEndian;
 				}
 
@@ -295,16 +295,16 @@ for (var type in dataTypes) {
 				}
 				// ArrayBuffer: we use a typed array of size 1 if the alignment is good
 				// ArrayBuffer does not support endianess flag (for size > 1)
-				else if (this._isArrayBuffer && byteOffset % size == 0 && (size == 1 || littleEndian)) {
+				else if (this._isArrayBuffer && byteOffset % size === 0 && (size == 1 || littleEndian)) {
 					value = new self[type + 'Array'](this._buffer, byteOffset, 1)[0];
 				}
 				else {
 					// Error Checking
 					if (typeof byteOffset !== 'number') {
-						throw new TypeError("Type error");
+						throw new TypeError('Type error');
 					}
 					if (byteOffset + size > this.length) {
-						throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
+						throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 					}
 					value = this['_get' + type](this._start + byteOffset, littleEndian);
 				}
