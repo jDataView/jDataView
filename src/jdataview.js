@@ -1,4 +1,3 @@
-
 //
 // jDataView by Vjeux - Jan 2010
 //
@@ -61,12 +60,11 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		this._view = new DataView(buffer, byteOffset, byteLength);
 		this._start = 0;
 	}
-	else {
-		this._start = byteOffset;
-		if (this._end >= bufferLength) {
-			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
-		}
+	this._start = byteOffset;
+	if (byteOffset >= bufferLength) {
+		throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
 	}
+
 	this._offset = 0;
 	this.length = byteLength;
 };
@@ -106,7 +104,7 @@ jDataView.prototype = {
 
 		if (this._isArrayBuffer) {
 			// Use Int8Array and String.fromCharCode to extract a string
-			var int8array = new Int8Array(this._buffer, byteOffset, length);
+			var int8array = new Int8Array(this._buffer, this._start + byteOffset, length);
 			var stringarray = [];
 			for (var i = 0; i < length; ++i) {
 				stringarray[i] = int8array[i];
@@ -231,8 +229,8 @@ jDataView.prototype = {
 		return (b3 * Math.pow(2, 24)) + (b2 << 16) + (b1 << 8) + b0;
 	},
 
-	_getInt16: function (offset) {
-		var b = this._getUint16(offset);
+	_getInt16: function (offset, littleEndian) {
+		var b = this._getUint16(offset, littleEndian);
 		return b > Math.pow(2, 15) - 1 ? b - Math.pow(2, 16) : b;
 	},
 
@@ -250,9 +248,9 @@ jDataView.prototype = {
 
 	_getUint8: function (offset) {
 		if (this._isArrayBuffer) {
-			return new Uint8Array(this._buffer, offset, 1)[0];
+			return new Uint8Array(this._buffer, this._start + offset, 1)[0];
 		} else {
-			return this._buffer.charCodeAt(offset) & 0xff;
+			return this._buffer.charCodeAt(this._start + offset) & 0xff;
 		}
 	}
 };
@@ -302,7 +300,7 @@ for (var type in dataTypes) {
 				// ArrayBuffer: we use a typed array of size 1 if the alignment is good
 				// ArrayBuffer does not support endianess flag (for size > 1)
 				else if (this._isArrayBuffer && byteOffset % size === 0 && (size === 1 || littleEndian)) {
-					value = new window[type + 'Array'](this._buffer, byteOffset, 1)[0];
+					value = new self[type + 'Array'](this._buffer, byteOffset, 1)[0];
 				}
 				else {
 					// Error Checking
@@ -323,7 +321,7 @@ for (var type in dataTypes) {
 	})(type);
 }
 
-window.jDataView = jDataView;
+self.jDataView = jDataView;
 
 if (typeof jQuery !== 'undefined' && jQuery.fn.jquery >= "1.6.2") {
 	jQuery.ajaxSetup({
@@ -363,4 +361,3 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.jquery >= "1.6.2") {
 }
 
 })();
-

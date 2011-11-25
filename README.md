@@ -123,6 +123,8 @@ $.get(
 
 Changelog
 ========
+* **21 September 2011**: Added a missing ```littleEndian``` argument on getInt16.
+* **28 April 2011**: Seeking to the end of file no longer throws an error.
 * **26 April 2011**: Fixed a bug with extremely large unsigned 32bit being considered as signed. ([Solution](http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string/2954435#2954435)). 
 * **8 April 2011**: Added littleEndian argument on the constructor. Opera 11.50 does not fully implement DataView, improved check.
 
