@@ -15,7 +15,7 @@ var compatibility = {
 };
 
 var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
-	this._buffer = buffer;
+	this.buffer = buffer;
 
 	// Handle Type Errors
 	if (!(compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) &&
@@ -34,10 +34,12 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	if (byteOffset === undefined) {
 		byteOffset = 0;
 	}
+	this.byteOffset = byteOffset;
 
 	if (byteLength === undefined) {
 		byteLength = bufferLength - byteOffset;
 	}
+	this.byteLength = byteLength;
 
 	if (!this._isDataView) {
 		// Do additional checks to simulate DataView
@@ -66,11 +68,10 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	}
 
 	this._offset = 0;
-	this.length = byteLength;
 };
 
 jDataView.createBuffer = function () {
-	if (typeof ArrayBuffer !== 'undefined') {
+	if (compatibility.ArrayBuffer) {
 		var buffer = new ArrayBuffer(arguments.length);
 		var view = new Int8Array(buffer);
 		for (var i = 0; i < arguments.length; ++i) {
@@ -98,20 +99,20 @@ jDataView.prototype = {
 		if (typeof byteOffset !== 'number') {
 			throw new TypeError('Type error');
 		}
-		if (length < 0 || byteOffset + length > this.length) {
+		if (length < 0 || byteOffset + length > this.byteLength) {
 			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 		}
 
 		if (this._isArrayBuffer) {
 			// Use Int8Array and String.fromCharCode to extract a string
-			var int8array = new Int8Array(this._buffer, this._start + byteOffset, length);
+			var int8array = new Int8Array(this.buffer, this._start + byteOffset, length);
 			var stringarray = [];
 			for (var i = 0; i < length; ++i) {
 				stringarray[i] = int8array[i];
 			}
 			value = String.fromCharCode.apply(null, stringarray);
 		} else {
-			value = this._buffer.substr(this._start + byteOffset, length);
+			value = this.buffer.substr(this._start + byteOffset, length);
 		}
 
 		this._offset = byteOffset + length;
@@ -134,11 +135,11 @@ jDataView.prototype = {
 			if (typeof byteOffset !== 'number') {
 				throw new TypeError('Type error');
 			}
-			if (length < 0 || byteOffset + size > this.length) {
+			if (length < 0 || byteOffset + size > this.byteLength) {
 				throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 			}
 
-			value = this._buffer.charAt(this._start + byteOffset);
+			value = this.buffer.charAt(this._start + byteOffset);
 			this._offset = byteOffset + size;
 		}
 
@@ -153,7 +154,7 @@ jDataView.prototype = {
 		if (typeof byteOffset !== 'number') {
 			throw new TypeError('Type error');
 		}
-		if (byteOffset < 0 || byteOffset > this.length) {
+		if (byteOffset < 0 || byteOffset > this.byteLength) {
 			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 		}
 
@@ -183,8 +184,12 @@ jDataView.prototype = {
 			mantissa = ((b1 & 0x0f) * Math.pow(2, 48)) + (b2 * Math.pow(2, 40)) + (b3 * Math.pow(2, 32)) +
 						(b4 * Math.pow(2, 24)) + (b5 * Math.pow(2, 16)) + (b6 * Math.pow(2, 8)) + b7;
 
-		if (mantissa === 0 && exponent === -(Math.pow(2, 10) - 1)) {
-			return 0.0;
+		if (exponent === 1024) {
+			if (mantissa !== 0) {
+				return NaN;
+			} else {
+				return sign * Infinity;
+			}
 		}
 
 		if (exponent === -1023) { // Denormalized
@@ -204,8 +209,12 @@ jDataView.prototype = {
 			exponent = (((b0 << 1) & 0xff) | (b1 >> 7)) - 127,
 			mantissa = ((b1 & 0x7f) << 16) | (b2 << 8) | b3;
 
-		if (mantissa === 0 && exponent === -127) {
-			return 0.0;
+		if (exponent === 128) {
+			if (mantissa !== 0) {
+				return NaN;
+			} else {
+				return sign * Infinity;
+			}
 		}
 
 		if (exponent === -127) { // Denormalized
@@ -248,9 +257,9 @@ jDataView.prototype = {
 
 	_getUint8: function (offset) {
 		if (this._isArrayBuffer) {
-			return new Uint8Array(this._buffer, this._start + offset, 1)[0];
+			return new Uint8Array(this.buffer, this._start + offset, 1)[0];
 		} else {
-			return this._buffer.charCodeAt(this._start + offset) & 0xff;
+			return this.buffer.charCodeAt(this._start + offset) & 0xff;
 		}
 	}
 };
@@ -300,14 +309,14 @@ for (var type in dataTypes) {
 				// ArrayBuffer: we use a typed array of size 1 if the alignment is good
 				// ArrayBuffer does not support endianess flag (for size > 1)
 				else if (this._isArrayBuffer && byteOffset % size === 0 && (size === 1 || littleEndian)) {
-					value = new self[type + 'Array'](this._buffer, byteOffset, 1)[0];
+					value = new self[type + 'Array'](this.buffer, byteOffset, 1)[0];
 				}
 				else {
 					// Error Checking
 					if (typeof byteOffset !== 'number') {
 						throw new TypeError('Type error');
 					}
-					if (byteOffset + size > this.length) {
+					if (byteOffset + size > this.byteLength) {
 						throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 					}
 					value = this['_get' + type](this._start + byteOffset, littleEndian);
