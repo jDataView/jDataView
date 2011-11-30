@@ -63,13 +63,13 @@ function chr (x) {
 }
 
 test('Char', function () {
-	equal(view.getChar(0), chr(255));
-	equal(view.getChar(1), chr(254));
-	equal(view.getChar(2), chr(253));
-	equal(view.getChar(3), chr(252));
-	equal(view.getChar(4), chr(250));
+	equal(view.getChar(0), chr(65533));
+	equal(view.getChar(1), chr(65533));
+	equal(view.getChar(2), chr(65533));
+	equal(view.getChar(3), chr(65533));
+	equal(view.getChar(4), chr(65533));
 	equal(view.getChar(5), chr(0));
-	equal(view.getChar(6), chr(186));
+	equal(view.getChar(6), chr(65533));
 	equal(view.getChar(7), chr(1));
 });
 

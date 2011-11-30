@@ -147,30 +147,7 @@ jDataView.prototype = {
 	},
 
 	getChar: function (byteOffset) {
-		var value, size = 1;
-
-		// Handle the lack of byteOffset
-		if (byteOffset === undefined) {
-			byteOffset = this._offset;
-		}
-
-		if (this._isArrayBuffer || this._isNodeBuffer) {
-			// Use Int8Array and String.fromCharCode to extract a string
-			value = String.fromCharCode(this.getUint8(byteOffset));
-		} else {
-			// Error Checking
-			if (typeof byteOffset !== 'number') {
-				throw new TypeError('Type error');
-			}
-			if (byteOffset + size > this.byteLength) {
-				throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
-			}
-
-			value = this.buffer.charAt(this._start + byteOffset);
-			this._offset = byteOffset + size;
-		}
-
-		return value;
+		return this.getString(1, byteOffset);
 	},
 
 	tell: function () {
