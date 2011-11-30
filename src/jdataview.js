@@ -2,23 +2,37 @@
 // jDataView by Vjeux - Jan 2010
 //
 // A unique way to read a binary file in the browser
-// http://github.com/vjeux/jsDataView
+// http://github.com/vjeux/jDataView
 // http://blog.vjeux.com/ <vjeuxx@gmail.com>
 //
 
-
 (function () {
+
+var all;
+if (typeof self !== 'undefined') {
+	all = self;
+} else if (typeof window !== 'undefined') {
+	all = window;
+} else if (typeof global !== 'undefined') {
+	all = global;
+}
 
 var compatibility = {
 	ArrayBuffer: typeof ArrayBuffer !== 'undefined',
-	DataView: typeof DataView !== 'undefined' && 'getFloat64' in DataView.prototype
+	DataView: typeof DataView !== 'undefined' && 'getFloat64' in DataView.prototype,
+	NodeBuffer: typeof Buffer !== 'undefined',
+// 0.6.0 -> readInt8LE(offset)
+	NodeBufferFull: typeof Buffer !== 'undefined' && 'readInt8LE' in Buffer,
+// 0.5.0 -> readInt8(offset, endian)
+	NodeBufferEndian: typeof Buffer !== 'undefined' && 'readInt8' in Buffer
 };
 
 var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	this.buffer = buffer;
 
 	// Handle Type Errors
-	if (!(compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) &&
+	if (!(compatibility.NodeBuffer && buffer instanceof Buffer) &&
+		!(compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) &&
 		typeof buffer !== 'string') {
 		throw new TypeError('Type error');
 	}
@@ -26,6 +40,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	// Check parameters and existing functionnalities
 	this._isArrayBuffer = compatibility.ArrayBuffer && buffer instanceof ArrayBuffer;
 	this._isDataView = compatibility.DataView && this._isArrayBuffer;
+	this._isNodeBuffer = compatibility.NodeBuffer && buffer instanceof Buffer;
 
 	// Default Values
 	this._littleEndian = littleEndian === undefined ? true : littleEndian;
@@ -71,6 +86,13 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 };
 
 jDataView.createBuffer = function () {
+	if (compatibility.NodeBuffer) {
+		var buffer = new Buffer(arguments.length);
+		for (var i = 0; i < arguments.length; ++i) {
+			buffer[i] = arguments[i];
+		}
+		return buffer;
+	}
 	if (compatibility.ArrayBuffer) {
 		var buffer = new ArrayBuffer(arguments.length);
 		var view = new Int8Array(buffer);
@@ -103,7 +125,10 @@ jDataView.prototype = {
 			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 		}
 
-		if (this._isArrayBuffer) {
+		if (this._isNodeBuffer) {
+			value = this.buffer.toString('ascii', byteOffset, byteOffset + length);
+		}
+		else if (this._isArrayBuffer) {
 			// Use Int8Array and String.fromCharCode to extract a string
 			var int8array = new Int8Array(this.buffer, this._start + byteOffset, length);
 			var stringarray = [];
@@ -139,7 +164,11 @@ jDataView.prototype = {
 				throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 			}
 
-			value = this.buffer.charAt(this._start + byteOffset);
+			if (this._isNodeBuffer) {
+				value = this.buffer.toString('ascii', byteOffset, byteOffset + 1);
+			} else {
+				value = this.buffer.charAt(this._start + byteOffset);
+			}
 			this._offset = byteOffset + size;
 		}
 
@@ -258,6 +287,9 @@ jDataView.prototype = {
 	_getUint8: function (offset) {
 		if (this._isArrayBuffer) {
 			return new Uint8Array(this.buffer, this._start + offset, 1)[0];
+		}
+		else if (this._isNodeBuffer) {
+			return this.buffer[offset];
 		} else {
 			return this.buffer.charCodeAt(this._start + offset) & 0xff;
 		}
@@ -275,6 +307,16 @@ var dataTypes = {
 	'Uint32': 4,
 	'Float32': 4,
 	'Float64': 8
+};
+var nodeNaming = {
+	'Int8': 'Int8',
+	'Int16': 'Int16',
+	'Int32': 'Int32',
+	'Uint8': 'UInt8',
+	'Uint16': 'UInt16',
+	'Uint32': 'UInt32',
+	'Float32': 'Float',
+	'Float64': 'Double'
 };
 
 for (var type in dataTypes) {
@@ -309,7 +351,17 @@ for (var type in dataTypes) {
 				// ArrayBuffer: we use a typed array of size 1 if the alignment is good
 				// ArrayBuffer does not support endianess flag (for size > 1)
 				else if (this._isArrayBuffer && byteOffset % size === 0 && (size === 1 || littleEndian)) {
-					value = new self[type + 'Array'](this.buffer, byteOffset, 1)[0];
+					value = new all[type + 'Array'](this.buffer, byteOffset, 1)[0];
+				}
+				// NodeJS Buffer
+				else if (this._isNodeBuffer && compatibility.NodeBufferFull) {
+					if (littleEndian) {
+						value = this.buffer['read' + nodeNaming[type] + 'LE'](byteOffset);
+					} else {
+						value = this.buffer['read' + nodeNaming[type] + 'BE'](byteOffset);
+					}
+				} else if (this._isNodeBuffer && compatibility.NodeBufferEndian) {
+					value = this.buffer['read' + nodeNaming[type]](byteOffset, littleEndian);
 				}
 				else {
 					// Error Checking
@@ -330,7 +382,12 @@ for (var type in dataTypes) {
 	})(type);
 }
 
-self.jDataView = jDataView;
+// Browser + Web Worker
+all.jDataView = jDataView;
+// NodeJS + NPM
+if (typeof module !== 'undefined') {
+	module.exports = jDataView;
+}
 
 if (typeof jQuery !== 'undefined' && jQuery.fn.jquery >= "1.6.2") {
 	jQuery.ajaxSetup({
