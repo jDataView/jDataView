@@ -130,16 +130,14 @@ jDataView.prototype = {
 		}
 
 		if (this._isNodeBuffer) {
-			value = this.buffer.toString('ascii', byteOffset, byteOffset + length);
+			value = this.buffer.toString('ascii', this._start + byteOffset, this._start + byteOffset + length);
 		}
 		else if (this._isArrayBuffer) {
-			// Use Int8Array and String.fromCharCode to extract a string
-			var int8array = new Int8Array(this.buffer, this._start + byteOffset, length);
-			var stringarray = [];
+			value = '';
 			for (var i = 0; i < length; ++i) {
-				stringarray[i] = int8array[i];
+				var char = this.getUint8(byteOffset + i);
+				value += String.fromCharCode(char > 127 ? 65533 : char);
 			}
-			value = String.fromCharCode.apply(null, stringarray);
 		} else {
 			value = this.buffer.substr(this._start + byteOffset, length);
 		}
@@ -156,7 +154,7 @@ jDataView.prototype = {
 			byteOffset = this._offset;
 		}
 
-		if (this._isArrayBuffer) {
+		if (this._isArrayBuffer || this._isNodeBuffer) {
 			// Use Int8Array and String.fromCharCode to extract a string
 			value = String.fromCharCode(this.getUint8(byteOffset));
 		} else {
@@ -164,15 +162,11 @@ jDataView.prototype = {
 			if (typeof byteOffset !== 'number') {
 				throw new TypeError('Type error');
 			}
-			if (length < 0 || byteOffset + size > this.byteLength) {
+			if (byteOffset + size > this.byteLength) {
 				throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 			}
 
-			if (this._isNodeBuffer) {
-				value = this.buffer.toString('ascii', byteOffset, byteOffset + 1);
-			} else {
-				value = this.buffer.charAt(this._start + byteOffset);
-			}
+			value = this.buffer.charAt(this._start + byteOffset);
 			this._offset = byteOffset + size;
 		}
 
