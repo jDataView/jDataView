@@ -66,7 +66,6 @@ Shortcomings
 ==========
 
 * Only the Read API is being wrapped, jDataView does not provide any `set` method.
-* The Float64 implementation on strings does not have full precision.
 * I found that most files we want to read are in littleEndian due to x86 architecture. I changed the default behavior of getters to be littleEndian instead of bigEndian.
 
 Example
@@ -123,10 +122,11 @@ $.get(
 
 Changelog
 ========
-* **21 September 2011**: Added a missing ```littleEndian``` argument on getInt16.
-* **28 April 2011**: Seeking to the end of file no longer throws an error.
-* **26 April 2011**: Fixed a bug with extremely large unsigned 32bit being considered as signed. ([Solution](http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string/2954435#2954435)). 
-* **8 April 2011**: Added littleEndian argument on the constructor. Opera 11.50 does not fully implement DataView, improved check.
+* **November 29 2011**: Added support for NaN and Infinity in the float shim. Added ```buffer```, ```byteLength``` and ```byteOffset``` attributes.
+* **September 21 2011**: Added a missing ```littleEndian``` argument on getInt16.
+* **April 28 2011**: Seeking to the end of file no longer throws an error.
+* **April 26 2011**: Fixed a bug with extremely large unsigned 32bit being considered as signed. ([Solution](http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string/2954435#2954435)). 
+* **April 8 2011**: Added littleEndian argument on the constructor. Opera 11.50 does not fully implement DataView, improved check.
 
 Demos
 ==== 
