@@ -28,6 +28,10 @@ var compatibility = {
 };
 
 var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
+	if (!(this instanceof arguments.callee)) {
+		throw new Error("Constructor may not be called as a function");
+	}
+
 	this.buffer = buffer;
 
 	// Handle Type Errors
@@ -78,7 +82,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		this._start = 0;
 	}
 	this._start = byteOffset;
-	if (byteOffset >= bufferLength) {
+	if (byteOffset + byteLength > bufferLength) {
 		throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
 	}
 
@@ -192,19 +196,19 @@ jDataView.prototype = {
 
 	// Compatibility functions on a String Buffer
 
-	_endianness: function (offset, pos, max, littleEndian) {
-		return offset + (littleEndian ? max - pos - 1 : pos);
+	_endianness: function (byteOffset, pos, max, littleEndian) {
+		return byteOffset + (littleEndian ? max - pos - 1 : pos);
 	},
 
-	_getFloat64: function (offset, littleEndian) {
-		var b0 = this._getUint8(this._endianness(offset, 0, 8, littleEndian)),
-			b1 = this._getUint8(this._endianness(offset, 1, 8, littleEndian)),
-			b2 = this._getUint8(this._endianness(offset, 2, 8, littleEndian)),
-			b3 = this._getUint8(this._endianness(offset, 3, 8, littleEndian)),
-			b4 = this._getUint8(this._endianness(offset, 4, 8, littleEndian)),
-			b5 = this._getUint8(this._endianness(offset, 5, 8, littleEndian)),
-			b6 = this._getUint8(this._endianness(offset, 6, 8, littleEndian)),
-			b7 = this._getUint8(this._endianness(offset, 7, 8, littleEndian)),
+	_getFloat64: function (byteOffset, littleEndian) {
+		var b0 = this._getUint8(this._endianness(byteOffset, 0, 8, littleEndian)),
+			b1 = this._getUint8(this._endianness(byteOffset, 1, 8, littleEndian)),
+			b2 = this._getUint8(this._endianness(byteOffset, 2, 8, littleEndian)),
+			b3 = this._getUint8(this._endianness(byteOffset, 3, 8, littleEndian)),
+			b4 = this._getUint8(this._endianness(byteOffset, 4, 8, littleEndian)),
+			b5 = this._getUint8(this._endianness(byteOffset, 5, 8, littleEndian)),
+			b6 = this._getUint8(this._endianness(byteOffset, 6, 8, littleEndian)),
+			b7 = this._getUint8(this._endianness(byteOffset, 7, 8, littleEndian)),
 
 			sign = 1 - (2 * (b0 >> 7)),
 			exponent = ((((b0 << 1) & 0xff) << 3) | (b1 >> 4)) - (Math.pow(2, 10) - 1),
@@ -228,11 +232,11 @@ jDataView.prototype = {
 		return sign * (1 + mantissa * Math.pow(2, -52)) * Math.pow(2, exponent);
 	},
 
-	_getFloat32: function (offset, littleEndian) {
-		var b0 = this._getUint8(this._endianness(offset, 0, 4, littleEndian)),
-			b1 = this._getUint8(this._endianness(offset, 1, 4, littleEndian)),
-			b2 = this._getUint8(this._endianness(offset, 2, 4, littleEndian)),
-			b3 = this._getUint8(this._endianness(offset, 3, 4, littleEndian)),
+	_getFloat32: function (byteOffset, littleEndian) {
+		var b0 = this._getUint8(this._endianness(byteOffset, 0, 4, littleEndian)),
+			b1 = this._getUint8(this._endianness(byteOffset, 1, 4, littleEndian)),
+			b2 = this._getUint8(this._endianness(byteOffset, 2, 4, littleEndian)),
+			b3 = this._getUint8(this._endianness(byteOffset, 3, 4, littleEndian)),
 
 			sign = 1 - (2 * (b0 >> 7)),
 			exponent = (((b0 << 1) & 0xff) | (b1 >> 7)) - 127,
@@ -253,45 +257,45 @@ jDataView.prototype = {
 		return sign * (1 + mantissa * Math.pow(2, -23)) * Math.pow(2, exponent);
 	},
 
-	_getInt32: function (offset, littleEndian) {
-		var b = this._getUint32(offset, littleEndian);
+	_getInt32: function (byteOffset, littleEndian) {
+		var b = this._getUint32(byteOffset, littleEndian);
 		return b > Math.pow(2, 31) - 1 ? b - Math.pow(2, 32) : b;
 	},
 
-	_getUint32: function (offset, littleEndian) {
-		var b3 = this._getUint8(this._endianness(offset, 0, 4, littleEndian)),
-			b2 = this._getUint8(this._endianness(offset, 1, 4, littleEndian)),
-			b1 = this._getUint8(this._endianness(offset, 2, 4, littleEndian)),
-			b0 = this._getUint8(this._endianness(offset, 3, 4, littleEndian));
+	_getUint32: function (byteOffset, littleEndian) {
+		var b3 = this._getUint8(this._endianness(byteOffset, 0, 4, littleEndian)),
+			b2 = this._getUint8(this._endianness(byteOffset, 1, 4, littleEndian)),
+			b1 = this._getUint8(this._endianness(byteOffset, 2, 4, littleEndian)),
+			b0 = this._getUint8(this._endianness(byteOffset, 3, 4, littleEndian));
 
 		return (b3 * Math.pow(2, 24)) + (b2 << 16) + (b1 << 8) + b0;
 	},
 
-	_getInt16: function (offset, littleEndian) {
-		var b = this._getUint16(offset, littleEndian);
+	_getInt16: function (byteOffset, littleEndian) {
+		var b = this._getUint16(byteOffset, littleEndian);
 		return b > Math.pow(2, 15) - 1 ? b - Math.pow(2, 16) : b;
 	},
 
-	_getUint16: function (offset, littleEndian) {
-		var b1 = this._getUint8(this._endianness(offset, 0, 2, littleEndian)),
-			b0 = this._getUint8(this._endianness(offset, 1, 2, littleEndian));
+	_getUint16: function (byteOffset, littleEndian) {
+		var b1 = this._getUint8(this._endianness(byteOffset, 0, 2, littleEndian)),
+			b0 = this._getUint8(this._endianness(byteOffset, 1, 2, littleEndian));
 
 		return (b1 << 8) + b0;
 	},
 
-	_getInt8: function (offset) {
-		var b = this._getUint8(offset);
+	_getInt8: function (byteOffset) {
+		var b = this._getUint8(byteOffset);
 		return b > Math.pow(2, 7) - 1 ? b - Math.pow(2, 8) : b;
 	},
 
-	_getUint8: function (offset) {
+	_getUint8: function (byteOffset) {
 		if (this._isArrayBuffer) {
-			return new Uint8Array(this.buffer, this._start + offset, 1)[0];
+			return new Uint8Array(this.buffer, byteOffset, 1)[0];
 		}
 		else if (this._isNodeBuffer) {
-			return this.buffer[offset];
+			return this.buffer[byteOffset];
 		} else {
-			return this.buffer.charCodeAt(this._start + offset) & 0xff;
+			return this.buffer.charCodeAt(byteOffset) & 0xff;
 		}
 	}
 };
@@ -350,18 +354,18 @@ for (var type in dataTypes) {
 				}
 				// ArrayBuffer: we use a typed array of size 1 if the alignment is good
 				// ArrayBuffer does not support endianess flag (for size > 1)
-				else if (this._isArrayBuffer && byteOffset % size === 0 && (size === 1 || littleEndian)) {
-					value = new all[type + 'Array'](this.buffer, byteOffset, 1)[0];
+				else if (this._isArrayBuffer && (this._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
+					value = new all[type + 'Array'](this.buffer, this._start + byteOffset, 1)[0];
 				}
 				// NodeJS Buffer
 				else if (this._isNodeBuffer && compatibility.NodeBufferFull) {
 					if (littleEndian) {
-						value = this.buffer['read' + nodeNaming[type] + 'LE'](byteOffset);
+						value = this.buffer['read' + nodeNaming[type] + 'LE'](this._start + byteOffset);
 					} else {
-						value = this.buffer['read' + nodeNaming[type] + 'BE'](byteOffset);
+						value = this.buffer['read' + nodeNaming[type] + 'BE'](this._start + byteOffset);
 					}
 				} else if (this._isNodeBuffer && compatibility.NodeBufferEndian) {
-					value = this.buffer['read' + nodeNaming[type]](byteOffset, littleEndian);
+					value = this.buffer['read' + nodeNaming[type]](this._start + byteOffset, littleEndian);
 				}
 				else {
 					// Error Checking
