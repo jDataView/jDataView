@@ -14,7 +14,11 @@ There are three ways to read a binary file from the browser.
 
 * A new revision of the specification added **DataViews**. It is a view around your buffer that can read arbitrary data types directly through functions: getUint32, getFloat64 ... Only Chrome 9 supports it.
 
-jDataView provides the DataView API for all the browsers using the best available option between Strings, TypedArrays and DataViews.
+And one way to read a binary file from the server.
+
+* **NodeJS Buffers**. They appeared in [Node 0.4.0](http://nodejs.org/docs/v0.4.0/api/buffers.html). [Node 0.5.0](http://nodejs.org/docs/v0.5.0/api/buffers.html) added a DataView-like API. And [Node 0.6.0](http://nodejs.org/docs/v0.6.0/api/buffers.html) changed the API naming convention.
+
+jDataView provides the DataView API using the best available option between Strings, TypedArrays, NodeJS Buffers and DataViews.
 
 API
 ===
