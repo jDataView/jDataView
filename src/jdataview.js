@@ -162,7 +162,7 @@ jDataView.prototype = {
 			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
 		}
 
-		this._offset = byteOffset;
+		return this._offset = byteOffset;
 	},
 
 	// Compatibility functions on a String Buffer
