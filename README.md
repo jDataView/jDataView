@@ -126,7 +126,11 @@ $.get(
 
 Changelog
 ========
-* **November 29 2011**: Added support for NaN and Infinity in the float shim. Added ```buffer```, ```byteLength``` and ```byteOffset``` attributes.
+* **November 30 2011**:
+  * Added NodeJS Buffer support + NPM Package.
+  * Added support for NaN and Infinity in the float shim.
+  * Added ```buffer```, ```byteLength``` and ```byteOffset``` attributes.
+  * Fixed bugs using non zero ```byteOffset` and added more bound checks.
 * **September 21 2011**: Added a missing ```littleEndian``` argument on getInt16.
 * **April 28 2011**: Seeking to the end of file no longer throws an error.
 * **April 26 2011**: Fixed a bug with extremely large unsigned 32bit being considered as signed. ([Solution](http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string/2954435#2954435)). 
