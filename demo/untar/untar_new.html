@@ -1,4 +1,4 @@
-<script src="../../jquery/jquery-1.4.4-binary-ajax.js"></script>
+<script src="../../jquery/jquery-1.7.1-binary-ajax.js"></script>
 <script src="../../src/jdataview.js"></script>
 
 <style>
@@ -7,10 +7,7 @@ textarea { width: 80%; height: 300px; }
 <p>Content of the file <a href="jquery.tar">jquery.tar</a></p>
 
 <script>
-function tar(data) {
-	// Make a view on the data
-	var view = new jDataView(data);
-
+function tar(view) {
 //	console.log(view.getUint32(0, true));
 //	console.log(view.getUint32(0, false));
 //	view.seek(0);
@@ -60,6 +57,6 @@ function tar(data) {
 }
 
 // Download the file
-$.get('jquery.tar', tar, 'binary');
+$.get('jquery.tar', tar, 'dataview');
 
 </script>
