@@ -115,12 +115,11 @@ You can use a <a href="http://blog.vjeux.com/2011/javascript/jquery-binary-ajax.
 ```javascript
 $.get(
   'data.bin',
-  function (data) {
-    var view = new jDataView(data);
+  function (view) {
     var tag = view.getString(4); // 'MD20'
     var version = view.getUint32(); // 732
   },
-  'binary'
+  'dataview'
 );
 ```
 
