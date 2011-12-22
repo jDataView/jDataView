@@ -1,6 +1,6 @@
 {
 	"name": "jDataView",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"description": "A unique way to read a binary file in the browser and the server.",
 	"keywords": ["buffer", "binary", "file", "read"],
 	"homepage": "http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html",

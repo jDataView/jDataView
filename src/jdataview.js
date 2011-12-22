@@ -6,16 +6,7 @@
 // http://blog.vjeux.com/ <vjeuxx@gmail.com>
 //
 
-(function () {
-
-var all;
-if (typeof self !== 'undefined') {
-	all = self;
-} else if (typeof window !== 'undefined') {
-	all = window;
-} else if (typeof global !== 'undefined') {
-	all = global;
-}
+(function (global) {
 
 var compatibility = {
 	ArrayBuffer: typeof ArrayBuffer !== 'undefined',
@@ -355,13 +346,6 @@ for (var type in dataTypes) {
 	})(type);
 }
 
-// Browser + Web Worker
-all.jDataView = jDataView;
-// NodeJS + NPM
-if (typeof module !== 'undefined') {
-	module.exports = jDataView;
-}
-
 if (typeof jQuery !== 'undefined' && jQuery.fn.jquery >= "1.6.2") {
 	var convertResponseBodyToText = function (byteArray) {
 		// http://jsperf.com/vbscript-binary-download/6
@@ -371,7 +355,7 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.jquery >= "1.6.2") {
 		} catch (e) {
 			// http://stackoverflow.com/questions/1919972/how-do-i-access-xhr-responsebody-for-binary-data-from-javascript-in-ie
 			// http://miskun.com/javascript/internet-explorer-and-binary-files-data-access/
-			var IEBinaryToArray_ByteStr_Script = 
+			var IEBinaryToArray_ByteStr_Script =
 				"Function IEBinaryToArray_ByteStr(Binary)\r\n"+
 				"	IEBinaryToArray_ByteStr = CStr(Binary)\r\n"+
 				"End Function\r\n"+
@@ -462,4 +446,6 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.jquery >= "1.6.2") {
 	});
 }
 
-})();
+global.jDataView = (global.module || {}).exports = jDataView;
+
+})(this);
