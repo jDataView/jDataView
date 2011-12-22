@@ -451,10 +451,13 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.jquery >= "1.6.2") {
 	});
 
 	jQuery.ajaxPrefilter('dataview', function(options, originalOptions, jqXHR) {
-		if (!options.hasOwnProperty('xhrFields')) {
-			options.xhrFields = {};
+		// trying to set the responseType on IE 6 causes an error
+		if (jQuery.support.ajaxResponseType) {
+			if (!options.hasOwnProperty('xhrFields')) {
+				options.xhrFields = {};
+			}
+			options.xhrFields.responseType = 'arraybuffer';
 		}
-		options.xhrFields.responseType = 'arraybuffer';
 		options.mimeType = 'text/plain; charset=x-user-defined';
 	});
 }
