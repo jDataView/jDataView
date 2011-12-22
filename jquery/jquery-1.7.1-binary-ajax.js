@@ -8039,6 +8039,7 @@ jQuery.ajaxSettings.xhr = window.ActiveXObject ?
 (function( xhr ) {
 	jQuery.extend( jQuery.support, {
 		ajax: !!xhr,
+		ajaxResponseType: !!xhr && ( "responseType" in xhr ),
 		cors: !!xhr && ( "withCredentials" in xhr )
 	});
 })( jQuery.ajaxSettings.xhr() );
