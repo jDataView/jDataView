@@ -1,9 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
 <script src="../../jquery/jquery-1.7.1-binary-ajax.js"></script>
 <script src="../../src/jdataview.js"></script>
+<script src="json.js"></script>
 
 <style>
 textarea { width: 80%; height: 300px; }
 </style>
+</head>
+
+<body>
 <p>Content of the file <a href="jquery.tar">jquery.tar</a></p>
 
 <script>
@@ -60,3 +67,5 @@ function tar(view) {
 $.get('jquery.tar', tar, 'dataview');
 
 </script>
+</body>
+</html>
