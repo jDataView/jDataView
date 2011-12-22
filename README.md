@@ -125,6 +125,7 @@ $.get(
 
 Changelog
 ========
+* **December 22 2011**: Added IE6-9 support by [scintill](https://github.com/scintill)
 * **November 30 2011**:
   * Added NodeJS Buffer support + NPM Package.
   * Added support for NaN and Infinity in the float shim.
