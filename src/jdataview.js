@@ -315,7 +315,7 @@ for (var type in dataTypes) {
 				// ArrayBuffer: we use a typed array of size 1 if the alignment is good
 				// ArrayBuffer does not support endianess flag (for size > 1)
 				else if (this._isArrayBuffer && (this._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
-					value = new all[type + 'Array'](this.buffer, this._start + byteOffset, 1)[0];
+					value = new global[type + 'Array'](this.buffer, this._start + byteOffset, 1)[0];
 				}
 				// NodeJS Buffer
 				else if (this._isNodeBuffer && compatibility.NodeBufferFull) {
