@@ -126,8 +126,8 @@ jDataView.prototype = {
 		else {
 			value = '';
 			for (var i = 0; i < length; ++i) {
-				var char = this.getUint8(byteOffset + i);
-				value += String.fromCharCode(char > 127 ? 65533 : char);
+				var chr = this.getUint8(byteOffset + i);
+				value += String.fromCharCode(chr > 127 ? 65533 : chr);
 			}
 		}
 
