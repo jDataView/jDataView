@@ -446,6 +446,6 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.jquery >= "1.6.2") {
 	});
 }
 
-global.jDataView = (global.module || {}).exports = jDataView;
+global.jDataView = (module || {}).exports = jDataView;
 
 })(this);
