@@ -447,5 +447,8 @@ if (typeof jQuery !== 'undefined' && jQuery.fn.jquery >= "1.6.2") {
 }
 
 global.jDataView = (global.module || {}).exports = jDataView;
+if (typeof module !== 'undefined') {
+  module.exports = jDataView;
+}
 
 })(this);
