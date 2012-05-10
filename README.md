@@ -27,7 +27,7 @@ See the specification for a detailed API. [http://www.khronos.org/registry/webgl
 Constructor
 -----------------
 * new **jDataView**(buffer, offset, length, littleEndian=true)
-    * buffer can be either a String or an ArrayBuffer
+    * buffer can be either a String, an ArrayBuffer, or a Node.js Buffer
     * littleEndian is a default value for the view
 
 Specification API
