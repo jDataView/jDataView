@@ -22,7 +22,7 @@ jDataView provides the DataView API using the best available option between Stri
 
 API
 ===
-See the [Typed Array Specification](http://www.khronos.org/registry/typedarray/specs/latest/#8) for a detailed API.
+See the [Typed Array Specification](http://www.khronos.org/registry/typedarray/specs/latest/#8) subsection 8 (“The DataView View Type”) for a detailed API.
 
 Constructor
 -----------------
