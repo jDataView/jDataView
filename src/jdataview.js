@@ -165,28 +165,6 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 				}
 			})(type, this);
 		}
-	} else if (this._isArrayBuffer && (this._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
-		// ArrayBuffer: we use a typed array of size 1 if the alignment is good
-		// ArrayBuffer does not support endianess flag (for size > 1)
-		for (var type in dataTypes) {
-			if (!dataTypes.hasOwnProperty(type)) {
-				continue;
-			}
-			(function(type, jDV){
-				var size = dataTypes[type];
-				jDV['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of parameters:
-					if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
-					if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
-
-					var value = new window[type + 'Array'](this.buffer, this._start + byteOffset, 1)[0];
-
-					// Move the internal offset forward
-					this._offset = byteOffset + size;
-					return value;
-				}
-			})(type, this);
-		}
 	} else {
 		for (var type in dataTypes) {
 			if (!dataTypes.hasOwnProperty(type)) {
@@ -199,15 +177,21 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 					if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
 					if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
 
-					// Error checking:
-					if (typeof byteOffset !== 'number') {
-						throw new TypeError('Type error');
-					}
-					if (byteOffset + size > this.byteLength) {
-						throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
-					}
+					if (jDV._isArrayBuffer && (jDV._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
+						// ArrayBuffer: we use a typed array of size 1 if the alignment is good
+						// ArrayBuffer does not support endianess flag (for size > 1)
+						var value = new window[type + 'Array'](this.buffer, this._start + byteOffset, 1)[0];
+					} else {
+						// Error checking:
+						if (typeof byteOffset !== 'number') {
+							throw new TypeError('Type error');
+						}
+						if (byteOffset + size > this.byteLength) {
+							throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
+						}
 
-					var value = this['_get' + type](this._start + byteOffset, littleEndian);
+						var value = this['_get' + type](this._start + byteOffset, littleEndian);
+					}
 
 					// Move the internal offset forward
 					this._offset = byteOffset + size;
