@@ -101,93 +101,110 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		'Float64': 'Double'
 	};
 
-	for (var type in dataTypes) {
-		if (!dataTypes.hasOwnProperty(type)) {
-			continue;
-		}
-		var jDV = this;
-
-		// Bind the variable type
-		(function (type) {
-			var size = dataTypes[type];
-
-			if (jDV._isDataView) { // DataView: we use the direct method
-				jDV['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of parameters:
-					if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
-					if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
-
-					var value = this._view['get' + type](byteOffset, littleEndian);
-
-					// Move the internal offset forward
-					this._offset = byteOffset + size;
-					return value;
-				}
-			} else if (jDV._isNodeBuffer && compatibility.NodeBufferFull) { // NodeJS v0.6 Buffer
-				jDV['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of parameters:
-					if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
-					if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
-
-					if (littleEndian) {
-						var value = this.buffer['read' + nodeNaming[type] + 'LE'](this._start + byteOffset);
-					} else {
-						var value = this.buffer['read' + nodeNaming[type] + 'BE'](this._start + byteOffset);
-					}
-
-					// Move the internal offset forward
-					this._offset = byteOffset + size;
-					return value;
-				}
-			} else if (jDV._isNodeBuffer && compatibility.NodeBufferEndian) { // NodeJS v0.5 Buffer
-				jDV['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of parameters:
-					if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
-					if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
-
-					var value = this.buffer['read' + nodeNaming[type]](this._start + byteOffset, littleEndian);
-
-					// Move the internal offset forward
-					this._offset = byteOffset + size;
-					return value;
-				}
-			} else if (jDV._isArrayBuffer && (jDV._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
-				// ArrayBuffer: we use a typed array of size 1 if the alignment is good
-				// ArrayBuffer does not support endianess flag (for size > 1)
-
-				jDV['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of parameters:
-					if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
-					if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
-
-					var value = new window[type + 'Array'](this.buffer, this._start + byteOffset, 1)[0];
-
-					// Move the internal offset forward
-					this._offset = byteOffset + size;
-					return value;
-				}
-			} else {
-				jDV['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of parameters:
-					if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
-					if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
-
-					// Error checking:
-					if (typeof byteOffset !== 'number') {
-						throw new TypeError('Type error');
-					}
-					if (byteOffset + size > this.byteLength) {
-						throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
-					}
-
-					var value = this['_get' + type](this._start + byteOffset, littleEndian);
-
-					// Move the internal offset forward
-					this._offset = byteOffset + size;
-					return value;
-				}
+	if (this._isDataView) { // DataView: we use the direct method
+		for (var type in dataTypes) {
+			if (!dataTypes.hasOwnProperty(type)) {
+				continue;
 			}
-		})(type);
+			var size = dataTypes[type];
+			this['get' + type] = function (byteOffset, littleEndian) {
+				// Handle the lack of parameters:
+				if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
+				if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
+
+				var value = this._view['get' + type](byteOffset, littleEndian);
+
+				// Move the internal offset forward
+				this._offset = byteOffset + size;
+				return value;
+			}
+		}
+	} else if (this._isNodeBuffer && compatibility.NodeBufferFull) { // NodeJS v0.6 Buffer
+		for (var type in dataTypes) {
+			if (!dataTypes.hasOwnProperty(type)) {
+				continue;
+			}
+			var size = dataTypes[type];
+			this['get' + type] = function (byteOffset, littleEndian) {
+				// Handle the lack of parameters:
+				if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
+				if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
+
+				if (littleEndian) {
+					var value = this.buffer['read' + nodeNaming[type] + 'LE'](this._start + byteOffset);
+				} else {
+					var value = this.buffer['read' + nodeNaming[type] + 'BE'](this._start + byteOffset);
+				}
+
+				// Move the internal offset forward
+				this._offset = byteOffset + size;
+				return value;
+			}
+		}
+	} else if (this._isNodeBuffer && compatibility.NodeBufferEndian) { // NodeJS v0.5 Buffer
+		for (var type in dataTypes) {
+			if (!dataTypes.hasOwnProperty(type)) {
+				continue;
+			}
+			var size = dataTypes[type];
+			this['get' + type] = function (byteOffset, littleEndian) {
+				// Handle the lack of parameters:
+				if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
+				if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
+
+				var value = this.buffer['read' + nodeNaming[type]](this._start + byteOffset, littleEndian);
+
+				// Move the internal offset forward
+				this._offset = byteOffset + size;
+				return value;
+			}
+		}
+	} else if (this._isArrayBuffer && (this._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
+		// ArrayBuffer: we use a typed array of size 1 if the alignment is good
+		// ArrayBuffer does not support endianess flag (for size > 1)
+		for (var type in dataTypes) {
+			if (!dataTypes.hasOwnProperty(type)) {
+				continue;
+			}
+			var size = dataTypes[type];
+			this['get' + type] = function (byteOffset, littleEndian) {
+				// Handle the lack of parameters:
+				if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
+				if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
+
+				var value = new window[type + 'Array'](this.buffer, this._start + byteOffset, 1)[0];
+
+				// Move the internal offset forward
+				this._offset = byteOffset + size;
+				return value;
+			}
+		}
+	} else {
+		for (var type in dataTypes) {
+			if (!dataTypes.hasOwnProperty(type)) {
+				continue;
+			}
+			var size = dataTypes[type];
+			this['get' + type] = function (byteOffset, littleEndian) {
+				// Handle the lack of parameters:
+				if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
+				if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
+
+				// Error checking:
+				if (typeof byteOffset !== 'number') {
+					throw new TypeError('Type error');
+				}
+				if (byteOffset + size > this.byteLength) {
+					throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
+				}
+
+				var value = this['_get' + type](this._start + byteOffset, littleEndian);
+
+				// Move the internal offset forward
+				this._offset = byteOffset + size;
+				return value;
+			}
+		}
 	}
 
 }; // end of jDataView constructor
