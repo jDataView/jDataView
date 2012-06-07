@@ -12,13 +12,16 @@ function b() {
 	return new jDataView(jDataView.createBuffer.apply(this, arguments), undefined, undefined, false);
 }
 
-module('Array Buffer')
-test(view._isArrayBuffer ? 'yes' : 'no', function () {})
-module('Data View')
-test(view._isDataView ? 'yes' : 'no', function () {})
-module('Node Buffer')
-test(view._isNodeBuffer ? 'yes' : 'no', function () {})
-
+module('Engine support')
+test('Array Buffer', function () {
+	equal(view._isArrayBuffer, true)
+})
+test('Data View', function () {
+	equal(view._isDataView, true)
+})
+test('Node Buffer', function () {
+	equal(view._isNodeBuffer, true)
+})
 
 module('Bound Check');
 
