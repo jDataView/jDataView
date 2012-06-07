@@ -20,7 +20,7 @@ var compatibility = {
 
 var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	if (!(this instanceof jDataView)) {
-		throw new Error("Constructor may not be called as a function");
+		throw new Error("jDataView constructor may not be called as a function");
 	}
 
 	this.buffer = buffer;
@@ -29,7 +29,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	if (!(compatibility.NodeBuffer && buffer instanceof Buffer) &&
 		!(compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) &&
 		typeof buffer !== 'string') {
-		throw new TypeError('Type error');
+		throw new TypeError('jDataView buffer has an incompatible type');
 	}
 
 	// Check parameters and existing functionnalities
@@ -54,16 +54,16 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	if (!this._isDataView) {
 		// Do additional checks to simulate DataView
 		if (typeof byteOffset !== 'number') {
-			throw new TypeError('Type error');
+			throw new TypeError('jDataView byteOffset is not a number');
 		}
 		if (typeof byteLength !== 'number') {
-			throw new TypeError('Type error');
+			throw new TypeError('jDataView byteLength is not a number');
 		}
 		if (typeof byteOffset < 0) {
-			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
+			throw new Error('jDataView byteOffset is negative');
 		}
 		if (typeof byteLength < 0) {
-			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
+			throw new Error('jDataView byteLength is negative');
 		}
 	}
 
@@ -74,7 +74,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	}
 	this._start = byteOffset;
 	if (byteOffset + byteLength > bufferLength) {
-		throw new Error("INDEX_SIZE_ERR: DOM Exception 1");
+		throw new Error("jDataView (byteOffset+byteLength) value is out of bounds');
 	}
 
 	this._offset = 0;
@@ -184,10 +184,10 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 					} else {
 						// Error checking:
 						if (typeof byteOffset !== 'number') {
-							throw new TypeError('Type error');
+							throw new TypeError('jDataView byteOffset is not a number');
 						}
 						if (byteOffset + size > this.byteLength) {
-							throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
+							throw new Error('jDataView (byteOffset + size) value is out of bounds');
 						}
 
 						var value = this['_get' + type](this._start + byteOffset, littleEndian);
@@ -240,10 +240,10 @@ jDataView.prototype = {
 
 		// Error Checking
 		if (typeof byteOffset !== 'number') {
-			throw new TypeError('Type error');
+			throw new TypeError('jDataView byteOffset is not a number');
 		}
 		if (length < 0 || byteOffset + length > this.byteLength) {
-			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
+			throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
 		}
 
 		if (this._isNodeBuffer) {
@@ -271,10 +271,10 @@ jDataView.prototype = {
 
 	seek: function (byteOffset) {
 		if (typeof byteOffset !== 'number') {
-			throw new TypeError('Type error');
+			throw new TypeError('jDataView byteOffset is not a number');
 		}
 		if (byteOffset < 0 || byteOffset > this.byteLength) {
-			throw new Error('INDEX_SIZE_ERR: DOM Exception 1');
+			throw new Error('jDataView byteOffset value is out of bounds');
 		}
 
 		return this._offset = byteOffset;
