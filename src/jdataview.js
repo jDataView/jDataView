@@ -74,7 +74,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	}
 	this._start = byteOffset;
 	if (byteOffset + byteLength > bufferLength) {
-		throw new Error("jDataView (byteOffset+byteLength) value is out of bounds');
+		throw new Error("jDataView (byteOffset+byteLength) value is out of bounds");
 	}
 
 	this._offset = 0;
