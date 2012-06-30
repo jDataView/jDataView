@@ -111,11 +111,10 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 					// Handle the lack of byteOffset:
 					if (typeof byteOffset   === 'undefined') byteOffset = this._offset;
 
-					var value = this._view['get' + type](byteOffset, littleEndian);
-
 					// Move the internal offset forward
 					this._offset = byteOffset + size;
-					return value;
+
+					return this._view['get' + type](byteOffset, littleEndian);
 				}
 			})(type, this);
 		}
@@ -130,15 +129,14 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 					// Handle the lack of byteOffset:
 					if (typeof byteOffset   === 'undefined') byteOffset = this._offset;
 
-					if (littleEndian) {
-						var value = this.buffer['read' + nodeNaming[type] + 'LE'](this._start + byteOffset);
-					} else {
-						var value = this.buffer['read' + nodeNaming[type] + 'BE'](this._start + byteOffset);
-					}
-
 					// Move the internal offset forward
 					this._offset = byteOffset + size;
-					return value;
+
+					if (littleEndian) {
+						return this.buffer['read' + nodeNaming[type] + 'LE'](this._start + byteOffset);
+					} else {
+						return this.buffer['read' + nodeNaming[type] + 'BE'](this._start + byteOffset);
+					}
 				}
 			})(type, this);
 		}
@@ -153,11 +151,10 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 					// Handle the lack of byteOffset:
 					if (typeof byteOffset   === 'undefined') byteOffset = this._offset;
 
-					var value = this.buffer['read' + nodeNaming[type]](this._start + byteOffset, !littleEndian);
-
 					// Move the internal offset forward
 					this._offset = byteOffset + size;
-					return value;
+
+					return this.buffer['read' + nodeNaming[type]](this._start + byteOffset, !littleEndian);
 				}
 			})(type, this);
 		}
@@ -173,10 +170,13 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 					if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
 					if (typeof littleEndian === 'undefined') littleEndian = false;
 
+					// Move the internal offset forward
+					this._offset = byteOffset + size;
+
 					if (jDV._isArrayBuffer && (jDV._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
 						// ArrayBuffer: we use a typed array of size 1 if the alignment is good
 						// ArrayBuffer does not support endianess flag (for size > 1)
-						var value = new window[type + 'Array'](this.buffer, this._start + byteOffset, 1)[0];
+						return new window[type + 'Array'](this.buffer, this._start + byteOffset, 1)[0];
 					} else {
 						// Error checking:
 						if (typeof byteOffset !== 'number') {
@@ -186,12 +186,8 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 							throw new Error('jDataView (byteOffset + size) value is out of bounds');
 						}
 
-						var value = this['_get' + type](this._start + byteOffset, littleEndian);
+						return this['_get' + type](this._start + byteOffset, littleEndian);
 					}
-
-					// Move the internal offset forward
-					this._offset = byteOffset + size;
-					return value;
 				}
 			})(type, this);
 		}
