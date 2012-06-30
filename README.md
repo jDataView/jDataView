@@ -70,7 +70,6 @@ Shortcomings
 ==========
 
 * Only the Read API is being wrapped, jDataView does not provide any `set` method.
-* I found that most files we want to read are in littleEndian due to x86 architecture. I changed the default behavior of getters to be littleEndian instead of bigEndian.
 
 Example
 ======
