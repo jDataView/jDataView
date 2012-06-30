@@ -10,7 +10,8 @@
 
 var compatibility = {
 	ArrayBuffer: typeof ArrayBuffer !== 'undefined',
-	DataView: typeof DataView !== 'undefined' && 'getFloat64' in DataView.prototype,
+	DataView: typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined' &&
+		'getFloat64' in ( new DataView(new ArrayBuffer(1)) ),
 	NodeBuffer: typeof Buffer !== 'undefined',
 // 0.6.0 -> readInt8LE(offset)
 	NodeBufferFull: typeof Buffer !== 'undefined' && 'readInt8LE' in Buffer,
