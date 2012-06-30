@@ -22,7 +22,7 @@ jDataView provides the DataView API using the best available option between Stri
 
 API
 ===
-See the [Typed Array Specification](http://www.khronos.org/registry/typedarray/specs/latest/#8) subsection 8 (“The DataView View Type”) for a detailed API.
+See the [Typed Array Specification](http://www.khronos.org/registry/typedarray/specs/latest/#8) subsectionï¿½8 (ï¿½Theï¿½DataView Viewï¿½Typeï¿½) for a detailed API.
 
 Constructor
 -----------------
@@ -125,12 +125,17 @@ $.get(
 
 Changelog
 ========
+* **June 30 2012**: Thanks to @Mithgol for the changes!
+  * Changed default from big endian to little endian to be compatible with DataView specification
+  * Dropped support for NodeJS < 0.5.5, it was buggy anyway
+  * Fixed an issue where ArrayBuffer would not work on NodeJS
+  * Moved the compatibility checks outside of the read functions for hopefully better performance
 * **December 22 2011**: Added IE6-9 support by [scintill](https://github.com/scintill)
 * **November 30 2011**:
   * Added NodeJS Buffer support + NPM Package.
   * Added support for NaN and Infinity in the float shim.
   * Added ```buffer```, ```byteLength``` and ```byteOffset``` attributes.
-  * Fixed bugs using non zero ```byteOffset` and added more bound checks.
+  * Fixed bugs using non zero ```byteOffset``` and added more bound checks.
 * **September 21 2011**: Added a missing ```littleEndian``` argument on getInt16.
 * **April 28 2011**: Seeking to the end of file no longer throws an error.
 * **April 26 2011**: Fixed a bug with extremely large unsigned 32bit being considered as signed. ([Solution](http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string/2954435#2954435)). 
