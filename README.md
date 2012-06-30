@@ -26,7 +26,7 @@ See the [Typed Array Specification](http://www.khronos.org/registry/typedarray/s
 
 Constructor
 -----------------
-* new **jDataView**(buffer, offset, length, littleEndian=true)
+* new **jDataView**(buffer, offset, length, littleEndian=false)
     * buffer can be either a String, an ArrayBuffer, or a Node.js Buffer
     * littleEndian is a default value for the view
 
@@ -48,7 +48,7 @@ Extended Specification
 ---------------------------------
 Addition of a littleEndian argument to the constructor. It will be the default value of the getters if their littleEndian value is undefined.
 
-* **jDataView**(buffer, offset, length, littleEndian=true)
+* **jDataView**(buffer, offset, length, littleEndian=false)
 
 The byteOffset parameter is now optional. If you omit it, it will read right after the latest read offset. You can interact with the internal pointer with those two functions.
 
