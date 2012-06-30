@@ -109,7 +109,7 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 				var size = dataTypes[type];
 				jDV['get' + type] = function (byteOffset, littleEndian) {
 					// Handle the lack of byteOffset:
-					if (typeof byteOffset   === 'undefined') byteOffset = this._offset;
+					if (typeof byteOffset === 'undefined') byteOffset = this._offset;
 
 					// Move the internal offset forward
 					this._offset = byteOffset + size;
@@ -127,7 +127,7 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 				var size = dataTypes[type];
 				jDV['get' + type] = function (byteOffset, littleEndian) {
 					// Handle the lack of byteOffset:
-					if (typeof byteOffset   === 'undefined') byteOffset = this._offset;
+					if (typeof byteOffset === 'undefined') byteOffset = this._offset;
 
 					// Move the internal offset forward
 					this._offset = byteOffset + size;
@@ -149,7 +149,7 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 				var size = dataTypes[type];
 				jDV['get' + type] = function (byteOffset, littleEndian) {
 					// Handle the lack of byteOffset:
-					if (typeof byteOffset   === 'undefined') byteOffset = this._offset;
+					if (typeof byteOffset === 'undefined') byteOffset = this._offset;
 
 					// Move the internal offset forward
 					this._offset = byteOffset + size;
