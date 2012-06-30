@@ -18,7 +18,7 @@ var compatibility = {
 	NodeBufferEndian: typeof Buffer !== 'undefined' && 'readInt8' in Buffer
 };
 
-var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
+var jDataView = function (buffer, byteOffset, byteLength) {
 	if (!(this instanceof jDataView)) {
 		throw new Error("jDataView constructor may not be called as a function");
 	}
@@ -38,8 +38,6 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	this._isNodeBuffer = compatibility.NodeBuffer && buffer instanceof Buffer;
 
 	// Default Values
-	this._littleEndian = littleEndian === undefined ? true : littleEndian;
-
 	var bufferLength = this._isArrayBuffer ? buffer.byteLength : buffer.length;
 	if (byteOffset === undefined) {
 		byteOffset = 0;
@@ -109,9 +107,8 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 			(function(type, jDV){
 				var size = dataTypes[type];
 				jDV['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of parameters:
-					if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
-					if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
+					// Handle the lack of byteOffset:
+					if (typeof byteOffset   === 'undefined') byteOffset = this._offset;
 
 					var value = this._view['get' + type](byteOffset, littleEndian);
 
@@ -121,7 +118,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 				}
 			})(type, this);
 		}
-	} else if (this._isNodeBuffer && compatibility.NodeBufferFull) { // NodeJS v0.6 Buffer
+	} else if (this._isNodeBuffer && compatibility.NodeBufferFull) { // NodeJS Buffer in v0.5.5 and newer
 		for (var type in dataTypes) {
 			if (!dataTypes.hasOwnProperty(type)) {
 				continue;
@@ -129,9 +126,8 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 			(function(type, jDV){
 				var size = dataTypes[type];
 				jDV['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of parameters:
-					if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
-					if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
+					// Handle the lack of byteOffset:
+					if (typeof byteOffset   === 'undefined') byteOffset = this._offset;
 
 					if (littleEndian) {
 						var value = this.buffer['read' + nodeNaming[type] + 'LE'](this._start + byteOffset);
@@ -145,7 +141,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 				}
 			})(type, this);
 		}
-	} else if (this._isNodeBuffer && compatibility.NodeBufferEndian) { // NodeJS v0.5 Buffer
+	} else if (this._isNodeBuffer && compatibility.NodeBufferEndian) { // NodeJS Buffer in v0.5.4
 		for (var type in dataTypes) {
 			if (!dataTypes.hasOwnProperty(type)) {
 				continue;
@@ -153,9 +149,8 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 			(function(type, jDV){
 				var size = dataTypes[type];
 				jDV['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of parameters:
-					if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
-					if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
+					// Handle the lack of byteOffset:
+					if (typeof byteOffset   === 'undefined') byteOffset = this._offset;
 
 					var value = this.buffer['read' + nodeNaming[type]](this._start + byteOffset, littleEndian);
 
@@ -173,9 +168,9 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 			(function(type, jDV){
 				var size = dataTypes[type];
 				jDV['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of parameters:
-					if (typeof littleEndian === 'undefined') littleEndian = this._littleEndian;
+					// Handle the lack of arguments:
 					if (typeof byteOffset   === 'undefined') byteOffset   = this._offset;
+					if (typeof littleEndian === 'undefined') littleEndian = false;
 
 					if (jDV._isArrayBuffer && (jDV._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
 						// ArrayBuffer: we use a typed array of size 1 if the alignment is good
