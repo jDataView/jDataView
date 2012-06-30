@@ -13,10 +13,10 @@ var compatibility = {
 	DataView: typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined' &&
 		'getFloat64' in ( new DataView(new ArrayBuffer(1)) ),
 	NodeBuffer: typeof Buffer !== 'undefined',
-// 0.6.0 -> readInt8LE(offset)
-	NodeBufferFull: typeof Buffer !== 'undefined' && 'readInt8LE' in Buffer,
-// 0.5.0 -> readInt8(offset, endian)
-	NodeBufferEndian: typeof Buffer !== 'undefined' && 'readInt8' in Buffer
+// 0.5.5 and newer -> readInt16LE(offset)
+	NodeBufferFull: typeof Buffer !== 'undefined' && 'readInt16LE' in Buffer,
+// 0.5.4 -> readInt16(offset, bigEndian)
+	NodeBufferEndian: typeof Buffer !== 'undefined' && 'readInt16' in Buffer
 };
 
 var jDataView = function (buffer, byteOffset, byteLength) {
@@ -153,7 +153,7 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 					// Handle the lack of byteOffset:
 					if (typeof byteOffset   === 'undefined') byteOffset = this._offset;
 
-					var value = this.buffer['read' + nodeNaming[type]](this._start + byteOffset, littleEndian);
+					var value = this.buffer['read' + nodeNaming[type]](this._start + byteOffset, !littleEndian);
 
 					// Move the internal offset forward
 					this._offset = byteOffset + size;
