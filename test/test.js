@@ -1,4 +1,7 @@
 
+if (typeof jDataView === 'undefined') {
+	jDataView = require('..');
+}
 var module = QUnit.module;
 var test = QUnit.test;
 
@@ -6,19 +9,23 @@ var buffer = jDataView.createBuffer(
     0x00,
 	0xff, 0xfe, 0xfd, 0xfc,
 	0xfa, 0x00, 0xba, 0x01);
-var view = new jDataView(buffer, 1);
+var view = new jDataView(buffer, 1, undefined, true);
 
 function b() {
-	return new jDataView(jDataView.createBuffer.apply(this, arguments), undefined, undefined, false);
+	return new jDataView(jDataView.createBuffer.apply(this, arguments));
 }
 
-module('Array Buffer')
-test(view._isArrayBuffer ? 'yes' : 'no', function () {})
-module('Data View')
-test(view._isDataView ? 'yes' : 'no', function () {})
-module('Node Buffer')
-test(view._isNodeBuffer ? 'yes' : 'no', function () {})
+module('Engine support');
 
+test('Array Buffer', function () {
+	equal(jDataView.prototype.compatibility.ArrayBuffer, true);
+});
+test('Data View', function () {
+	equal(jDataView.prototype.compatibility.DataView, true);
+});
+test('Node Buffer', function () {
+	equal(jDataView.prototype.compatibility.NodeBuffer, true);
+});
 
 module('Bound Check');
 
