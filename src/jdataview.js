@@ -176,7 +176,11 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 					if (jDV._isArrayBuffer && (jDV._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
 						// ArrayBuffer: we use a typed array of size 1 if the alignment is good
 						// ArrayBuffer does not support endianess flag (for size > 1)
-						return new window[type + 'Array'](this.buffer, this._start + byteOffset, 1)[0];
+						if (typeof window === 'undefined') {
+							return new global[type + 'Array'](this.buffer, this._start + byteOffset, 1)[0];
+						} else {
+							return new window[type + 'Array'](this.buffer, this._start + byteOffset, 1)[0];
+						}
 					} else {
 						// Error checking:
 						if (typeof byteOffset !== 'number') {
