@@ -39,7 +39,7 @@ var nodeNaming = {
 	'Float64': 'Double'
 };
 
-var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
+var jDataView = function (buffer, byteOffset, byteLength) {
 	if (!(this instanceof jDataView)) {
 		throw new Error("jDataView constructor may not be called as a function");
 	}
@@ -59,8 +59,6 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	this._isNodeBuffer = compatibility.NodeBuffer && buffer instanceof Buffer;
 
 	// Default Values
-	this._littleEndian = littleEndian === undefined ? false : littleEndian;
-
 	var bufferLength = this._isArrayBuffer ? buffer.byteLength : buffer.length;
 	if (byteOffset === undefined) {
 		byteOffset = 0;
@@ -88,7 +86,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		}
 	}
 
-	// Instanciate
+	// Instantiate
 	if (this._isDataView) {
 		this._view = new DataView(buffer, byteOffset, byteLength);
 		this._start = 0;
@@ -110,11 +108,6 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 			(function(type, view){
 				var size = dataTypes[type];
 				view['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of endianness
-					if (littleEndian === undefined) {
-						littleEndian = view._littleEndian;
-					}
-
 					// Handle the lack of byteOffset
 					if (byteOffset === undefined) {
 						byteOffset = view._offset;
@@ -133,21 +126,16 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 				continue;
 			}
 
-			var name;
-			if (type === 'Int8' || type === 'Uint8') {
-				name = 'read' + nodeNaming[type];
-			} else if (littleEndian) {
-				name = 'read' + nodeNaming[type] + 'LE';
-			} else {
-				name = 'read' + nodeNaming[type] + 'BE';
-			}
-
-			(function(type, view, name){
+			(function(type, view){
 				var size = dataTypes[type];
 				view['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of endianness
-					if (littleEndian === undefined) {
-						littleEndian = view._littleEndian;
+					var name;
+					if (type === 'Int8' || type === 'Uint8') {
+						name = 'read' + nodeNaming[type];
+					} else if (littleEndian) {
+						name = 'read' + nodeNaming[type] + 'LE';
+					} else {
+						name = 'read' + nodeNaming[type] + 'BE';
 					}
 
 					// Handle the lack of byteOffset
@@ -160,7 +148,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 
 					return view.buffer[name](view._start + byteOffset);
 				}
-			})(type, this, name);
+			})(type, this);
 		}
 	} else {
 		for (var type in dataTypes) {
@@ -172,7 +160,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 				view['get' + type] = function (byteOffset, littleEndian) {
 					// Handle the lack of endianness
 					if (littleEndian === undefined) {
-						littleEndian = view._littleEndian;
+						littleEndian = false;
 					}
 
 					// Handle the lack of byteOffset
@@ -186,7 +174,11 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 					if (view._isArrayBuffer && (view._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
 						// ArrayBuffer: we use a typed array of size 1 if the alignment is good
 						// ArrayBuffer does not support endianess flag (for size > 1)
-						return new global[type + 'Array'](view.buffer, view._start + byteOffset, 1)[0];
+						if (typeof global === 'undefined') {
+							return new window[type + 'Array'](view.buffer, view._start + byteOffset, 1)[0];
+						} else {
+							return new global[type + 'Array'](view.buffer, view._start + byteOffset, 1)[0];
+						}
 					} else {
 						// Error checking:
 						if (typeof byteOffset !== 'number') {

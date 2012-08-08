@@ -1,4 +1,3 @@
-
 if (typeof jDataView === 'undefined') {
 	jDataView = require('..');
 }
