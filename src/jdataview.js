@@ -129,7 +129,6 @@ var jDataView = function (buffer, byteOffset, byteLength) {
 			(function(type, view){
 				var size = dataTypes[type];
 				view['get' + type] = function (byteOffset, littleEndian) {
-
 					var name;
 					if (type === 'Int8' || type === 'Uint8') {
 						name = 'read' + nodeNaming[type];
