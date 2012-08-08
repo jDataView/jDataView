@@ -22,11 +22,11 @@ jDataView provides the DataView API using the best available option between Stri
 
 API
 ===
-See the specification for a detailed API. [http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6)
+See the [Typed Array Specification](http://www.khronos.org/registry/typedarray/specs/latest/#8) for a detailed API.
 
 Constructor
 -----------------
-* new **jDataView**(buffer, offset, length, littleEndian=true)
+* new **jDataView**(buffer, offset, length, littleEndian=false)
     * buffer can be either a String, an ArrayBuffer, or a Node.js Buffer
     * littleEndian is a default value for the view
 
@@ -48,7 +48,7 @@ Extended Specification
 ---------------------------------
 Addition of a littleEndian argument to the constructor. It will be the default value of the getters if their littleEndian value is undefined.
 
-* **jDataView**(buffer, offset, length, littleEndian=true)
+* **jDataView**(buffer, offset, length, littleEndian=false)
 
 The byteOffset parameter is now optional. If you omit it, it will read right after the latest read offset. You can interact with the internal pointer with those two functions.
 
@@ -70,7 +70,6 @@ Shortcomings
 ==========
 
 * Only the Read API is being wrapped, jDataView does not provide any `set` method.
-* I found that most files we want to read are in littleEndian due to x86 architecture. I changed the default behavior of getters to be littleEndian instead of bigEndian.
 
 Example
 ======
@@ -125,12 +124,17 @@ $.get(
 
 Changelog
 ========
+* **June 30 2012**: Thanks to [Mithgol](https://github.com/Mithgol) for the changes!
+  * Changed default from big endian to little endian to be compatible with DataView specification
+  * Dropped support for NodeJS < 0.5.5, it was buggy anyway
+  * Fixed an issue where ArrayBuffer would not work on NodeJS
+  * Moved the compatibility checks outside of the read functions for hopefully better performance
 * **December 22 2011**: Added IE6-9 support by [scintill](https://github.com/scintill)
 * **November 30 2011**:
   * Added NodeJS Buffer support + NPM Package.
   * Added support for NaN and Infinity in the float shim.
   * Added ```buffer```, ```byteLength``` and ```byteOffset``` attributes.
-  * Fixed bugs using non zero ```byteOffset` and added more bound checks.
+  * Fixed bugs using non zero ```byteOffset``` and added more bound checks.
 * **September 21 2011**: Added a missing ```littleEndian``` argument on getInt16.
 * **April 28 2011**: Seeking to the end of file no longer throws an error.
 * **April 26 2011**: Fixed a bug with extremely large unsigned 32bit being considered as signed. ([Solution](http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string/2954435#2954435)). 

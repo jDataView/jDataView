@@ -1,4 +1,6 @@
-
+if (typeof jDataView === 'undefined') {
+	jDataView = require('..');
+}
 var module = QUnit.module;
 var test = QUnit.test;
 
@@ -6,22 +8,23 @@ var buffer = jDataView.createBuffer(
     0x00,
 	0xff, 0xfe, 0xfd, 0xfc,
 	0xfa, 0x00, 0xba, 0x01);
-var view = new jDataView(buffer, 1);
+var view = new jDataView(buffer, 1, undefined, true);
 
 function b() {
 	return new jDataView(jDataView.createBuffer.apply(this, arguments));
 }
 
-module('Engine support')
+module('Engine support');
+
 test('Array Buffer', function () {
-	equal(view._isArrayBuffer, true)
-})
+	equal(jDataView.prototype.compatibility.ArrayBuffer, true);
+});
 test('Data View', function () {
-	equal(view._isDataView, true)
-})
+	equal(jDataView.prototype.compatibility.DataView, true);
+});
 test('Node Buffer', function () {
-	equal(view._isNodeBuffer, true)
-})
+	equal(jDataView.prototype.compatibility.NodeBuffer, true);
+});
 
 module('Bound Check');
 
@@ -106,47 +109,47 @@ test('Uint8', function () {
 });
 
 test('Int16', function () {
-	equal(view.getInt16(0, true), -257);
-	equal(view.getInt16(1, true), -514);
-	equal(view.getInt16(2, true), -771);
-	equal(view.getInt16(3, true), -1284);
-	equal(view.getInt16(4, true), 250);
-	equal(view.getInt16(5, true), -17920);
-	equal(view.getInt16(6, true), 442);
+	equal(view.getInt16(0), -257);
+	equal(view.getInt16(1), -514);
+	equal(view.getInt16(2), -771);
+	equal(view.getInt16(3), -1284);
+	equal(view.getInt16(4), 250);
+	equal(view.getInt16(5), -17920);
+	equal(view.getInt16(6), 442);
 });
 
 test('Uint16', function () {
-	equal(view.getUint16(0, true), 65279);
-	equal(view.getUint16(1, true), 65022);
-	equal(view.getUint16(2, true), 64765);
-	equal(view.getUint16(3, true), 64252);
-	equal(view.getUint16(4, true), 250);
-	equal(view.getUint16(5, true), 47616);
-	equal(view.getUint16(6, true), 442);
+	equal(view.getUint16(0), 65279);
+	equal(view.getUint16(1), 65022);
+	equal(view.getUint16(2), 64765);
+	equal(view.getUint16(3), 64252);
+	equal(view.getUint16(4), 250);
+	equal(view.getUint16(5), 47616);
+	equal(view.getUint16(6), 442);
 });
 
 test('Uint32', function () {
-	equal(view.getUint32(0, true), 4244504319);
-	equal(view.getUint32(1, true), 4210884094);
-	equal(view.getUint32(2, true), 16448765);
-	equal(view.getUint32(3, true), 3120626428);
-	equal(view.getUint32(4, true), 28967162);
+	equal(view.getUint32(0), 4244504319);
+	equal(view.getUint32(1), 4210884094);
+	equal(view.getUint32(2), 16448765);
+	equal(view.getUint32(3), 3120626428);
+	equal(view.getUint32(4), 28967162);
 });
 
 test('Int32', function () {
-	equal(view.getInt32(0, true), -50462977);
-	equal(view.getInt32(1, true), -84083202);
-	equal(view.getInt32(2, true), 16448765);
-	equal(view.getInt32(3, true), -1174340868);
-	equal(view.getInt32(4, true), 28967162);
+	equal(view.getInt32(0), -50462977);
+	equal(view.getInt32(1), -84083202);
+	equal(view.getInt32(2), 16448765);
+	equal(view.getInt32(3), -1174340868);
+	equal(view.getInt32(4), 28967162);
 });
 
 test('Float32', function () {
-	equal(view.getFloat32(0, true), -1.055058432344064e+37);
-	equal(view.getFloat32(1, true), -6.568051909668895e+35);
-	equal(view.getFloat32(2, true), 2.30496291345398e-38);
-	equal(view.getFloat32(3, true), -0.0004920212086290121);
-	equal(view.getFloat32(4, true), 6.832701044000979e-38);
+	equal(view.getFloat32(0), -1.055058432344064e+37);
+	equal(view.getFloat32(1), -6.568051909668895e+35);
+	equal(view.getFloat32(2), 2.30496291345398e-38);
+	equal(view.getFloat32(3), -0.0004920212086290121);
+	equal(view.getFloat32(4), 6.832701044000979e-38);
 	equal(b(0x7f, 0x80, 0x00, 0x00).getFloat32(), Infinity)
 	equal(b(0xff, 0x80, 0x00, 0x00).getFloat32(), -Infinity)
 	equal(b(0x00, 0x00, 0x00, 0x00).getFloat32(), 0);
@@ -154,7 +157,7 @@ test('Float32', function () {
 });
 
 test('Float64', function () {
-	equal(view.getFloat64(0, true), 2.426842827241402e-300);
+	equal(view.getFloat64(0), 2.426842827241402e-300);
 	equal(b(0x7f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00).getFloat64(), Infinity)
 	equal(b(0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00).getFloat64(), -Infinity)
 	equal(b(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00).getFloat64(), 0);
