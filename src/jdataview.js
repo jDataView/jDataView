@@ -13,8 +13,9 @@ var compatibility = {
 	DataView: typeof DataView !== 'undefined' &&
 		('getFloat64' in DataView.prototype ||				// Chrome
 		 'getFloat64' in new DataView(new ArrayBuffer(1))), // Node
-	// NodeJS Buffer in v0.5.5 and newer
-	NodeBuffer: typeof Buffer !== 'undefined' && 'readInt16LE' in Buffer.prototype
+	// NodeJS Buffer in v0.5.6 and newer
+	NodeBuffer: typeof Buffer !== 'undefined' && typeof DataView !== 'undefined'
+		&& ( 'getFloat64' in new DataView(new Buffer(1)) )
 };
 
 var dataTypes = {
@@ -26,17 +27,6 @@ var dataTypes = {
 	'Uint32': 4,
 	'Float32': 4,
 	'Float64': 8
-};
-
-var nodeNaming = {
-	'Int8': 'Int8',
-	'Int16': 'Int16',
-	'Int32': 'Int32',
-	'Uint8': 'UInt8',
-	'Uint16': 'UInt16',
-	'Uint32': 'UInt32',
-	'Float32': 'Float',
-	'Float64': 'Double'
 };
 
 var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
@@ -53,7 +43,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		throw new TypeError('jDataView buffer has an incompatible type');
 	}
 
-	// Check parameters and existing functionnalities
+	// Check parameters and existing functionalities
 	this._isArrayBuffer = compatibility.ArrayBuffer && buffer instanceof ArrayBuffer;
 	this._isDataView = compatibility.DataView && this._isArrayBuffer;
 	this._isNodeBuffer = compatibility.NodeBuffer && buffer instanceof Buffer;
@@ -88,12 +78,16 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		}
 	}
 
-	// Instanciate
+	// Instantiate
 	if (this._isDataView) {
 		this._view = new DataView(buffer, byteOffset, byteLength);
 		this._start = 0;
+	} else if (this._isNodeBuffer) {
+		this._view = new DataView(buffer, byteOffset, byteLength);
+		this._start = 0;
+	} else {
+		this._start = byteOffset;
 	}
-	this._start = byteOffset;
 	if (byteOffset + byteLength > bufferLength) {
 		throw new Error("jDataView (byteOffset + byteLength) value is out of bounds");
 	}
@@ -102,7 +96,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 
 	// Create uniform reading methods (wrappers) for the following data types
 
-	if (this._isDataView) { // DataView: we use the direct method
+	if (this._isDataView || this._isNodeBuffer) { // DataView: direct method
 		for (var type in dataTypes) {
 			if (!dataTypes.hasOwnProperty(type)) {
 				continue;
@@ -126,41 +120,6 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 					return view._view['get' + type](byteOffset, littleEndian);
 				}
 			})(type, this);
-		}
-	} else if (this._isNodeBuffer && compatibility.NodeBuffer) {
-		for (var type in dataTypes) {
-			if (!dataTypes.hasOwnProperty(type)) {
-				continue;
-			}
-
-			var name;
-			if (type === 'Int8' || type === 'Uint8') {
-				name = 'read' + nodeNaming[type];
-			} else if (littleEndian) {
-				name = 'read' + nodeNaming[type] + 'LE';
-			} else {
-				name = 'read' + nodeNaming[type] + 'BE';
-			}
-
-			(function(type, view, name){
-				var size = dataTypes[type];
-				view['get' + type] = function (byteOffset, littleEndian) {
-					// Handle the lack of endianness
-					if (littleEndian === undefined) {
-						littleEndian = view._littleEndian;
-					}
-
-					// Handle the lack of byteOffset
-					if (byteOffset === undefined) {
-						byteOffset = view._offset;
-					}
-
-					// Move the internal offset forward
-					view._offset = byteOffset + size;
-
-					return view.buffer[name](view._start + byteOffset);
-				}
-			})(type, this, name);
 		}
 	} else {
 		for (var type in dataTypes) {
