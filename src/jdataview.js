@@ -127,7 +127,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 				}
 			})(type, this);
 		}
-	} else if (this._isNodeBuffer && compatibility.NodeBuffer) {
+	} else if (this._isNodeBuffer) {
 		for (var type in dataTypes) {
 			if (!dataTypes.hasOwnProperty(type)) {
 				continue;
