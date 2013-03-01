@@ -174,9 +174,3 @@ test('Float64', function () {
 	equal(b(0x7f, 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff).getFloat64(), 1.7976931348623157e+308);
 	ok(isNaN(b(0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01).getFloat64()))
 });
-
-test('Bits', function () {
-	equal(view.getBits(10, 0), 3);
-	equal(view.getBits(14), 0x3ffe);
-	equal(view.getBits(8, 64, false), 0x80);
-});
