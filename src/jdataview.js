@@ -59,7 +59,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	this._isNodeBuffer = compatibility.NodeBuffer && buffer instanceof Buffer;
 
 	// Default Values
-	this._littleEndian = littleEndian === undefined ? false : littleEndian;
+	this._littleEndian = Boolean(littleEndian);
 
 	var bufferLength = this._isArrayBuffer ? buffer.byteLength : buffer.length;
 	if (byteOffset === undefined) {
@@ -206,20 +206,11 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 
 if (compatibility.NodeBuffer) {
 	jDataView.createBuffer = function () {
-		var buffer = new Buffer(arguments.length);
-		for (var i = 0; i < arguments.length; ++i) {
-			buffer[i] = arguments[i];
-		}
-		return buffer;
+        return new Buffer(arguments);
 	}
 } else if (compatibility.ArrayBuffer) {
 	jDataView.createBuffer = function () {
-		var buffer = new ArrayBuffer(arguments.length);
-		var view = new Int8Array(buffer);
-		for (var i = 0; i < arguments.length; ++i) {
-			view[i] = arguments[i];
-		}
-		return buffer;
+        return new Uint8Array(arguments).buffer;
 	}
 } else {
 	jDataView.createBuffer = function () {
@@ -232,34 +223,77 @@ jDataView.prototype = {
 
 	// Helpers
 
+    getBytes: function (length, byteOffset, littleEndian) {
+        var result;
+
+        // Handle the lack of endianness
+        if (littleEndian === undefined) {
+            littleEndian = this._littleEndian;
+        }
+
+        // Handle the lack of byteOffset
+        if (byteOffset === undefined) {
+            byteOffset = this._offset;
+        }
+
+        // Error Checking
+        if (typeof byteOffset !== 'number') {
+            throw new TypeError('jDataView byteOffset is not a number');
+        }
+        if (length < 0 || byteOffset + length > this.byteLength) {
+            throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
+        }
+
+        if (this._isArrayBuffer) {
+            result = new Uint8Array(this.buffer, byteOffset, length);
+        }
+        else {
+            result = this.buffer.slice(byteOffset, byteOffset + length);
+
+            if (!this._isNodeBuffer) {
+                result = Array.prototype.map.call(result, function (char) {
+                    return char.charCodeAt(0) & 0xff;
+                });
+            }
+        }
+
+        if (littleEndian && length > 1) {
+            if (!(result instanceof Array)) {
+                result = Array.prototype.slice.call(result);
+            }
+            
+            result.reverse();
+        }
+
+        this._offset = byteOffset + length;
+
+        return result;
+    },
+
 	getString: function (length, byteOffset) {
 		var value;
 
-		// Handle the lack of byteOffset
-		if (byteOffset === undefined) {
-			byteOffset = this._offset;
-		}
-
-		// Error Checking
-		if (typeof byteOffset !== 'number') {
-			throw new TypeError('jDataView byteOffset is not a number');
-		}
-		if (length < 0 || byteOffset + length > this.byteLength) {
-			throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
-		}
-
 		if (this._isNodeBuffer) {
+            // Handle the lack of byteOffset
+            if (byteOffset === undefined) {
+                byteOffset = this._offset;
+            }
+
+            // Error Checking
+            if (typeof byteOffset !== 'number') {
+                throw new TypeError('jDataView byteOffset is not a number');
+            }
+            if (length < 0 || byteOffset + length > this.byteLength) {
+                throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
+            }
+
 			value = this.buffer.toString('ascii', this._start + byteOffset, this._start + byteOffset + length);
+            this._offset = byteOffset + length;
 		}
 		else {
-			value = '';
-			for (var i = 0; i < length; ++i) {
-				var char = this.getUint8(byteOffset + i);
-				value += String.fromCharCode(char > 127 ? 65533 : char);
-			}
+			value = String.fromCharCode.apply(null, this.getBytes(length, byteOffset, false));
 		}
 
-		this._offset = byteOffset + length;
 		return value;
 	},
 
@@ -284,26 +318,15 @@ jDataView.prototype = {
 
 	// Compatibility functions on a String Buffer
 
-	_endianness: function (byteOffset, pos, max, littleEndian) {
-		return byteOffset + (littleEndian ? max - pos - 1 : pos);
-	},
-
 	_getFloat64: function (byteOffset, littleEndian) {
-		var b0 = this._getUint8(this._endianness(byteOffset, 0, 8, littleEndian)),
-			b1 = this._getUint8(this._endianness(byteOffset, 1, 8, littleEndian)),
-			b2 = this._getUint8(this._endianness(byteOffset, 2, 8, littleEndian)),
-			b3 = this._getUint8(this._endianness(byteOffset, 3, 8, littleEndian)),
-			b4 = this._getUint8(this._endianness(byteOffset, 4, 8, littleEndian)),
-			b5 = this._getUint8(this._endianness(byteOffset, 5, 8, littleEndian)),
-			b6 = this._getUint8(this._endianness(byteOffset, 6, 8, littleEndian)),
-			b7 = this._getUint8(this._endianness(byteOffset, 7, 8, littleEndian)),
+		var b = this.getBytes(8, byteOffset, littleEndian),
 
-			sign = 1 - (2 * (b0 >> 7)),
-			exponent = ((((b0 << 1) & 0xff) << 3) | (b1 >> 4)) - (Math.pow(2, 10) - 1),
+			sign = 1 - (2 * (b[0] >> 7)),
+			exponent = ((((b[0] << 1) & 0xff) << 3) | (b[1] >> 4)) - (Math.pow(2, 10) - 1),
 
 		// Binary operators such as | and << operate on 32 bit values, using + and Math.pow(2) instead
-			mantissa = ((b1 & 0x0f) * Math.pow(2, 48)) + (b2 * Math.pow(2, 40)) + (b3 * Math.pow(2, 32)) +
-						(b4 * Math.pow(2, 24)) + (b5 * Math.pow(2, 16)) + (b6 * Math.pow(2, 8)) + b7;
+			mantissa = ((b[1] & 0x0f) * Math.pow(2, 48)) + (b[2] * Math.pow(2, 40)) + (b[3] * Math.pow(2, 32)) +
+						(b[4] * Math.pow(2, 24)) + (b[5] * Math.pow(2, 16)) + (b[6] * Math.pow(2, 8)) + b[7];
 
 		if (exponent === 1024) {
 			if (mantissa !== 0) {
@@ -321,14 +344,11 @@ jDataView.prototype = {
 	},
 
 	_getFloat32: function (byteOffset, littleEndian) {
-		var b0 = this._getUint8(this._endianness(byteOffset, 0, 4, littleEndian)),
-			b1 = this._getUint8(this._endianness(byteOffset, 1, 4, littleEndian)),
-			b2 = this._getUint8(this._endianness(byteOffset, 2, 4, littleEndian)),
-			b3 = this._getUint8(this._endianness(byteOffset, 3, 4, littleEndian)),
+		var b = this.getBytes(4, byteOffset, littleEndian),
 
-			sign = 1 - (2 * (b0 >> 7)),
-			exponent = (((b0 << 1) & 0xff) | (b1 >> 7)) - 127,
-			mantissa = ((b1 & 0x7f) << 16) | (b2 << 8) | b3;
+			sign = 1 - (2 * (b[0] >> 7)),
+			exponent = (((b[0] << 1) & 0xff) | (b[1] >> 7)) - 127,
+			mantissa = ((b[1] & 0x7f) << 16) | (b[2] << 8) | b[3];
 
 		if (exponent === 128) {
 			if (mantissa !== 0) {
@@ -351,12 +371,8 @@ jDataView.prototype = {
 	},
 
 	_getUint32: function (byteOffset, littleEndian) {
-		var b3 = this._getUint8(this._endianness(byteOffset, 0, 4, littleEndian)),
-			b2 = this._getUint8(this._endianness(byteOffset, 1, 4, littleEndian)),
-			b1 = this._getUint8(this._endianness(byteOffset, 2, 4, littleEndian)),
-			b0 = this._getUint8(this._endianness(byteOffset, 3, 4, littleEndian));
-
-		return (b3 * Math.pow(2, 24)) + (b2 << 16) + (b1 << 8) + b0;
+		var b = this.getBytes(4, byteOffset, littleEndian);
+		return (b[3] * Math.pow(2, 24)) + (b[2] << 16) + (b[1] << 8) + b[0];
 	},
 
 	_getInt16: function (byteOffset, littleEndian) {
@@ -365,10 +381,8 @@ jDataView.prototype = {
 	},
 
 	_getUint16: function (byteOffset, littleEndian) {
-		var b1 = this._getUint8(this._endianness(byteOffset, 0, 2, littleEndian)),
-			b0 = this._getUint8(this._endianness(byteOffset, 1, 2, littleEndian));
-
-		return (b1 << 8) + b0;
+		var b = this.getBytes(2, byteOffset, littleEndian);
+		return (b[1] << 8) + b[0];
 	},
 
 	_getInt8: function (byteOffset) {
@@ -377,14 +391,7 @@ jDataView.prototype = {
 	},
 
 	_getUint8: function (byteOffset) {
-		if (this._isArrayBuffer) {
-			return new Uint8Array(this.buffer, byteOffset, 1)[0];
-		}
-		else if (this._isNodeBuffer) {
-			return this.buffer[byteOffset];
-		} else {
-			return this.buffer.charCodeAt(byteOffset) & 0xff;
-		}
+        return this.getBytes(1, byteOffset)[0];
 	}
 };
 
