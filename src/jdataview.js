@@ -206,11 +206,11 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 
 if (compatibility.NodeBuffer) {
 	jDataView.createBuffer = function () {
-        return new Buffer(arguments);
+		return new Buffer(arguments);
 	}
 } else if (compatibility.ArrayBuffer) {
 	jDataView.createBuffer = function () {
-        return new Uint8Array(arguments).buffer;
+		return new Uint8Array(arguments).buffer;
 	}
 } else {
 	jDataView.createBuffer = function () {
@@ -223,85 +223,85 @@ jDataView.prototype = {
 
 	// Helpers
 
-    _getBytes: function (length, byteOffset, littleEndian) {
-        var result;
+	_getBytes: function (length, byteOffset, littleEndian) {
+		var result;
 
-        // Handle the lack of endianness
-        if (littleEndian === undefined) {
-            littleEndian = this._littleEndian;
-        }
+		// Handle the lack of endianness
+		if (littleEndian === undefined) {
+			littleEndian = this._littleEndian;
+		}
 
-        // Handle the lack of byteOffset
-        if (byteOffset === undefined) {
-            byteOffset = this._offset;
-        }
+		// Handle the lack of byteOffset
+		if (byteOffset === undefined) {
+			byteOffset = this._offset;
+		}
 
-        // Error Checking
-        if (typeof byteOffset !== 'number') {
-            throw new TypeError('jDataView byteOffset is not a number');
-        }
-        if (length < 0 || byteOffset + length > this.byteLength) {
-            throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
-        }
+		// Error Checking
+		if (typeof byteOffset !== 'number') {
+			throw new TypeError('jDataView byteOffset is not a number');
+		}
+		if (length < 0 || byteOffset + length > this.byteLength) {
+			throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
+		}
 
-        byteOffset += this._start;
+		byteOffset += this._start;
 
-        if (this._isArrayBuffer) {
-            result = new Uint8Array(this.buffer, byteOffset, length);
-        }
-        else {
-            result = this.buffer.slice(byteOffset, byteOffset + length);
+		if (this._isArrayBuffer) {
+			result = new Uint8Array(this.buffer, byteOffset, length);
+		}
+		else {
+			result = this.buffer.slice(byteOffset, byteOffset + length);
 
-            if (!this._isNodeBuffer) {
-                result = Array.prototype.map.call(result, function (char) {
-                    return char.charCodeAt(0) & 0xff;
-                });
-            }
-        }
+			if (!this._isNodeBuffer) {
+				result = Array.prototype.map.call(result, function (char) {
+					return char.charCodeAt(0) & 0xff;
+				});
+			}
+		}
 
-        if (littleEndian && length > 1) {
-            if (!(result instanceof Array)) {
-                result = Array.prototype.slice.call(result);
-            }
-            
-            result.reverse();
-        }
+		if (littleEndian && length > 1) {
+			if (!(result instanceof Array)) {
+				result = Array.prototype.slice.call(result);
+			}
 
-        this._offset = byteOffset - this._start + length;
+			result.reverse();
+		}
 
-        return result;
-    },
+		this._offset = byteOffset - this._start + length;
 
-    // wrapper for external calls (do not return inner buffer directly to prevent it's modifying)
-    getBytes: function (length, byteOffset, littleEndian) {
-        var result = this._getBytes.apply(this, arguments);
+		return result;
+	},
 
-        if (!(result instanceof Array)) {
-            result = Array.prototype.slice.call(result);
-        }
+	// wrapper for external calls (do not return inner buffer directly to prevent it's modifying)
+	getBytes: function (length, byteOffset, littleEndian) {
+		var result = this._getBytes.apply(this, arguments);
 
-        return result;
-    },
+		if (!(result instanceof Array)) {
+			result = Array.prototype.slice.call(result);
+		}
+
+		return result;
+	},
 
 	getString: function (length, byteOffset) {
 		var value;
 
 		if (this._isNodeBuffer) {
-            // Handle the lack of byteOffset
-            if (byteOffset === undefined) {
-                byteOffset = this._offset;
-            }
+			// Handle the lack of byteOffset
+			if (byteOffset === undefined) {
+				byteOffset = this._offset;
+			}
 
-            // Error Checking
-            if (typeof byteOffset !== 'number') {
-                throw new TypeError('jDataView byteOffset is not a number');
-            }
-            if (length < 0 || byteOffset + length > this.byteLength) {
-                throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
-            }
+			// Error Checking
+			if (typeof byteOffset !== 'number') {
+				throw new TypeError('jDataView byteOffset is not a number');
+			}
+			if (length < 0 || byteOffset + length > this.byteLength) {
+				throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
+			}
 
 			value = this.buffer.toString('ascii', this._start + byteOffset, this._start + byteOffset + length);
-            this._offset = byteOffset + length;
+			this._offset = byteOffset + length;
 		}
 		else {
 			value = String.fromCharCode.apply(null, this._getBytes(length, byteOffset, false));
@@ -404,7 +404,7 @@ jDataView.prototype = {
 	},
 
 	_getUint8: function (byteOffset) {
-        return this._getBytes(1, byteOffset)[0];
+		return this._getBytes(1, byteOffset)[0];
 	}
 };
 
