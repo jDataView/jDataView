@@ -267,7 +267,7 @@ jDataView.prototype = {
             result.reverse();
         }
 
-        this._offset = byteOffset + length;
+        this._offset = byteOffset - this._start + length;
 
         return result;
     },
