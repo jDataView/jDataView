@@ -6,7 +6,7 @@ var module = QUnit.module;
 var test = QUnit.test;
 
 var buffer = jDataView.createBuffer(
-    0x00,
+	0x00,
 	0xff, 0xfe, 0xfd, 0xfc,
 	0xfa, 0x00, 0xba, 0x01);
 var view = new jDataView(buffer, 1, undefined, true);
@@ -70,18 +70,18 @@ function chr (x) {
 }
 
 test('Char', function () {
-	equal(view.getChar(0), chr(65533));
-	equal(view.getChar(1), chr(65533));
-	equal(view.getChar(2), chr(65533));
-	equal(view.getChar(3), chr(65533));
-	equal(view.getChar(4), chr(65533));
+	equal(view.getChar(0), chr(0xff));
+	equal(view.getChar(1), chr(0xfe));
+	equal(view.getChar(2), chr(0xfd));
+	equal(view.getChar(3), chr(0xfc));
+	equal(view.getChar(4), chr(0xfa));
 	equal(view.getChar(5), chr(0));
-	equal(view.getChar(6), chr(65533));
+	equal(view.getChar(6), chr(0xba));
 	equal(view.getChar(7), chr(1));
 });
 
 test('String', function () {
-	equal(view.getString(1, 0), chr(65533));
+	equal(view.getString(1, 0), chr(0xff));
 	equal(view.getString(1, 5), chr(0));
 	equal(view.getString(1, 7), chr(1));
 	equal(b(127, 0, 1, 65, 66).getString(5), chr(127) + chr(0) + chr(1) + chr(65) + chr(66));

@@ -28,7 +28,7 @@ Constructor
 -----------------
 * new **jDataView**(buffer, offset, length, littleEndian=false)
     * buffer can be either a String, an ArrayBuffer, or a Node.js Buffer
-    * littleEndian is a default value for the view
+    * littleEndian = false (Big Endian mode) is a default value for the view
 
 Specification API
 -------------------------
@@ -42,11 +42,12 @@ The wrapper satisfies all the specification getters.
 * **getUint32**(byteOffset, littleEndian)
 * **getFloat32**(byteOffset, littleEndian)
 * **getFloat64**(byteOffset, littleEndian)
+* **getBytes**(length, byteOffset, littleEndian)
 
 
 Extended Specification
 ---------------------------------
-Addition of a littleEndian argument to the constructor. It will be the default value of the getters if their littleEndian value is undefined.
+Addition of a littleEndian argument to the constructor. Big Endian will be the default mode of getters if their littleEndian value is undefined.
 
 * **jDataView**(buffer, offset, length, littleEndian=false)
 
@@ -125,7 +126,7 @@ $.get(
 Changelog
 ========
 * **June 30 2012**: Thanks to [Mithgol](https://github.com/Mithgol) for the changes!
-  * Changed default from big endian to little endian to be compatible with DataView specification
+  * Changed default to big endian from little endian to be compatible with DataView specification
   * Dropped support for NodeJS < 0.5.5, it was buggy anyway
   * Fixed an issue where ArrayBuffer would not work on NodeJS
   * Moved the compatibility checks outside of the read functions for hopefully better performance
