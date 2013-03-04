@@ -28,7 +28,7 @@ Constructor
 -----------------
 * new **jDataView**(buffer, offset, length, littleEndian=false)
     * buffer can be either a String, an ArrayBuffer, or a Node.js Buffer
-    * littleEndian is a default value for the view
+    * littleEndian = false (Big Endian mode) is a default value for the view
 
 Specification API
 -------------------------
@@ -42,11 +42,12 @@ The wrapper satisfies all the specification getters.
 * **getUint32**(byteOffset, littleEndian)
 * **getFloat32**(byteOffset, littleEndian)
 * **getFloat64**(byteOffset, littleEndian)
+* **getBytes**(length, byteOffset, littleEndian)
 
 
 Extended Specification
 ---------------------------------
-Addition of a littleEndian argument to the constructor. It will be the default value of the getters if their littleEndian value is undefined.
+Addition of a littleEndian argument to the constructor. Big Endian will be the default mode of getters if their littleEndian value is undefined.
 
 * **jDataView**(buffer, offset, length, littleEndian=false)
 
