@@ -126,7 +126,7 @@ $.get(
 Changelog
 ========
 * **June 30 2012**: Thanks to [Mithgol](https://github.com/Mithgol) for the changes!
-  * Changed default from big endian to little endian to be compatible with DataView specification
+  * Changed default to big endian from little endian to be compatible with DataView specification
   * Dropped support for NodeJS < 0.5.5, it was buggy anyway
   * Fixed an issue where ArrayBuffer would not work on NodeJS
   * Moved the compatibility checks outside of the read functions for hopefully better performance
