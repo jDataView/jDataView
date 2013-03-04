@@ -244,6 +244,8 @@ jDataView.prototype = {
             throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
         }
 
+        byteOffset += this._start;
+
         if (this._isArrayBuffer) {
             result = new Uint8Array(this.buffer, byteOffset, length);
         }
