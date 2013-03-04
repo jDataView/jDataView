@@ -223,7 +223,7 @@ jDataView.prototype = {
 
 	// Helpers
 
-    getBytes: function (length, byteOffset, littleEndian) {
+    _getBytes: function (length, byteOffset, littleEndian) {
         var result;
 
         // Handle the lack of endianness
@@ -270,6 +270,17 @@ jDataView.prototype = {
         return result;
     },
 
+    // wrapper for external calls (do not return inner buffer directly to prevent it's modifying)
+    getBytes: function (length, byteOffset, littleEndian) {
+        var result = this._getBytes.apply(this, arguments);
+
+        if (!(result instanceof Array)) {
+            result = Array.prototype.slice.call(result);
+        }
+
+        return result;
+    },
+
 	getString: function (length, byteOffset) {
 		var value;
 
@@ -291,7 +302,7 @@ jDataView.prototype = {
             this._offset = byteOffset + length;
 		}
 		else {
-			value = String.fromCharCode.apply(null, this.getBytes(length, byteOffset, false));
+			value = String.fromCharCode.apply(null, this._getBytes(length, byteOffset, false));
 		}
 
 		return value;
@@ -319,7 +330,7 @@ jDataView.prototype = {
 	// Compatibility functions on a String Buffer
 
 	_getFloat64: function (byteOffset, littleEndian) {
-		var b = this.getBytes(8, byteOffset, littleEndian),
+		var b = this._getBytes(8, byteOffset, littleEndian),
 
 			sign = 1 - (2 * (b[0] >> 7)),
 			exponent = ((((b[0] << 1) & 0xff) << 3) | (b[1] >> 4)) - (Math.pow(2, 10) - 1),
@@ -344,7 +355,7 @@ jDataView.prototype = {
 	},
 
 	_getFloat32: function (byteOffset, littleEndian) {
-		var b = this.getBytes(4, byteOffset, littleEndian),
+		var b = this._getBytes(4, byteOffset, littleEndian),
 
 			sign = 1 - (2 * (b[0] >> 7)),
 			exponent = (((b[0] << 1) & 0xff) | (b[1] >> 7)) - 127,
@@ -371,7 +382,7 @@ jDataView.prototype = {
 	},
 
 	_getUint32: function (byteOffset, littleEndian) {
-		var b = this.getBytes(4, byteOffset, littleEndian);
+		var b = this._getBytes(4, byteOffset, littleEndian);
 		return (b[3] * Math.pow(2, 24)) + (b[2] << 16) + (b[1] << 8) + b[0];
 	},
 
@@ -381,7 +392,7 @@ jDataView.prototype = {
 	},
 
 	_getUint16: function (byteOffset, littleEndian) {
-		var b = this.getBytes(2, byteOffset, littleEndian);
+		var b = this._getBytes(2, byteOffset, littleEndian);
 		return (b[1] << 8) + b[0];
 	},
 
@@ -391,7 +402,7 @@ jDataView.prototype = {
 	},
 
 	_getUint8: function (byteOffset) {
-        return this.getBytes(1, byteOffset)[0];
+        return this._getBytes(1, byteOffset)[0];
 	}
 };
 
