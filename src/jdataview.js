@@ -133,16 +133,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 				continue;
 			}
 
-			var name;
-			if (type === 'Int8' || type === 'Uint8') {
-				name = 'read' + nodeNaming[type];
-			} else if (littleEndian) {
-				name = 'read' + nodeNaming[type] + 'LE';
-			} else {
-				name = 'read' + nodeNaming[type] + 'BE';
-			}
-
-			(function(type, view, name){
+			(function(type, view){
 				var size = dataTypes[type];
 				view['get' + type] = function (byteOffset, littleEndian) {
 					// Handle the lack of endianness
@@ -155,12 +146,21 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 						byteOffset = view._offset;
 					}
 
+					var name;
+					if (type === 'Int8' || type === 'Uint8') {
+						name = 'read' + nodeNaming[type];
+					} else if (littleEndian) {
+						name = 'read' + nodeNaming[type] + 'LE';
+					} else {
+						name = 'read' + nodeNaming[type] + 'BE';
+					}
+
 					// Move the internal offset forward
 					view._offset = byteOffset + size;
 
 					return view.buffer[name](view._start + byteOffset);
 				}
-			})(type, this, name);
+			})(type, this);
 		}
 	} else {
 		for (var type in dataTypes) {
