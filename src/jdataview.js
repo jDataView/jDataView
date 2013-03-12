@@ -259,7 +259,7 @@ jDataView.prototype = {
 			}
 		}
 
-		if (littleEndian && length > 1) {
+		if (!littleEndian && length > 1) {
 			if (!(result instanceof Array)) {
 				result = Array.prototype.slice.call(result);
 			}
@@ -284,7 +284,7 @@ jDataView.prototype = {
 	},
 
 	getString: function (length, byteOffset) {
-		return String.fromCharCode.apply(null, this._getBytes(length, byteOffset, false));
+		return String.fromCharCode.apply(null, this._getBytes(length, byteOffset, true));
 	},
 
 	getChar: function (byteOffset) {
@@ -311,12 +311,12 @@ jDataView.prototype = {
 	_getFloat64: function (byteOffset, littleEndian) {
 		var b = this._getBytes(8, byteOffset, littleEndian),
 
-			sign = 1 - (2 * (b[0] >> 7)),
-			exponent = ((((b[0] << 1) & 0xff) << 3) | (b[1] >> 4)) - (Math.pow(2, 10) - 1),
+			sign = 1 - (2 * (b[7] >> 7)),
+			exponent = ((((b[7] << 1) & 0xff) << 3) | (b[6] >> 4)) - ((1 << 10) - 1),
 
 		// Binary operators such as | and << operate on 32 bit values, using + and Math.pow(2) instead
-			mantissa = ((b[1] & 0x0f) * Math.pow(2, 48)) + (b[2] * Math.pow(2, 40)) + (b[3] * Math.pow(2, 32)) +
-						(b[4] * Math.pow(2, 24)) + (b[5] * Math.pow(2, 16)) + (b[6] * Math.pow(2, 8)) + b[7];
+			mantissa = ((b[6] & 0x0f) * Math.pow(2, 48)) + (b[5] * Math.pow(2, 40)) + (b[4] * Math.pow(2, 32)) +
+						(b[3] * Math.pow(2, 24)) + (b[2] * Math.pow(2, 16)) + (b[1] * Math.pow(2, 8)) + b[0];
 
 		if (exponent === 1024) {
 			if (mantissa !== 0) {
@@ -336,9 +336,9 @@ jDataView.prototype = {
 	_getFloat32: function (byteOffset, littleEndian) {
 		var b = this._getBytes(4, byteOffset, littleEndian),
 
-			sign = 1 - (2 * (b[0] >> 7)),
-			exponent = (((b[0] << 1) & 0xff) | (b[1] >> 7)) - 127,
-			mantissa = ((b[1] & 0x7f) << 16) | (b[2] << 8) | b[3];
+			sign = 1 - (2 * (b[3] >> 7)),
+			exponent = (((b[3] << 1) & 0xff) | (b[2] >> 7)) - 127,
+			mantissa = ((b[2] & 0x7f) << 16) | (b[1] << 8) | b[0];
 
 		if (exponent === 128) {
 			if (mantissa !== 0) {
@@ -356,28 +356,25 @@ jDataView.prototype = {
 	},
 
 	_getInt32: function (byteOffset, littleEndian) {
-		var b = this._getUint32(byteOffset, littleEndian);
-		return b > Math.pow(2, 31) - 1 ? b - Math.pow(2, 32) : b;
+		var b = this._getBytes(4, byteOffset, littleEndian);
+		return (b[3] << 24) | (b[2] << 16) | (b[1] << 8) | b[0];
 	},
 
 	_getUint32: function (byteOffset, littleEndian) {
-		var b = this._getBytes(4, byteOffset, littleEndian);
-		return (b[0] * Math.pow(2, 24)) + (b[1] << 16) + (b[2] << 8) + b[3];
+		return this._getInt32(byteOffset, littleEndian) >>> 0;
 	},
 
 	_getInt16: function (byteOffset, littleEndian) {
-		var b = this._getUint16(byteOffset, littleEndian);
-		return b > Math.pow(2, 15) - 1 ? b - Math.pow(2, 16) : b;
+		return (this._getUint16(byteOffset, littleEndian) << 16) >> 16;
 	},
 
 	_getUint16: function (byteOffset, littleEndian) {
 		var b = this._getBytes(2, byteOffset, littleEndian);
-		return (b[0] << 8) + b[1];
+		return (b[1] << 8) | b[0];
 	},
 
 	_getInt8: function (byteOffset) {
-		var b = this._getUint8(byteOffset);
-		return b > Math.pow(2, 7) - 1 ? b - Math.pow(2, 8) : b;
+		return (this._getUint8(byteOffset) << 24) >> 24;
 	},
 
 	_getUint8: function (byteOffset) {
