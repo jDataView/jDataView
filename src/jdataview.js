@@ -196,7 +196,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 							throw new Error('jDataView (byteOffset + size) value is out of bounds');
 						}
 
-						return view['_get' + type](view._start + byteOffset, littleEndian);
+						return view['_get' + type](byteOffset, littleEndian);
 					}
 				}
 			})(type, this);
@@ -284,30 +284,7 @@ jDataView.prototype = {
 	},
 
 	getString: function (length, byteOffset) {
-		var value;
-
-		if (this._isNodeBuffer) {
-			// Handle the lack of byteOffset
-			if (byteOffset === undefined) {
-				byteOffset = this._offset;
-			}
-
-			// Error Checking
-			if (typeof byteOffset !== 'number') {
-				throw new TypeError('jDataView byteOffset is not a number');
-			}
-			if (length < 0 || byteOffset + length > this.byteLength) {
-				throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
-			}
-
-			value = this.buffer.toString('ascii', this._start + byteOffset, this._start + byteOffset + length);
-			this._offset = byteOffset + length;
-		}
-		else {
-			value = String.fromCharCode.apply(null, this._getBytes(length, byteOffset, false));
-		}
-
-		return value;
+		return String.fromCharCode.apply(null, this._getBytes(length, byteOffset, false));
 	},
 
 	getChar: function (byteOffset) {
@@ -385,7 +362,7 @@ jDataView.prototype = {
 
 	_getUint32: function (byteOffset, littleEndian) {
 		var b = this._getBytes(4, byteOffset, littleEndian);
-		return (b[3] * Math.pow(2, 24)) + (b[2] << 16) + (b[1] << 8) + b[0];
+		return (b[0] * Math.pow(2, 24)) + (b[1] << 16) + (b[2] << 8) + b[3];
 	},
 
 	_getInt16: function (byteOffset, littleEndian) {
@@ -395,7 +372,7 @@ jDataView.prototype = {
 
 	_getUint16: function (byteOffset, littleEndian) {
 		var b = this._getBytes(2, byteOffset, littleEndian);
-		return (b[1] << 8) + b[0];
+		return (b[0] << 8) + b[1];
 	},
 
 	_getInt8: function (byteOffset) {
