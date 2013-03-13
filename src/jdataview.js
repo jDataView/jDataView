@@ -44,6 +44,10 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		throw new Error("jDataView constructor may not be called as a function");
 	}
 
+	if (buffer instanceof Array) {
+		buffer = jDataView.createBuffer.apply(jDataView, buffer);
+	}
+
 	this.buffer = buffer;
 
 	// Handle Type Errors
@@ -271,6 +275,15 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 					}
 				};
 			})(type, this);
+		}
+	}
+
+	for (var type in dataTypes) {
+		if (!dataTypes.hasOwnProperty(type)) {
+			continue;
+		}
+		this['write' + type] = function (value, littleEndian) {
+		    this['set' + type](undefined, value, littleEndian);
 		}
 	}
 };

@@ -11,8 +11,7 @@ var dataBytes = [
 	0xfa, 0x00, 0xba, 0x01
 ];
 var dataStart = 1;
-var buffer = jDataView.createBuffer.apply(jDataView, dataBytes);
-var view = new jDataView(buffer, dataStart, undefined, true);
+var view = new jDataView(dataBytes, dataStart, undefined, true);
 
 function b() {
 	return new jDataView(jDataView.createBuffer.apply(jDataView, arguments));
