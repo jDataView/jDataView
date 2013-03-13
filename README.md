@@ -32,7 +32,7 @@ Constructor
 
 Specification API
 -------------------------
-The wrapper satisfies all the specification getters and setters.
+The wrapper satisfies all the specification getters:
 
 * **getInt8**(byteOffset)
 * **getUint8**(byteOffset)
@@ -42,6 +42,8 @@ The wrapper satisfies all the specification getters and setters.
 * **getUint32**(byteOffset, littleEndian)
 * **getFloat32**(byteOffset, littleEndian)
 * **getFloat64**(byteOffset, littleEndian)
+
+And setters:
 
 * **setInt8**(byteOffset, value)
 * **setUint8**(byteOffset, value)
