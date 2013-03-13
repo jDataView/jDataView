@@ -5,11 +5,14 @@ if (typeof jDataView === 'undefined') {
 var module = QUnit.module;
 var test = QUnit.test;
 
-var buffer = jDataView.createBuffer(
-	0x00,
-	0xff, 0xfe, 0xfd, 0xfc,
-	0xfa, 0x00, 0xba, 0x01);
-var view = new jDataView(buffer, 1, undefined, true);
+var dataBytes = [
+    0x00,
+    0xff, 0xfe, 0xfd, 0xfc,
+    0xfa, 0x00, 0xba, 0x01
+];
+var dataStart = 1;
+var buffer = jDataView.createBuffer.apply(jDataView, dataBytes);
+var view = new jDataView(buffer, dataStart, undefined, true);
 
 function b() {
 	return new jDataView(jDataView.createBuffer.apply(this, arguments));
@@ -173,4 +176,25 @@ test('Float64', function () {
 	equal(b(0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00).getFloat64(), 2.2250738585072014e-308);
 	equal(b(0x7f, 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff).getFloat64(), 1.7976931348623157e+308);
 	ok(isNaN(b(0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01).getFloat64()))
+});
+
+module('Value Write', {
+    teardown: function () {
+        console.log('Teardown');
+        view.setBytes(0, dataBytes.slice(dataStart), true);
+    }
+});
+
+test('Char', function () {
+    view.setChar(5, chr(0xdf));
+    equal(view.getChar(5), chr(0xdf));
+    view.setChar(7, chr(0x03));
+    equal(view.getChar(7), chr(0x03));
+});
+
+test('String', function () {
+    view.setString(4, chr(1) + chr(2) + chr(3));
+    equal(view.getString(4, 4), chr(1) + chr(2) + chr(3) + chr(1));
+    view.setString(0, chr(8) + chr(9));
+    equal(view.getString(2, 1), chr(9) + chr(0xfd));
 });
