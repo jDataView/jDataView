@@ -404,7 +404,7 @@ jDataView.prototype = {
 
 	setString: function (byteOffset, subString) {
 		this.setBytes(byteOffset, Array.prototype.map.call(subString, function (char) {
-			return char.charCodeAt(0);
+			return char.charCodeAt(0) & 0xff;
 		}), true);
 	},
 
