@@ -8,11 +8,11 @@ Explanation
 
 There are three ways to read a binary file from the browser.
 
-* The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a **String**, and you have to rewrite all the decoding functions (getUint16, getFloat32, ...). All the browsers support this.
+* The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a **String**, and you have to rewrite all the decoding and encoding functions (getUint16, getFloat32, ...). All the browsers support this.
 
-* Then browsers that implemented WebGL also added **ArrayBuffers**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. It has big drawback, it can't read non-aligned data. It is supported by Firefox 4 and Chrome 7.
+* Then browsers that implemented WebGL also added **ArrayBuffers**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. It has big drawback, it can't read non-aligned data.
 
-* A new revision of the specification added **DataViews**. It is a view around your buffer that can read arbitrary data types directly through functions: getUint32, getFloat64 ... Only Chrome 9 supports it.
+* A new revision of the specification added **DataViews**. It is a view around your buffer that can read/write arbitrary data types directly through functions: getUint32, getFloat64 ...
 
 And one way to read a binary file from the server.
 
@@ -27,12 +27,12 @@ See the [Typed Array Specification](http://www.khronos.org/registry/typedarray/s
 Constructor
 -----------------
 * new **jDataView**(buffer, offset, length, littleEndian=false)
-    * buffer can be either a String, an ArrayBuffer, or a Node.js Buffer
+    * buffer can be either a byte Array, binary String, an ArrayBuffer, or a Node.js Buffer
     * littleEndian = false (Big Endian mode) is a default value for the view
 
 Specification API
 -------------------------
-The wrapper satisfies all the specification getters.
+The wrapper satisfies all the specification getters and setters.
 
 * **getInt8**(byteOffset)
 * **getUint8**(byteOffset)
@@ -42,8 +42,14 @@ The wrapper satisfies all the specification getters.
 * **getUint32**(byteOffset, littleEndian)
 * **getFloat32**(byteOffset, littleEndian)
 * **getFloat64**(byteOffset, littleEndian)
-* **getBytes**(length, byteOffset, littleEndian)
-
+* **setInt8**(byteOffset, value)
+* **setUint8**(byteOffset, value)
+* **setInt16**(byteOffset, value, littleEndian)
+* **setUint16**(byteOffset, value, littleEndian)
+* **setInt32**(byteOffset, value, littleEndian)
+* **setUint32**(byteOffset, value, littleEndian)
+* **setFloat32**(byteOffset, value, littleEndian)
+* **setFloat64**(byteOffset, value, littleEndian)
 
 Extended Specification
 ---------------------------------
@@ -58,19 +64,33 @@ The byteOffset parameter is now optional. If you omit it, it will read right aft
 * **tell**()
     * Returns the current position
 
-Addition of getChar and getString utilities.
+Also, specification DataView setters require byteOffset as first argument, and passing "undefined" for sequential writes can be not very convenient.
+You can use ```writeXXX``` methods instead, which will set values at current position automatically:
+
+* **writeInt8**(value)
+* **writeUint8**(value)
+* **writeInt16**(value, littleEndian)
+* **writeUint16**(value, littleEndian)
+* **writeInt32**(value, littleEndian)
+* **writeUint32**(value, littleEndian)
+* **writeFloat32**(value, littleEndian)
+* **writeFloat64**(value, littleEndian)
+
+Addition of Char, String and Bytes utilities.
 
 * **getChar**(byteOffset)
 * **getString**(length, byteOffset)
+* **getBytes**(length, byteOffset, littleEndian)
+* **setChar**(byteOffset, char)
+* **setString**(byteOffset, chars)
+* **setBytes**(byteOffset, bytes, littleEndian)
+* **writeChar**(char)
+* **writeString**(chars)
+* **writeBytes**(bytes, littleEndian)
 
 Addition of createBuffer, a utility to easily create buffers with the latest available storage type (String or ArrayBuffer).
 
 * **createBuffer**(byte1, byte2, ...)
-
-Shortcomings
-==========
-
-* Only the Read API is being wrapped, jDataView does not provide any `set` method.
 
 Example
 ======
