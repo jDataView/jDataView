@@ -42,6 +42,7 @@ The wrapper satisfies all the specification getters and setters.
 * **getUint32**(byteOffset, littleEndian)
 * **getFloat32**(byteOffset, littleEndian)
 * **getFloat64**(byteOffset, littleEndian)
+
 * **setInt8**(byteOffset, value)
 * **setUint8**(byteOffset, value)
 * **setInt16**(byteOffset, value, littleEndian)
@@ -148,6 +149,7 @@ Changelog
 * **March 13 2013**:
   * [RReverser](https://github.com/rreverser) added support for setters in all supported implementations!
   * Performance improvements changing lower level constructs
+  * Addition of getBytes and write* helpers
 * **June 30 2012**: Thanks to [Mithgol](https://github.com/Mithgol) for the changes!
   * Changed default to big endian from little endian to be compatible with DataView specification
   * Dropped support for NodeJS < 0.5.5, it was buggy anyway
