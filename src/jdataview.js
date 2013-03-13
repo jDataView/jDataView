@@ -506,6 +506,66 @@ jDataView.prototype = {
 		return this._getBytes(1, byteOffset)[0];
 	},
 
+	_setBinaryFloat: function (byteOffset, value, mantSize, expSize, littleEndian) {
+		var signBit = value < 0 ? 1 : 0,
+			exponent,
+			mantissa,
+			eMax = ~(-1 << (expSize - 1)),
+			eMin = 1 - eMax;
+
+		if (value < 0) {
+			value = -value;
+		}
+
+		if (value === 0) {
+			exponent = eMin - 1;
+			mantissa = 0;
+		} else
+		if (isNaN(value)) {
+			exponent = eMax + 1;
+			mantissa = 1;
+		} else
+		if (value === Infinity) {
+			exponent = eMax + 1;
+			mantissa = 0;
+		} else {
+			exponent = Math.floor(Math.log(value) / Math.LN2);
+			if (exponent > eMin && exponent <= eMax) {
+				mantissa = Math.floor((value * Math.pow(2, -exponent) - 1) * Math.pow(2, mantSize));
+			} else {
+				mantissa = Math.floor(value * Math.pow(2, mantSize - eMin));
+				exponent = eMin - 1;
+			}
+		}
+
+		exponent += eMax;
+
+		var b = [];
+		while (mantSize >= 8) {
+			b.push(mantissa % 256);
+			mantissa = Math.floor(mantissa / 256);
+			mantSize -= 8;
+		}
+		exponent = (exponent << mantSize) | mantissa;
+		expSize += mantSize;
+		while (expSize >= 8) {
+			b.push(exponent & 0xff);
+			exponent >>>= 8;
+			expSize -= 8;
+		}
+		b.push((signBit << expSize) | exponent);
+
+		this.setBytes(byteOffset, b, littleEndian);
+	},
+
+	_setFloat32: function (byteOffset, value, littleEndian) {
+		this._setBinaryFloat(byteOffset, value, 23, 8, littleEndian);
+	},
+
+	_setFloat64: function (byteOffset, value, littleEndian) {
+		this._setBinaryFloat(byteOffset, value ,52, 11, littleEndian);
+	},
+
 	_setInt32: function (byteOffset, value, littleEndian) {
 		this.setBytes(byteOffset, [
 			value & 0xff,
