@@ -84,6 +84,9 @@ Addition of Char, String and Bytes utilities.
 * **setChar**(byteOffset, char)
 * **setString**(byteOffset, chars)
 * **setBytes**(byteOffset, bytes, littleEndian)
+* **writeChar**(char)
+* **writeString**(chars)
+* **writeBytes**(bytes, littleEndian)
 
 Addition of createBuffer, a utility to easily create buffers with the latest available storage type (String or ArrayBuffer).
 

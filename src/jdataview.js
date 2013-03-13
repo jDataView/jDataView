@@ -411,6 +411,10 @@ jDataView.prototype = {
 		this._offset = byteOffset - this._start + length;
 	},
 
+	writeBytes: function (bytes, littleEndian) {
+		this.setBytes(undefined, bytes, littleEndian);
+	},
+
 	getString: function (length, byteOffset) {
 		return String.fromCharCode.apply(null, this._getBytes(length, byteOffset, true));
 	},
@@ -421,12 +425,20 @@ jDataView.prototype = {
 		}), true);
 	},
 
+	writeString: function (subString) {
+		this.setString(undefined, subString);
+	},
+
 	getChar: function (byteOffset) {
 		return this.getString(1, byteOffset);
 	},
 
 	setChar: function (byteOffset, char) {
 		this.setString.apply(this, arguments);
+	},
+
+	writeChar: function (char) {
+		this.setChar(undefined, char);
 	},
 
 	tell: function () {
