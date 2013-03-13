@@ -225,3 +225,17 @@ test('Uint16', function () {
 	view.setUint16(2, 35);
 	equal(view.getUint16(2), 35);
 });
+
+test('Int32', function () {
+    view.setInt32(0, -1238748268);
+	equal(view.getInt32(0), -1238748268);
+	view.setInt32(4, 69359465);
+	equal(view.getInt32(4), 69359465);
+});
+
+test('Uint32', function () {
+    view.setUint32(0, 3592756249);
+	equal(view.getUint32(0), 3592756249);
+	view.setUint32(4, 257391);
+	equal(view.getUint32(4), 257391);
+});

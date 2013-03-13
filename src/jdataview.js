@@ -267,7 +267,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 							throw new Error('jDataView (byteOffset + size) value is out of bounds');
 						}
 
-						view['_set' + type](byteOffset, value, littleEndian);
+						view['_set' + type.replace('Uint', 'Int')](byteOffset, value, littleEndian);
 					}
 				};
 			})(type, this);
@@ -506,26 +506,23 @@ jDataView.prototype = {
 		return this._getBytes(1, byteOffset)[0];
 	},
 
-	_setUint32: function (byteOffset, value, littleEndian) {
-
+	_setInt32: function (byteOffset, value, littleEndian) {
+		this.setBytes(byteOffset, [
+			value & 0xff,
+			(value >>> 8) & 0xff,
+			(value >>> 16) & 0xff,
+			value >>> 24
+		], littleEndian);
 	},
 
 	_setInt16: function (byteOffset, value, littleEndian) {
-		this._setUint16(byteOffset, value & 0xffff, littleEndian);
-	},
-
-	_setUint16: function (byteOffset, value, littleEndian) {
 		this.setBytes(byteOffset, [
 			value & 0xff,
-			value >> 8
+			value >>> 8
 		], littleEndian);
 	},
 
 	_setInt8: function (byteOffset, value) {
-		this._setUint8(byteOffset, value & 0xff);
-	},
-
-	_setUint8: function (byteOffset, value) {
 		this.setBytes(byteOffset, [value]);
 	}
 };
