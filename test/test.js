@@ -180,7 +180,6 @@ test('Float64', function () {
 
 module('Value Write', {
     teardown: function () {
-        console.log('Teardown');
         view.setBytes(0, dataBytes.slice(dataStart), true);
     }
 });
@@ -197,4 +196,18 @@ test('String', function () {
     equal(view.getString(4, 4), chr(1) + chr(2) + chr(3) + chr(1));
     view.setString(0, chr(8) + chr(9));
     equal(view.getString(2, 1), chr(9) + chr(0xfd));
+});
+
+test('Int8', function () {
+    view.setInt8(3, -10);
+    equal(view.getInt8(3), -10);
+    view.setInt8(7, 29);
+    equal(view.getInt8(7), 29);
+});
+
+test('Uint8', function () {
+    view.setUint8(3, 19);
+    equal(view.getUint8(3), 19);
+    view.setUint8(7, 129);
+    equal(view.getUint8(7), 129);
 });

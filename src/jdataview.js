@@ -504,7 +504,15 @@ jDataView.prototype = {
 
 	_getUint8: function (byteOffset) {
 		return this._getBytes(1, byteOffset)[0];
-	}
+	},
+
+    _setInt8: function (byteOffset, value) {
+        this._setUint8(byteOffset, value & 0xff);
+    },
+
+    _setUint8: function (byteOffset, value) {
+        this.setBytes(byteOffset, [value]);
+    }
 };
 
 if (typeof jQuery !== 'undefined' && jQuery.fn.jquery >= "1.6.2") {
