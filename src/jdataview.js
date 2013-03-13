@@ -506,6 +506,17 @@ jDataView.prototype = {
 		return this._getBytes(1, byteOffset)[0];
 	},
 
+    _setInt16: function (byteOffset, value, littleEndian) {
+        this._setUint16(byteOffset, value & 0xffff, littleEndian);
+    },
+
+    _setUint16: function (byteOffset, value, littleEndian) {
+        this.setBytes(byteOffset, [
+            value & 0xff,
+            value >> 8
+        ], littleEndian);
+    },
+
     _setInt8: function (byteOffset, value) {
         this._setUint8(byteOffset, value & 0xff);
     },

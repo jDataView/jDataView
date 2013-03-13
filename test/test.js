@@ -211,3 +211,17 @@ test('Uint8', function () {
     view.setUint8(7, 129);
     equal(view.getUint8(7), 129);
 });
+
+test('Int16', function () {
+    view.setInt16(0, -17593);
+    equal(view.getInt16(0), -17593);
+    view.setInt16(2, 23784);
+    equal(view.getInt16(2), 23784);
+});
+
+test('Uint16', function () {
+    view.setUint16(0, 39571);
+    equal(view.getUint16(0), 39571);
+    view.setUint16(2, 35);
+    equal(view.getUint16(2), 35);
+});
