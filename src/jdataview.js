@@ -9,8 +9,8 @@
 (function (global) {
 
 var compatibility = {
-	ArrayBuffer: typeof ArrayBuffer !== 'undefined',
-	DataView: typeof DataView !== 'undefined' &&
+	ArrayBuffer: false && typeof ArrayBuffer !== 'undefined',
+	DataView: false && typeof DataView !== 'undefined' &&
 		('getFloat64' in DataView.prototype ||				// Chrome
 		 'getFloat64' in new DataView(new ArrayBuffer(1))), // Node
 	// NodeJS Buffer in v0.5.5 and newer
@@ -125,22 +125,22 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 
 					return view._view['get' + type](byteOffset, littleEndian);
 				};
-                view['set' + type] = function (byteOffset, value, littleEndian) {
-                    // Handle the lack of endianness
-                    if (littleEndian === undefined) {
-                        littleEndian = view._littleEndian;
-                    }
+				view['set' + type] = function (byteOffset, value, littleEndian) {
+					// Handle the lack of endianness
+					if (littleEndian === undefined) {
+						littleEndian = view._littleEndian;
+					}
 
-                    // Handle the lack of byteOffset
-                    if (byteOffset === undefined) {
-                        byteOffset = view._offset;
-                    }
+					// Handle the lack of byteOffset
+					if (byteOffset === undefined) {
+						byteOffset = view._offset;
+					}
 
-                    // Move the internal offset forward
-                    view._offset = byteOffset + size;
+					// Move the internal offset forward
+					view._offset = byteOffset + size;
 
-                    view._view['set' + type](byteOffset, value, littleEndian);
-                };
+					view._view['set' + type](byteOffset, value, littleEndian);
+				};
 			})(type, this);
 		}
 	} else if (this._isNodeBuffer && compatibility.NodeBuffer) {
@@ -176,31 +176,31 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 
 					return view.buffer[name](view._start + byteOffset);
 				};
-                view['set' + type] = function (byteOffset, value, littleEndian) {
-                    // Handle the lack of endianness
-                    if (littleEndian === undefined) {
-                        littleEndian = view._littleEndian;
-                    }
+				view['set' + type] = function (byteOffset, value, littleEndian) {
+					// Handle the lack of endianness
+					if (littleEndian === undefined) {
+						littleEndian = view._littleEndian;
+					}
 
-                    // Handle the lack of byteOffset
-                    if (byteOffset === undefined) {
-                        byteOffset = view._offset;
-                    }
+					// Handle the lack of byteOffset
+					if (byteOffset === undefined) {
+						byteOffset = view._offset;
+					}
 
-                    var name;
-                    if (type === 'Int8' || type === 'Uint8') {
-                        name = 'write' + nodeNaming[type];
-                    } else if (littleEndian) {
-                        name = 'write' + nodeNaming[type] + 'LE';
-                    } else {
-                        name = 'write' + nodeNaming[type] + 'BE';
-                    }
+					var name;
+					if (type === 'Int8' || type === 'Uint8') {
+						name = 'write' + nodeNaming[type];
+					} else if (littleEndian) {
+						name = 'write' + nodeNaming[type] + 'LE';
+					} else {
+						name = 'write' + nodeNaming[type] + 'BE';
+					}
 
-                    // Move the internal offset forward
-                    view._offset = byteOffset + size;
+					// Move the internal offset forward
+					view._offset = byteOffset + size;
 
-                    view.buffer[name](value, view._start + byteOffset);
-                };
+					view.buffer[name](value, view._start + byteOffset);
+				};
 			})(type, this);
 		}
 	} else {
@@ -240,36 +240,36 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 						return view['_get' + type](byteOffset, littleEndian);
 					}
 				};
-                view['set' + type] = function (byteOffset, value, littleEndian) {
-                    // Handle the lack of endianness
-                    if (littleEndian === undefined) {
-                        littleEndian = view._littleEndian;
-                    }
+				view['set' + type] = function (byteOffset, value, littleEndian) {
+					// Handle the lack of endianness
+					if (littleEndian === undefined) {
+						littleEndian = view._littleEndian;
+					}
 
-                    // Handle the lack of byteOffset
-                    if (byteOffset === undefined) {
-                        byteOffset = view._offset;
-                    }
+					// Handle the lack of byteOffset
+					if (byteOffset === undefined) {
+						byteOffset = view._offset;
+					}
 
-                    // Move the internal offset forward
-                    view._offset = byteOffset + size;
+					// Move the internal offset forward
+					view._offset = byteOffset + size;
 
-                    if (view._isArrayBuffer && (view._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
-                        // ArrayBuffer: we use a typed array of size 1 if the alignment is good
-                        // ArrayBuffer does not support endianess flag (for size > 1)
-                        new global[type + 'Array'](view.buffer, view._start + byteOffset, 1)[0] = value;
-                    } else {
-                        // Error checking:
-                        if (typeof byteOffset !== 'number') {
-                            throw new TypeError('jDataView byteOffset is not a number');
-                        }
-                        if (byteOffset + size > view.byteLength) {
-                            throw new Error('jDataView (byteOffset + size) value is out of bounds');
-                        }
+					if (view._isArrayBuffer && (view._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
+						// ArrayBuffer: we use a typed array of size 1 if the alignment is good
+						// ArrayBuffer does not support endianess flag (for size > 1)
+						new global[type + 'Array'](view.buffer, view._start + byteOffset, 1)[0] = value;
+					} else {
+						// Error checking:
+						if (typeof byteOffset !== 'number') {
+							throw new TypeError('jDataView byteOffset is not a number');
+						}
+						if (byteOffset + size > view.byteLength) {
+							throw new Error('jDataView (byteOffset + size) value is out of bounds');
+						}
 
-                        view['_set' + type](byteOffset, value, littleEndian);
-                    }
-                };
+						view['_set' + type](byteOffset, value, littleEndian);
+					}
+				};
 			})(type, this);
 		}
 	}
@@ -354,67 +354,67 @@ jDataView.prototype = {
 		return result;
 	},
 
-    setBytes: function (byteOffset, bytes, littleEndian) {
-        var length = bytes.length;
+	setBytes: function (byteOffset, bytes, littleEndian) {
+		var length = bytes.length;
 
-        // Handle the lack of endianness
-        if (littleEndian === undefined) {
-            littleEndian = this._littleEndian;
-        }
+		// Handle the lack of endianness
+		if (littleEndian === undefined) {
+			littleEndian = this._littleEndian;
+		}
 
-        // Handle the lack of byteOffset
-        if (byteOffset === undefined) {
-            byteOffset = this._offset;
-        }
+		// Handle the lack of byteOffset
+		if (byteOffset === undefined) {
+			byteOffset = this._offset;
+		}
 
-        // Error Checking
-        if (typeof byteOffset !== 'number') {
-            throw new TypeError('jDataView byteOffset is not a number');
-        }
-        if (length < 0 || byteOffset + length > this.byteLength) {
-            throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
-        }
+		// Error Checking
+		if (typeof byteOffset !== 'number') {
+			throw new TypeError('jDataView byteOffset is not a number');
+		}
+		if (length < 0 || byteOffset + length > this.byteLength) {
+			throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
+		}
 
-        if (!littleEndian && length > 1) {
-            bytes = Array.prototype.slice.call(bytes).reverse();
-        }
+		if (!littleEndian && length > 1) {
+			bytes = Array.prototype.slice.call(bytes).reverse();
+		}
 
-        byteOffset += this._start;
+		byteOffset += this._start;
 
-        if (this._isArrayBuffer) {
-            new Uint8Array(this.buffer, byteOffset, length).set(bytes);
-        }
-        else {
-            if (this._isNodeBuffer) {
-                new Buffer(bytes).copy(this.buffer, byteOffset);
-            } else {
-                this.buffer =
-                    this.buffer.slice(0, byteOffset) +
-                    String.fromCharCode.apply(null, bytes) +
-                    this.buffer.slice(byteOffset + length);
-            }
-        }
+		if (this._isArrayBuffer) {
+			new Uint8Array(this.buffer, byteOffset, length).set(bytes);
+		}
+		else {
+			if (this._isNodeBuffer) {
+				new Buffer(bytes).copy(this.buffer, byteOffset);
+			} else {
+				this.buffer =
+					this.buffer.slice(0, byteOffset) +
+					String.fromCharCode.apply(null, bytes) +
+					this.buffer.slice(byteOffset + length);
+			}
+		}
 
-        this._offset = byteOffset - this._start + length;
-    },
+		this._offset = byteOffset - this._start + length;
+	},
 
 	getString: function (length, byteOffset) {
 		return String.fromCharCode.apply(null, this._getBytes(length, byteOffset, true));
 	},
 
-    setString: function (byteOffset, subString) {
-        this.setBytes(byteOffset, Array.prototype.map.call(subString, function (char) {
-            return char.charCodeAt(0);
-        }), true);
-    },
+	setString: function (byteOffset, subString) {
+		this.setBytes(byteOffset, Array.prototype.map.call(subString, function (char) {
+			return char.charCodeAt(0);
+		}), true);
+	},
 
 	getChar: function (byteOffset) {
 		return this.getString(1, byteOffset);
 	},
 
-    setChar: function (byteOffset, char) {
-        this.setString.apply(this, arguments);
-    },
+	setChar: function (byteOffset, char) {
+		this.setString.apply(this, arguments);
+	},
 
 	tell: function () {
 		return this._offset;
@@ -506,24 +506,28 @@ jDataView.prototype = {
 		return this._getBytes(1, byteOffset)[0];
 	},
 
-    _setInt16: function (byteOffset, value, littleEndian) {
-        this._setUint16(byteOffset, value & 0xffff, littleEndian);
-    },
+	_setUint32: function (byteOffset, value, littleEndian) {
 
-    _setUint16: function (byteOffset, value, littleEndian) {
-        this.setBytes(byteOffset, [
-            value & 0xff,
-            value >> 8
-        ], littleEndian);
-    },
+	},
 
-    _setInt8: function (byteOffset, value) {
-        this._setUint8(byteOffset, value & 0xff);
-    },
+	_setInt16: function (byteOffset, value, littleEndian) {
+		this._setUint16(byteOffset, value & 0xffff, littleEndian);
+	},
 
-    _setUint8: function (byteOffset, value) {
-        this.setBytes(byteOffset, [value]);
-    }
+	_setUint16: function (byteOffset, value, littleEndian) {
+		this.setBytes(byteOffset, [
+			value & 0xff,
+			value >> 8
+		], littleEndian);
+	},
+
+	_setInt8: function (byteOffset, value) {
+		this._setUint8(byteOffset, value & 0xff);
+	},
+
+	_setUint8: function (byteOffset, value) {
+		this.setBytes(byteOffset, [value]);
+	}
 };
 
 if (typeof jQuery !== 'undefined' && jQuery.fn.jquery >= "1.6.2") {

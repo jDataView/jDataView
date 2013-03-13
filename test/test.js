@@ -6,9 +6,9 @@ var module = QUnit.module;
 var test = QUnit.test;
 
 var dataBytes = [
-    0x00,
-    0xff, 0xfe, 0xfd, 0xfc,
-    0xfa, 0x00, 0xba, 0x01
+	0x00,
+	0xff, 0xfe, 0xfd, 0xfc,
+	0xfa, 0x00, 0xba, 0x01
 ];
 var dataStart = 1;
 var buffer = jDataView.createBuffer.apply(jDataView, dataBytes);
@@ -179,49 +179,49 @@ test('Float64', function () {
 });
 
 module('Value Write', {
-    teardown: function () {
-        view.setBytes(0, dataBytes.slice(dataStart), true);
-    }
+	teardown: function () {
+		view.setBytes(0, dataBytes.slice(dataStart), true);
+	}
 });
 
 test('Char', function () {
-    view.setChar(5, chr(0xdf));
-    equal(view.getChar(5), chr(0xdf));
-    view.setChar(7, chr(0x03));
-    equal(view.getChar(7), chr(0x03));
+	view.setChar(5, chr(0xdf));
+	equal(view.getChar(5), chr(0xdf));
+	view.setChar(7, chr(0x03));
+	equal(view.getChar(7), chr(0x03));
 });
 
 test('String', function () {
-    view.setString(4, chr(1) + chr(2) + chr(3));
-    equal(view.getString(4, 4), chr(1) + chr(2) + chr(3) + chr(1));
-    view.setString(0, chr(8) + chr(9));
-    equal(view.getString(2, 1), chr(9) + chr(0xfd));
+	view.setString(4, chr(1) + chr(2) + chr(3));
+	equal(view.getString(4, 4), chr(1) + chr(2) + chr(3) + chr(1));
+	view.setString(0, chr(8) + chr(9));
+	equal(view.getString(2, 1), chr(9) + chr(0xfd));
 });
 
 test('Int8', function () {
-    view.setInt8(3, -10);
-    equal(view.getInt8(3), -10);
-    view.setInt8(7, 29);
-    equal(view.getInt8(7), 29);
+	view.setInt8(3, -10);
+	equal(view.getInt8(3), -10);
+	view.setInt8(7, 29);
+	equal(view.getInt8(7), 29);
 });
 
 test('Uint8', function () {
-    view.setUint8(3, 19);
-    equal(view.getUint8(3), 19);
-    view.setUint8(7, 129);
-    equal(view.getUint8(7), 129);
+	view.setUint8(3, 19);
+	equal(view.getUint8(3), 19);
+	view.setUint8(7, 129);
+	equal(view.getUint8(7), 129);
 });
 
 test('Int16', function () {
-    view.setInt16(0, -17593);
-    equal(view.getInt16(0), -17593);
-    view.setInt16(2, 23784);
-    equal(view.getInt16(2), 23784);
+	view.setInt16(0, -17593);
+	equal(view.getInt16(0), -17593);
+	view.setInt16(2, 23784);
+	equal(view.getInt16(2), 23784);
 });
 
 test('Uint16', function () {
-    view.setUint16(0, 39571);
-    equal(view.getUint16(0), 39571);
-    view.setUint16(2, 35);
-    equal(view.getUint16(2), 35);
+	view.setUint16(0, 39571);
+	equal(view.getUint16(0), 39571);
+	view.setUint16(2, 35);
+	equal(view.getUint16(2), 35);
 });
