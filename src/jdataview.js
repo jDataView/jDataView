@@ -9,8 +9,8 @@
 (function (global) {
 
 var compatibility = {
-	ArrayBuffer: false && typeof ArrayBuffer !== 'undefined',
-	DataView: false && typeof DataView !== 'undefined' &&
+	ArrayBuffer: typeof ArrayBuffer !== 'undefined',
+	DataView: typeof DataView !== 'undefined' &&
 		('getFloat64' in DataView.prototype ||				// Chrome
 		 'getFloat64' in new DataView(new ArrayBuffer(1))), // Node
 	// NodeJS Buffer in v0.5.5 and newer
