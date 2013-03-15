@@ -6,7 +6,9 @@
 // http://blog.vjeux.com/ <vjeuxx@gmail.com>
 //
 
-(function (global) {
+(function (exports) {
+
+var global = this;
 
 var compatibility = {
 	ArrayBuffer: typeof ArrayBuffer !== 'undefined',
@@ -44,23 +46,17 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		throw new Error("jDataView constructor may not be called as a function");
 	}
 
-	if (buffer instanceof Array) {
-		buffer = jDataView.createBuffer.apply(jDataView, buffer);
-	}
-
-	this.buffer = buffer;
-
-	// Handle Type Errors
-	if (!(compatibility.NodeBuffer && buffer instanceof Buffer) &&
-		!(compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) &&
-		typeof buffer !== 'string') {
-		throw new TypeError('jDataView buffer has an incompatible type');
-	}
+	this.buffer = buffer = jDataView.wrapBuffer(buffer);
 
 	// Check parameters and existing functionnalities
 	this._isArrayBuffer = compatibility.ArrayBuffer && buffer instanceof ArrayBuffer;
 	this._isDataView = compatibility.DataView && this._isArrayBuffer;
 	this._isNodeBuffer = compatibility.NodeBuffer && buffer instanceof Buffer;
+
+	// Handle Type Errors
+	if (!this._isNodeBuffer && !this._isArrayBuffer && !(buffer instanceof Array)) {
+		throw new TypeError('jDataView buffer has an incompatible type');
+	}
 
 	// Default Values
 	this._littleEndian = Boolean(littleEndian);
@@ -95,7 +91,6 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	// Instanciate
 	if (this._isDataView) {
 		this._view = new DataView(buffer, byteOffset, byteLength);
-		this._start = 0;
 	}
 	this._start = byteOffset;
 	if (byteOffset + byteLength > bufferLength) {
@@ -147,12 +142,11 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 				};
 			})(type, this);
 		}
-	} else if (this._isNodeBuffer && compatibility.NodeBuffer) {
+	} else if (this._isNodeBuffer) {
 		for (var type in dataTypes) {
 			if (!dataTypes.hasOwnProperty(type)) {
 				continue;
 			}
-
 			(function(type, view){
 				var size = dataTypes[type];
 				view['get' + type] = function (byteOffset, littleEndian) {
@@ -207,6 +201,63 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 				};
 			})(type, this);
 		}
+	} else if (this._isArrayBuffer) {
+		for (var type in dataTypes) {
+			if (!dataTypes.hasOwnProperty(type)) {
+				continue;
+			}
+			(function(type, view){
+				var size = dataTypes[type];
+				view['get' + type] = function (byteOffset, littleEndian) {
+					// Handle the lack of endianness
+					if (littleEndian === undefined) {
+						littleEndian = view._littleEndian;
+					}
+
+					// Handle the lack of byteOffset
+					if (byteOffset === undefined) {
+						byteOffset = view._offset;
+					}
+
+					// ArrayBuffer: we use a typed array of size 1 from original buffer if alignment is good and from slice when it's not
+					var buffer, offset;
+					if (size === 1 || ((view._start + byteOffset) % size === 0 && littleEndian)) {
+						buffer = view.buffer;
+						offset = view._start + byteOffset;
+						view._offset = byteOffset + size;
+					} else {
+						// standard decoding functions are still faster than JS implementations, so let's use them via hack
+						buffer = new Uint8Array(view.getBytes(size, byteOffset, littleEndian)).buffer;
+						offset = 0;
+					}
+
+					return new global[type + 'Array'](buffer, offset, 1)[0];
+				};
+				view['set' + type] = function (byteOffset, value, littleEndian) {
+					// Handle the lack of endianness
+					if (littleEndian === undefined) {
+						littleEndian = view._littleEndian;
+					}
+
+					// Handle the lack of byteOffset
+					if (byteOffset === undefined) {
+						byteOffset = view._offset;
+					}
+
+					// ArrayBuffer: we use a typed array of size 1 from original buffer if alignment is good and from slice when it's not
+					var TypedArray = global[type + 'Array'];
+					if (size === 1 || ((view._start + byteOffset) % size === 0 && littleEndian)) {
+						new TypedArray(view.buffer, view._start + byteOffset, 1)[0] = value;
+						view._offset = byteOffset + size;
+					} else {
+						// standard encoding functions are still faster than JS implementations, so let's use them via hack
+						var bytes = new Uint8Array(size);
+						new TypedArray(bytes.buffer, 0, 1)[0] = value;
+						view.setBytes(byteOffset, bytes, littleEndian);
+					}
+				};
+			})(type, this);
+		}
 	} else {
 		for (var type in dataTypes) {
 			if (!dataTypes.hasOwnProperty(type)) {
@@ -225,24 +276,15 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 						byteOffset = view._offset;
 					}
 
-					// Move the internal offset forward
-					view._offset = byteOffset + size;
-
-					if (view._isArrayBuffer && (view._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
-						// ArrayBuffer: we use a typed array of size 1 if the alignment is good
-						// ArrayBuffer does not support endianess flag (for size > 1)
-						return new global[type + 'Array'](view.buffer, view._start + byteOffset, 1)[0];
-					} else {
-						// Error checking:
-						if (typeof byteOffset !== 'number') {
-							throw new TypeError('jDataView byteOffset is not a number');
-						}
-						if (byteOffset + size > view.byteLength) {
-							throw new Error('jDataView (byteOffset + size) value is out of bounds');
-						}
-
-						return view['_get' + type](byteOffset, littleEndian);
+					// Error checking:
+					if (typeof byteOffset !== 'number') {
+						throw new TypeError('jDataView byteOffset is not a number');
 					}
+					if (byteOffset + size > view.byteLength) {
+						throw new Error('jDataView (byteOffset + size) value is out of bounds');
+					}
+
+					return view['_get' + type](byteOffset, littleEndian);
 				};
 				view['set' + type] = function (byteOffset, value, littleEndian) {
 					// Handle the lack of endianness
@@ -258,21 +300,15 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 					// Move the internal offset forward
 					view._offset = byteOffset + size;
 
-					if (view._isArrayBuffer && (view._start + byteOffset) % size === 0 && (size === 1 || littleEndian)) {
-						// ArrayBuffer: we use a typed array of size 1 if the alignment is good
-						// ArrayBuffer does not support endianess flag (for size > 1)
-						new global[type + 'Array'](view.buffer, view._start + byteOffset, 1)[0] = value;
-					} else {
-						// Error checking:
-						if (typeof byteOffset !== 'number') {
-							throw new TypeError('jDataView byteOffset is not a number');
-						}
-						if (byteOffset + size > view.byteLength) {
-							throw new Error('jDataView (byteOffset + size) value is out of bounds');
-						}
-
-						view['_set' + type.replace('Uint', 'Int')](byteOffset, value, littleEndian);
+					// Error checking:
+					if (typeof byteOffset !== 'number') {
+						throw new TypeError('jDataView byteOffset is not a number');
 					}
+					if (byteOffset + size > view.byteLength) {
+						throw new Error('jDataView (byteOffset + size) value is out of bounds');
+					}
+
+					view['_set' + type.replace('Uint', 'Int')](byteOffset, value, littleEndian);
 				};
 			})(type, this);
 		}
@@ -282,25 +318,43 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		if (!dataTypes.hasOwnProperty(type)) {
 			continue;
 		}
-		this['write' + type] = function (value, littleEndian) {
-		    this['set' + type](undefined, value, littleEndian);
-		}
+		(function (type, view) {
+			view['write' + type] = function (value, littleEndian) {
+				this['set' + type](undefined, value, littleEndian);
+			};
+		})(type, this);
 	}
 };
 
-if (compatibility.NodeBuffer) {
-	jDataView.createBuffer = function () {
-		return new Buffer(arguments);
+// mostly internal function for wrapping any supported input (String or Array-like) to best suitable buffer format
+jDataView.wrapBuffer = function (buffer) {
+	if (typeof buffer === 'string') {
+		buffer = Array.prototype.map.call(buffer, function (char) {
+			return char.charCodeAt(0) & 0xff;
+		});
 	}
-} else if (compatibility.ArrayBuffer) {
-	jDataView.createBuffer = function () {
-		return new Uint8Array(arguments).buffer;
+
+	if ('length' in buffer && !((compatibility.NodeBuffer && buffer instanceof Buffer) || (compatibility.ArrayBuffer && buffer instanceof ArrayBuffer))) {
+		if (compatibility.NodeBuffer) {
+			return new Buffer(buffer);
+		} else
+		if (compatibility.ArrayBuffer) {
+			var bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+			return bytes.buffer;
+		} else {
+			if (!(buffer instanceof Array)) {
+				return Array.prototype.slice.call(buffer);
+			}
+		}
 	}
-} else {
-	jDataView.createBuffer = function () {
-		return String.fromCharCode.apply(null, arguments);
-	}
-}
+
+	return buffer;
+};
+
+// left for backward compatibility
+jDataView.createBuffer = function () {
+	return jDataView.wrapBuffer(arguments);
+};
 
 jDataView.prototype = {
 	compatibility: compatibility,
@@ -320,6 +374,10 @@ jDataView.prototype = {
 			byteOffset = this._offset;
 		}
 
+		if (length === undefined) {
+			length = this.byteLength - byteOffset;
+		}
+
 		// Error Checking
 		if (typeof byteOffset !== 'number') {
 			throw new TypeError('jDataView byteOffset is not a number');
@@ -335,12 +393,6 @@ jDataView.prototype = {
 		}
 		else {
 			result = this.buffer.slice(byteOffset, byteOffset + length);
-
-			if (!this._isNodeBuffer) {
-				result = Array.prototype.map.call(result, function (char) {
-					return char.charCodeAt(0) & 0xff;
-				});
-			}
 		}
 
 		if (!littleEndian && length > 1) {
@@ -401,10 +453,9 @@ jDataView.prototype = {
 			if (this._isNodeBuffer) {
 				new Buffer(bytes).copy(this.buffer, byteOffset);
 			} else {
-				this.buffer =
-					this.buffer.slice(0, byteOffset) +
-					String.fromCharCode.apply(null, bytes) +
-					this.buffer.slice(byteOffset + length);
+				for (var i = 0; i < bytes.length; i++) {
+					this.buffer[byteOffset + i] = bytes[i];
+				}
 			}
 		}
 
@@ -454,6 +505,12 @@ jDataView.prototype = {
 		}
 
 		return this._offset = byteOffset;
+	},
+
+	slice: function (start, end, forceCopy) {
+		return forceCopy
+			   ? new jDataView(this.getBytes(end - start, start), undefined, undefined, true)
+			   : new jDataView(this.buffer, this._start + start, end - start, this._littleEndian);
 	},
 
 	// Compatibility functions on a String Buffer
@@ -612,9 +669,10 @@ jDataView.prototype = {
 	}
 };
 
-global.jDataView = (global.module || {}).exports = jDataView;
-if (typeof module !== 'undefined') {
+if (typeof module !== 'undefined' && exports === module.exports) {
 	module.exports = jDataView;
+} else {
+	exports.jDataView = jDataView;
 }
 
 })(this);

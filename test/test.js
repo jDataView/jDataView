@@ -5,13 +5,19 @@ if (typeof jDataView === 'undefined') {
 var module = QUnit.module;
 var test = QUnit.test;
 
+// workaround for http://code.google.com/p/v8/issues/detail?id=2578
+var _isNaN = Number.isNaN || window.isNaN,
+	 isNaN = function (obj) {
+		return _isNaN(obj) || (typeof obj === 'number' && obj.toString() === 'NaN');
+	 };
+
 var dataBytes = [
 	0x00,
 	0xff, 0xfe, 0xfd, 0xfc,
 	0xfa, 0x00, 0xba, 0x01
 ];
 var dataStart = 1;
-var view = new jDataView(dataBytes, dataStart, undefined, true);
+var view = new jDataView(dataBytes.slice(), dataStart, undefined, true);
 
 function b() {
 	return new jDataView(jDataView.createBuffer.apply(jDataView, arguments));
@@ -80,6 +86,11 @@ function testGetters(type, getters) {
 	    }
 	})
 }
+
+testGetters('Bytes', [
+	[function (bytes) { deepEqual(bytes, [0xfe, 0xfd]) }, [2, 1]],
+	[function (bytes) { deepEqual(bytes, [0xfd, 0xfe, 0xff]) }, [3, 0, false]]
+]);
 
 testGetters('Char', [
 	[chr(0xff), 0],
@@ -281,3 +292,23 @@ testSetters('Float64', [
 	-2,
 	[NaN, , , function (value) { ok(isNaN(value)) }]
 ]);
+
+test('slice', function () {
+	try {
+		view.slice(5, 10);
+		ok(false);
+	} catch(e) {
+		ok(true, e);
+	}
+
+	var pointerCopy = view.slice(1, 4);
+	deepEqual(pointerCopy.getBytes(), [0xfe, 0xfd, 0xfc]);
+	pointerCopy.setChar(0, chr(1));
+	equal(view.getChar(1), chr(1));
+	pointerCopy.setChar(0, chr(0xfe));
+
+	var copy = view.slice(1, 4, true);
+	deepEqual(copy.getBytes(), [0xfe, 0xfd, 0xfc]);
+	copy.setChar(0, chr(1));
+	notEqual(view.getChar(1), chr(1));
+});

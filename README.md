@@ -18,7 +18,7 @@ And one way to read a binary file from the server.
 
 * **NodeJS Buffers**. They appeared in [Node 0.4.0](http://nodejs.org/docs/v0.4.0/api/buffers.html). [Node 0.5.0](http://nodejs.org/docs/v0.5.0/api/buffers.html) added a DataView-like API. And [Node 0.6.0](http://nodejs.org/docs/v0.6.0/api/buffers.html) changed the API naming convention.
 
-jDataView provides the DataView API using the best available option between Strings, TypedArrays, NodeJS Buffers and DataViews.
+jDataView provides the DataView API using the best available option between Arrays, TypedArrays, NodeJS Buffers and DataViews.
 
 API
 ===
@@ -27,7 +27,7 @@ See the [Typed Array Specification](http://www.khronos.org/registry/typedarray/s
 Constructor
 -----------------
 * new **jDataView**(buffer, offset, length, littleEndian=false)
-    * buffer can be either a byte Array, binary String, an ArrayBuffer, or a Node.js Buffer
+    * buffer can be either a binary String or any Array-like byte storage (Array, Uint8Array, Arguments, jQuery(Array), ...)
     * littleEndian = false (Big Endian mode) is a default value for the view
 
 Specification API
@@ -66,6 +66,8 @@ The byteOffset parameter is now optional. If you omit it, it will read right aft
     * Moves the internal pointer to the position
 * **tell**()
     * Returns the current position
+* **slice(start, end, forceCopy)
+    * Returns view (jDataView) on part of original one; may point to the same memory buffer or copy data into new one depending on forceCopy parameter.
 
 Also, specification DataView setters require byteOffset as first argument, and passing "undefined" for sequential writes can be not very convenient.
 You can use ```writeXXX``` methods instead, which will set values at current position automatically:
@@ -91,8 +93,9 @@ Addition of Char, String and Bytes utilities.
 * **writeString**(chars)
 * **writeBytes**(bytes, littleEndian)
 
-Addition of createBuffer, a utility to easily create buffers with the latest available storage type (String or ArrayBuffer).
+Addition of wrapBuffer and createBuffer, utilities to easily create buffers with the latest available storage type (Node.js Buffer, ArrayBuffer or simple Array).
 
+* **wrapBuffer**(string_or_bytes)
 * **createBuffer**(byte1, byte2, ...)
 
 Example
@@ -148,10 +151,11 @@ $.get(
 
 Changelog
 ========
-* **March 13 2013**:
+* **March 15 2013**:
   * [RReverser](https://github.com/rreverser) added support for setters in all supported implementations!
-  * Performance improvements changing lower level constructs
-  * Addition of getBytes and write* helpers
+  * Performance improvements changing lower level constructs and type of inner buffers
+  * Addition of [gs]etBytes, write*, wrapBuffer and slice helpers
+  * Added support for any Array-like byte storage as input (Array, Uint8Array, Arguments, jQuery(Array), ...)
 * **June 30 2012**: Thanks to [Mithgol](https://github.com/Mithgol) for the changes!
   * Changed default to big endian from little endian to be compatible with DataView specification
   * Dropped support for NodeJS < 0.5.5, it was buggy anyway
