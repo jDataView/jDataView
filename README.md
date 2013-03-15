@@ -151,10 +151,11 @@ $.get(
 
 Changelog
 ========
-* **March 13 2013**:
+* **March 15 2013**:
   * [RReverser](https://github.com/rreverser) added support for setters in all supported implementations!
-  * Performance improvements changing lower level constructs
-  * Addition of getBytes and write* helpers
+  * Performance improvements changing lower level constructs and type of inner buffers
+  * Addition of [gs]etBytes, write*, wrapBuffer and slice helpers
+  * Added support for any Array-like byte storage as input (Array, Uint8Array, Arguments, jQuery(Array), ...)
 * **June 30 2012**: Thanks to [Mithgol](https://github.com/Mithgol) for the changes!
   * Changed default to big endian from little endian to be compatible with DataView specification
   * Dropped support for NodeJS < 0.5.5, it was buggy anyway
