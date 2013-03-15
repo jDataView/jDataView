@@ -1,7 +1,7 @@
 //
 // jDataView by Vjeux - Jan 2010
 //
-// A unique way to read a binary file in the browser
+// A unique way to work with a binary file in the browser
 // http://github.com/vjeux/jDataView
 // http://blog.vjeux.com/ <vjeuxx@gmail.com>
 //

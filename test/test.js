@@ -20,7 +20,7 @@ var dataStart = 1;
 var view = new jDataView(dataBytes.slice(), dataStart, undefined, true);
 
 function b() {
-	return new jDataView(jDataView.createBuffer.apply(jDataView, arguments));
+	return new jDataView(arguments);
 }
 
 module('Engine support');

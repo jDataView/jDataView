@@ -1,16 +1,16 @@
-<a href="http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html">jDataView</a> - A unique way to read a binary file in Javascript.
+<a href="http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html">jDataView</a> - A unique way to work with a binary file in JavaScript.
 ================================
 
-jDataView provides a standard way to read binary files in all the browsers. It follows the [DataView Specification](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6) and even extends it for a more practical use.
+jDataView provides a standard way to read and/or modify binary files in all the browsers. It follows the [DataView Specification](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6) and even extends it for a more practical use.
 
 Explanation
 =========
 
 There are three ways to read a binary file from the browser.
 
-* The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a **String**, and you have to rewrite all the decoding and encoding functions (getUint16, getFloat32, ...). All the browsers support this.
+* The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a **String**, convert it to byte **Array** and you have to rewrite all the decoding and encoding functions (getUint16, getFloat32, ...). All the browsers support this.
 
-* Then browsers that implemented WebGL also added **ArrayBuffers**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. It has big drawback, it can't read non-aligned data.
+* Then browsers that implemented WebGL also added **ArrayBuffers**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. It has big drawback, it can't read non-aligned data (but we can actually hack that).
 
 * A new revision of the specification added **DataViews**. It is a view around your buffer that can read/write arbitrary data types directly through functions: getUint32, getFloat64 ...
 
@@ -26,7 +26,7 @@ See the [Typed Array Specification](http://www.khronos.org/registry/typedarray/s
 
 Constructor
 -----------------
-* new **jDataView**(buffer, offset, length, littleEndian=false)
+* new **jDataView**(buffer, offset, length, littleEndian = false)
     * buffer can be either a binary String or any Array-like byte storage (Array, Uint8Array, Arguments, jQuery(Array), ...)
     * littleEndian = false (Big Endian mode) is a default value for the view
 
@@ -58,7 +58,7 @@ Extended Specification
 ---------------------------------
 Addition of a littleEndian argument to the constructor. Big Endian will be the default mode of getters if their littleEndian value is undefined.
 
-* **jDataView**(buffer, offset, length, littleEndian=false)
+* **jDataView**(buffer, offset, length, littleEndian = false)
 
 The byteOffset parameter is now optional. If you omit it, it will read right after the latest read offset. You can interact with the internal pointer with those two functions.
 
@@ -66,7 +66,7 @@ The byteOffset parameter is now optional. If you omit it, it will read right aft
     * Moves the internal pointer to the position
 * **tell**()
     * Returns the current position
-* **slice(start, end, forceCopy)
+* **slice**(start, end, forceCopy = false)
     * Returns view (jDataView) on part of original one; may point to the same memory buffer or copy data into new one depending on forceCopy parameter.
 
 Also, specification DataView setters require byteOffset as first argument, and passing "undefined" for sequential writes can be not very convenient.
