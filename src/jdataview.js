@@ -318,9 +318,11 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 		if (!dataTypes.hasOwnProperty(type)) {
 			continue;
 		}
-		this['write' + type] = function (value, littleEndian) {
-			this['set' + type](undefined, value, littleEndian);
-		}
+		(function (type, view) {
+			view['write' + type] = function (value, littleEndian) {
+				this['set' + type](undefined, value, littleEndian);
+			};
+		})(type, this);
 	}
 };
 
