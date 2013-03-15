@@ -337,7 +337,8 @@ jDataView.wrapBuffer = function (buffer) {
 			return new Buffer(buffer);
 		} else
 		if (compatibility.ArrayBuffer) {
-			return new Uint8Array(buffer).buffer;
+			var bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+			return bytes.buffer;
 		} else {
 			if (!(buffer instanceof Array)) {
 				return Array.prototype.slice.call(buffer);
