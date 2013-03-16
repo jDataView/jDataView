@@ -27,7 +27,7 @@ See the [Typed Array Specification](http://www.khronos.org/registry/typedarray/s
 Constructor
 -----------------
 * new **jDataView**(buffer, offset, length, littleEndian = false)
-    * buffer can be either a binary String or any Array-like byte storage (Array, Uint8Array, Arguments, jQuery(Array), ...)
+    * buffer can be either a binary String, any Array-like byte storage (Array, Uint8Array, Arguments, jQuery(Array), ...) or count of bytes if you want to operate on new empty buffer.
     * littleEndian = false (Big Endian mode) is a default value for the view
 
 Specification API
@@ -95,7 +95,7 @@ Addition of Char, String and Bytes utilities.
 
 Addition of wrapBuffer and createBuffer, utilities to easily create buffers with the latest available storage type (Node.js Buffer, ArrayBuffer or simple Array).
 
-* **wrapBuffer**(string_or_bytes)
+* **wrapBuffer**(string_or_bytes_or_byteCount)
 * **createBuffer**(byte1, byte2, ...)
 
 Example
@@ -151,11 +151,12 @@ $.get(
 
 Changelog
 ========
-* **March 15 2013**:
+* **March 16 2013**:
   * [RReverser](https://github.com/rreverser) added support for setters in all supported implementations!
   * Performance improvements changing lower level constructs and type of inner buffers
   * Addition of [gs]etBytes, write*, wrapBuffer and slice helpers
   * Added support for any Array-like byte storage as input (Array, Uint8Array, Arguments, jQuery(Array), ...)
+  * Added ability to create empty buffer (and operate on it) by passing count of bytes to wrapBuffer.
 * **June 30 2012**: Thanks to [Mithgol](https://github.com/Mithgol) for the changes!
   * Changed default to big endian from little endian to be compatible with DataView specification
   * Dropped support for NodeJS < 0.5.5, it was buggy anyway
