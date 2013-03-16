@@ -328,22 +328,32 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 
 // mostly internal function for wrapping any supported input (String or Array-like) to best suitable buffer format
 jDataView.wrapBuffer = function (buffer) {
-	if (typeof buffer === 'string') {
-		buffer = Array.prototype.map.call(buffer, function (char) {
-			return char.charCodeAt(0) & 0xff;
-		});
+	switch (typeof buffer) {
+		case 'string':
+			buffer = Array.prototype.map.call(buffer, function (char) {
+				return char.charCodeAt(0) & 0xff;
+			});
+			break;
+
+		case 'number':
+			buffer = {length: buffer};
+			break;
 	}
 
 	if ('length' in buffer && !((compatibility.NodeBuffer && buffer instanceof Buffer) || (compatibility.ArrayBuffer && buffer instanceof ArrayBuffer))) {
 		if (compatibility.NodeBuffer) {
-			return new Buffer(buffer);
+			buffer = new Buffer(buffer);
 		} else
 		if (compatibility.ArrayBuffer) {
 			var bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
-			return bytes.buffer;
+			buffer = bytes.buffer;
 		} else {
 			if (!(buffer instanceof Array)) {
-				return Array.prototype.slice.call(buffer);
+				buffer = Array.prototype.slice.call(buffer);
+			}
+			// as simple Array may contain non-byte values (incl. undefined)
+			for (var i = 0, length = buffer.length; i < length; i++) {
+				buffer[i] &= 0xff;
 			}
 		}
 	}
@@ -453,7 +463,7 @@ jDataView.prototype = {
 			if (this._isNodeBuffer) {
 				new Buffer(bytes).copy(this.buffer, byteOffset);
 			} else {
-				for (var i = 0; i < bytes.length; i++) {
+				for (var i = 0; i < length; i++) {
 					this.buffer[byteOffset + i] = bytes[i];
 				}
 			}
