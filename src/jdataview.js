@@ -326,13 +326,19 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	}
 };
 
+function getCharCodes(string) {
+	var codes = new Array(string.length);
+	for (var i = 0, length = string.length; i < length; i++) {
+		codes[i] = string.charCodeAt(i) & 0xff;
+	}
+	return codes;
+}
+
 // mostly internal function for wrapping any supported input (String or Array-like) to best suitable buffer format
 jDataView.wrapBuffer = function (buffer) {
 	switch (typeof buffer) {
 		case 'string':
-			buffer = Array.prototype.map.call(buffer, function (char) {
-				return char.charCodeAt(0) & 0xff;
-			});
+			buffer = getCharCodes(buffer);
 			break;
 
 		case 'number':
@@ -481,9 +487,7 @@ jDataView.prototype = {
 	},
 
 	setString: function (byteOffset, subString) {
-		this.setBytes(byteOffset, Array.prototype.map.call(subString, function (char) {
-			return char.charCodeAt(0) & 0xff;
-		}), true);
+		this.setBytes(byteOffset, getCharCodes(subString), true);
 	},
 
 	writeString: function (subString) {
