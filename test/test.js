@@ -1,4 +1,3 @@
-
 if (typeof jDataView === 'undefined') {
 	jDataView = require('..');
 }
@@ -271,6 +270,10 @@ testSetters('Uint32', [
 ]);
 
 testSetters('Float32', [
+	Math.pow(2, -149),
+	-Math.pow(2, -149),
+	Math.pow(2, -126),
+	-Math.pow(2, -126),
 	-1.055058432344064e+37,
 	-6.568051909668895e+35,
 	2.30496291345398e-38,
@@ -283,7 +286,11 @@ testSetters('Float32', [
 ]);
 
 testSetters('Float64', [
-	2.426842827241402e-300,
+    Math.pow(2, -1074),
+	-Math.pow(2, -1074),   
+	Math.pow(2, -1022),
+	-Math.pow(2, -1022),
+    2.426842827241402e-300,
 	Infinity,
 	-Infinity,
 	0,
