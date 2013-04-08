@@ -616,12 +616,10 @@ jDataView.prototype = {
 		if (value === 0) {
 			exponent = 0;
 			mantissa = 0;
-		} else
-		if (isNaN(value)) {
+		} else if (isNaN(value)) {
 			exponent = 2 * eMax + 1;
 			mantissa = 1;
-		} else
-		if (value === Infinity) {
+		} else if (value === Infinity) {
 			exponent = 2 * eMax + 1;
 			mantissa = 0;
 		} else {
