@@ -286,11 +286,11 @@ testSetters('Float32', [
 ]);
 
 testSetters('Float64', [
-    Math.pow(2, -1074),
+	Math.pow(2, -1074),
 	-Math.pow(2, -1074),   
 	Math.pow(2, -1022),
 	-Math.pow(2, -1022),
-    2.426842827241402e-300,
+	2.426842827241402e-300,
 	Infinity,
 	-Infinity,
 	0,
