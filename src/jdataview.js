@@ -614,26 +614,26 @@ jDataView.prototype = {
 		}
 
 		if (value === 0) {
-            exponent = 0;
-            mantissa = 0;
-        } else
-        if (isNaN(value)) {
-            exponent = 2 * eMax + 1;
-            mantissa = 1;
-        } else
-        if (value === Infinity) {
-            exponent = 2 * eMax + 1;
-            mantissa = 0;
-        } else {
-            exponent = Math.floor(Math.log(value) / Math.LN2);
-            if (exponent >= eMin && exponent <= eMax) {
-                mantissa = Math.floor((value * Math.pow(2, -exponent) - 1) * Math.pow(2, mantSize));
-                exponent += eMax;
-            } else {
-                mantissa = Math.floor(value / Math.pow(2, eMin - mantSize));
-                exponent = 0;
-            }
-        }
+			exponent = 0;
+			mantissa = 0;
+		} else
+		if (isNaN(value)) {
+			exponent = 2 * eMax + 1;
+			mantissa = 1;
+		} else
+		if (value === Infinity) {
+			exponent = 2 * eMax + 1;
+			mantissa = 0;
+		} else {
+			exponent = Math.floor(Math.log(value) / Math.LN2);
+			if (exponent >= eMin && exponent <= eMax) {
+				mantissa = Math.floor((value * Math.pow(2, -exponent) - 1) * Math.pow(2, mantSize));
+				exponent += eMax;
+			} else {
+				mantissa = Math.floor(value / Math.pow(2, eMin - mantSize));
+				exponent = 0;
+			}
+		}
 
 		var b = [];
 		while (mantSize >= 8) {
