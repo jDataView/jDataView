@@ -151,6 +151,8 @@ $.get(
 
 Changelog
 ========
+* **April 8 2013**:
+  * [mmthomas](http://blog.coolmuse.com/) implemented support for denormalized float values in setters
 * **March 16 2013**:
   * [RReverser](https://github.com/rreverser) added support for setters in all supported implementations!
   * Performance improvements changing lower level constructs and type of inner buffers
