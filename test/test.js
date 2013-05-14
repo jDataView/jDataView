@@ -197,6 +197,18 @@ testGetters('Float64', [
 	[function (value) { ok(isNaN(value)) }, , b(0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01)]
 ]);
 
+function testForInt64(expected) {
+	return function (value) {
+		equal(Number(value), expected);
+	};
+}
+
+testGetters('Int64', [
+	[testForInt64(-283686985483775), [0, false]],
+	[testForInt64(-2), , b(0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe)],
+	[testForInt64(4822678189205111), , b(0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77)]
+]);
+
 module('Value Write', {
 	teardown: function () {
 		view.setBytes(0, dataBytes.slice(dataStart), true);
@@ -298,6 +310,12 @@ testSetters('Float64', [
 	1.0000000000000004,
 	-2,
 	[NaN, , , function (value) { ok(isNaN(value)) }]
+]);
+
+testSetters('Int64', [
+	[-283686985483775, , , testForInt64(-283686985483775)],
+	[-2, , , testForInt64(-2)],
+	[4822678189205111, , , testForInt64(4822678189205111)]
 ]);
 
 test('slice', function () {

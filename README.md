@@ -93,6 +93,18 @@ Addition of Char, String and Bytes utilities.
 * **writeString**(chars)
 * **writeBytes**(bytes, littleEndian)
 
+Addition of 64-bit signed and unsigned integer types.
+
+**IMPORTANT**: Those types behave like primitive numbers (you can manipulate with them using arithmetic operations, convert them to strings etc.)., **BUT** due to IEEE.754 limitations, there is precision loss for numbers outside the ±2^53 range, and that's why they also contain
+`lo` and `hi` fields for retrieving corresponding 32-bit unsigned parts. You can pass both primitive numbers (with the same restriction as above) or original values with modified `lo` and `hi` fields to writer functions as well.
+
+* **getInt64**(byteOffset, littleEndian)
+* **getUint64**(byteOffset, littleEndian)
+* **setInt64**(byteOffset, value, littleEndian)
+* **setUint64**(byteOffset, value, littleEndian)
+* **writeInt64**(value, littleEndian)
+* **writeUint64**(value, littleEndian)
+
 Addition of wrapBuffer and createBuffer, utilities to easily create buffers with the latest available storage type (Node.js Buffer, ArrayBuffer or simple Array).
 
 * **wrapBuffer**(string_or_bytes_or_byteCount)

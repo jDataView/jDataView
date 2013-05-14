@@ -334,6 +334,64 @@ function getCharCodes(string) {
 	return codes;
 }
 
+function inherit(obj) {
+	if ('create' in Object) {
+		return Object.create(obj);
+	} else {
+		function ClonedObject() {}
+		ClonedObject.prototype = obj;
+		return new ClonedObject();
+	}
+}
+
+function Uint64(lo, hi) {
+	this.lo = lo;
+	this.hi = hi;
+}
+
+Uint64.prototype = {
+	valueOf: function () {
+		return this.lo + Math.pow(2, 32) * this.hi;
+	},
+
+	toString: function () {
+		return Number.prototype.toString.apply(this.valueOf(), arguments);
+	}
+};
+
+Uint64.fromNumber = function (number) {
+	var hi = Math.floor(number / Math.pow(2, 32));
+	var lo = number - hi * Math.pow(2, 32);
+	return new Uint64(lo, hi);
+};
+
+function Int64(lo, hi) {
+	Uint64.apply(this, arguments);
+}
+
+Int64.prototype = inherit(Uint64.prototype);
+
+Int64.prototype.valueOf = function () {
+	if (this.hi < Math.pow(2, 31)) {
+		return Uint64.prototype.valueOf.apply(this, arguments);
+	}
+	return -((Math.pow(2, 32) - this.lo) + Math.pow(2, 32) * (Math.pow(2, 32) - 1 - this.hi));
+};
+
+Int64.fromNumber = function (number) {
+	var lo, hi;
+	if (number >= 0) {
+		var unsigned = Uint64.fromNumber(number);
+		lo = unsigned.lo;
+		hi = unsigned.hi;
+	} else {
+		hi = Math.floor(number / Math.pow(2, 32));
+		lo = number - hi * Math.pow(2, 32);
+		hi += Math.pow(2, 32);
+	}
+	return new Int64(lo, hi);
+};
+
 // mostly internal function for wrapping any supported input (String or Array-like) to best suitable buffer format
 jDataView.wrapBuffer = function (buffer) {
 	switch (typeof buffer) {
@@ -576,6 +634,34 @@ jDataView.prototype = {
 		return sign * (1 + mantissa * Math.pow(2, -23)) * Math.pow(2, exponent);
 	},
 
+	_get64: function (className, byteOffset, littleEndian) {
+		// Handle the lack of endianness
+		if (littleEndian === undefined) {
+			littleEndian = this._littleEndian;
+		}
+
+		// Handle the lack of byteOffset
+		if (byteOffset === undefined) {
+			byteOffset = this._offset;
+		}
+
+		var parts = littleEndian ? [0, 4] : [4, 0];
+
+		for (var i = 0; i < 2; i++) {
+			parts[i] = this.getUint32(byteOffset + parts[i], littleEndian);
+		}
+
+		return new className(parts[0], parts[1]);
+	},
+
+	getInt64: function (byteOffset, littleEndian) {
+		return this._get64(Int64, byteOffset, littleEndian);
+	},
+
+	getUint64: function (byteOffset, littleEndian) {
+		return this._get64(Uint64, byteOffset, littleEndian);
+	},
+
 	_getInt32: function (byteOffset, littleEndian) {
 		var b = this._getBytes(4, byteOffset, littleEndian);
 		return (b[3] << 24) | (b[2] << 16) | (b[1] << 8) | b[0];
@@ -657,6 +743,44 @@ jDataView.prototype = {
 
 	_setFloat64: function (byteOffset, value, littleEndian) {
 		this._setBinaryFloat(byteOffset, value ,52, 11, littleEndian);
+	},
+
+	_set64: function (className, byteOffset, value, littleEndian) {
+		if (!(value instanceof className)) {
+			value = className.fromNumber(value);
+		}
+
+		// Handle the lack of endianness
+		if (littleEndian === undefined) {
+			littleEndian = this._littleEndian;
+		}
+
+		// Handle the lack of byteOffset
+		if (byteOffset === undefined) {
+			byteOffset = this._offset;
+		}
+
+		var parts = littleEndian ? {lo: 0, hi: 4} : {lo: 4, hi: 0};
+
+		for (var partName in parts) {
+			this.setUint32(byteOffset + parts[partName], value[partName], littleEndian);
+		}
+	},
+
+	setInt64: function (byteOffset, value, littleEndian) {
+		this._set64(Int64, byteOffset, value, littleEndian);
+	},
+
+	writeInt64: function (value, littleEndian) {
+		this.setInt64(undefined, value, littleEndian);
+	},
+
+	setUint64: function (byteOffset, value, littleEndian) {
+		this._set64(Uint64, byteOffset, value, littleEndian);
+	},
+
+	writeUint64: function (value, littleEndian) {
+		this.setUint64(undefined, value, littleEndian);
 	},
 
 	_setInt32: function (byteOffset, value, littleEndian) {
