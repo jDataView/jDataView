@@ -163,6 +163,8 @@ $.get(
 
 Changelog
 ========
+* **May 14 2013**:
+  * [RReverser](https://github.com/rreverser) added support for 64-bit integers (with precision loss outside the ±2^53 range when using primitive JS numbers due to IEEE.754 restrictions)
 * **April 8 2013**:
   * [mmthomas](http://blog.coolmuse.com/) implemented support for denormalized float values in setters
 * **March 16 2013**:
