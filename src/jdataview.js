@@ -496,6 +496,8 @@ jDataView.prototype = {
 	setBytes: function (byteOffset, bytes, littleEndian) {
 		var length = bytes.length;
 
+		if (length === 0) return;
+
 		// Handle the lack of endianness
 		if (littleEndian === undefined) {
 			littleEndian = this._littleEndian;
