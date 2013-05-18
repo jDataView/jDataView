@@ -561,16 +561,16 @@ jDataView.prototype = {
 		this.setString(undefined, subString, isUTF8);
 	},
 
-	getChar: function (byteOffset) {
-		return this.getString(1, byteOffset);
+	getChar: function (byteOffset, isUTF8) {
+		return this.getString(1, byteOffset, isUTF8);
 	},
 
-	setChar: function (byteOffset, char) {
+	setChar: function (byteOffset, char, isUTF8) {
 		this.setString.apply(this, arguments);
 	},
 
-	writeChar: function (char) {
-		this.setChar(undefined, char);
+	writeChar: function (char, isUTF8) {
+		this.setChar(undefined, char, isUTF8);
 	},
 
 	tell: function () {
