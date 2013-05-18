@@ -83,13 +83,13 @@ You can use ```writeXXX``` methods instead, which will set values at current pos
 
 Addition of Char, String and Bytes utilities.
 
-* **getChar**(byteOffset)
+* **getChar**(byteOffset, isUTF8)
 * **getString**(length, byteOffset, isUTF8)
 * **getBytes**(length, byteOffset, littleEndian)
-* **setChar**(byteOffset, char)
+* **setChar**(byteOffset, char, isUTF8)
 * **setString**(byteOffset, chars, isUTF8)
 * **setBytes**(byteOffset, bytes, littleEndian)
-* **writeChar**(char)
+* **writeChar**(char, isUTF8)
 * **writeString**(chars, isUTF8)
 * **writeBytes**(bytes, littleEndian)
 
