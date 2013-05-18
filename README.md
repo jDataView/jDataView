@@ -84,13 +84,13 @@ You can use ```writeXXX``` methods instead, which will set values at current pos
 Addition of Char, String and Bytes utilities.
 
 * **getChar**(byteOffset)
-* **getString**(length, byteOffset)
+* **getString**(length, byteOffset, isUTF8)
 * **getBytes**(length, byteOffset, littleEndian)
 * **setChar**(byteOffset, char)
-* **setString**(byteOffset, chars)
+* **setString**(byteOffset, chars, isUTF8)
 * **setBytes**(byteOffset, bytes, littleEndian)
 * **writeChar**(char)
-* **writeString**(chars)
+* **writeString**(chars, isUTF8)
 * **writeBytes**(bytes, littleEndian)
 
 Addition of 64-bit signed and unsigned integer types.
@@ -163,6 +163,8 @@ $.get(
 
 Changelog
 ========
+* **May 18 2013**:
+  * [RReverser](https://github.com/rreverser) added support for UTF-8 strings and 64-bit integers (with precision loss outside the ±2^53 range when using primitive JS numbers due to IEEE.754 restrictions)
 * **April 8 2013**:
   * [mmthomas](http://blog.coolmuse.com/) implemented support for denormalized float values in setters
 * **March 16 2013**:
