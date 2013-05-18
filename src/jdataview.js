@@ -542,16 +542,23 @@ jDataView.prototype = {
 		this.setBytes(undefined, bytes, littleEndian);
 	},
 
-	getString: function (length, byteOffset) {
-		return String.fromCharCode.apply(null, this._getBytes(length, byteOffset, true));
+	getString: function (length, byteOffset, isUTF8) {
+		var string = String.fromCharCode.apply(null, this._getBytes(length, byteOffset, true));
+		if (isUTF8) {
+			string = decodeURIComponent(escape(string));
+		}
+		return string;
 	},
 
-	setString: function (byteOffset, subString) {
+	setString: function (byteOffset, subString, isUTF8) {
+		if (isUTF8) {
+			subString = unescape(encodeURIComponent(subString));
+		}
 		this.setBytes(byteOffset, getCharCodes(subString), true);
 	},
 
-	writeString: function (subString) {
-		this.setString(undefined, subString);
+	writeString: function (subString, isUTF8) {
+		this.setString(undefined, subString, isUTF8);
 	},
 
 	getChar: function (byteOffset) {
