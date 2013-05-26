@@ -227,7 +227,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 						view._offset = byteOffset + size;
 					} else {
 						// standard decoding functions are still faster than JS implementations, so let's use them via hack
-						buffer = new Uint8Array(view.getBytes(size, byteOffset, littleEndian)).buffer;
+						buffer = new Uint8Array(view._getBytes(size, byteOffset, littleEndian)).buffer;
 						offset = 0;
 					}
 
@@ -253,7 +253,7 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 						// standard encoding functions are still faster than JS implementations, so let's use them via hack
 						var bytes = new Uint8Array(size);
 						new TypedArray(bytes.buffer, 0, 1)[0] = value;
-						view.setBytes(byteOffset, bytes, littleEndian);
+						view._setBytes(byteOffset, bytes, littleEndian);
 					}
 				};
 			})(type, this);
@@ -483,17 +483,21 @@ jDataView.prototype = {
 	},
 
 	// wrapper for external calls (do not return inner buffer directly to prevent it's modifying)
-	getBytes: function (length, byteOffset, littleEndian) {
+	getBytes: function (length, byteOffset, littleEndian, toArray) {
+		if (littleEndian === undefined) {
+			littleEndian = true;
+		}
+
 		var result = this._getBytes.apply(this, arguments);
 
-		if (!(result instanceof Array)) {
+		if (toArray && !(result instanceof Array)) {
 			result = Array.prototype.slice.call(result);
 		}
 
 		return result;
 	},
 
-	setBytes: function (byteOffset, bytes, littleEndian) {
+	_setBytes: function (byteOffset, bytes, littleEndian) {
 		var length = bytes.length;
 
 		if (length === 0) return;
@@ -538,12 +542,19 @@ jDataView.prototype = {
 		this._offset = byteOffset - this._start + length;
 	},
 
+	setBytes: function (byteOffset, bytes, littleEndian) {
+		if (littleEndian === undefined) {
+			littleEndian = true;
+		}
+		this._setBytes(byteOffset, bytes, littleEndian);
+	},
+
 	writeBytes: function (bytes, littleEndian) {
 		this.setBytes(undefined, bytes, littleEndian);
 	},
 
 	getString: function (length, byteOffset, isUTF8) {
-		var string = String.fromCharCode.apply(null, this._getBytes(length, byteOffset, true));
+		var string = String.fromCharCode.apply(String, this._getBytes(length, byteOffset, true));
 		if (isUTF8) {
 			string = decodeURIComponent(escape(string));
 		}
@@ -554,7 +565,7 @@ jDataView.prototype = {
 		if (isUTF8) {
 			subString = unescape(encodeURIComponent(subString));
 		}
-		this.setBytes(byteOffset, getCharCodes(subString), true);
+		this._setBytes(byteOffset, getCharCodes(subString), true);
 	},
 
 	writeString: function (subString, isUTF8) {
@@ -590,7 +601,7 @@ jDataView.prototype = {
 
 	slice: function (start, end, forceCopy) {
 		return forceCopy
-			   ? new jDataView(this.getBytes(end - start, start), undefined, undefined, true)
+			   ? new jDataView(this.getBytes(end - start, start, true, true), undefined, undefined, this._littleEndian)
 			   : new jDataView(this.buffer, this._start + start, end - start, this._littleEndian);
 	},
 
@@ -743,7 +754,7 @@ jDataView.prototype = {
 		}
 		b.push((signBit << expSize) | exponent);
 
-		this.setBytes(byteOffset, b, littleEndian);
+		this._setBytes(byteOffset, b, littleEndian);
 	},
 
 	_setFloat32: function (byteOffset, value, littleEndian) {
@@ -793,7 +804,7 @@ jDataView.prototype = {
 	},
 
 	_setInt32: function (byteOffset, value, littleEndian) {
-		this.setBytes(byteOffset, [
+		this._setBytes(byteOffset, [
 			value & 0xff,
 			(value >>> 8) & 0xff,
 			(value >>> 16) & 0xff,
@@ -802,14 +813,14 @@ jDataView.prototype = {
 	},
 
 	_setInt16: function (byteOffset, value, littleEndian) {
-		this.setBytes(byteOffset, [
+		this._setBytes(byteOffset, [
 			value & 0xff,
 			value >>> 8
 		], littleEndian);
 	},
 
 	_setInt8: function (byteOffset, value) {
-		this.setBytes(byteOffset, [value]);
+		this._setBytes(byteOffset, [value]);
 	}
 };
 
