@@ -488,7 +488,7 @@ jDataView.prototype = {
 			littleEndian = true;
 		}
 
-		var result = this._getBytes.apply(this, arguments);
+		var result = this._getBytes(length, byteOffset, littleEndian);
 
 		if (toArray && !(result instanceof Array)) {
 			result = Array.prototype.slice.call(result);
