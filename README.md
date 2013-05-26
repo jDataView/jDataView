@@ -85,13 +85,13 @@ Addition of Char, String and Bytes utilities.
 
 * **getChar**(byteOffset, isUTF8)
 * **getString**(length, byteOffset, isUTF8)
-* **getBytes**(length, byteOffset, littleEndian)
+* **getBytes**(length, byteOffset, littleEndian = true, toArray = false)
 * **setChar**(byteOffset, char, isUTF8)
 * **setString**(byteOffset, chars, isUTF8)
-* **setBytes**(byteOffset, bytes, littleEndian)
+* **setBytes**(byteOffset, bytes, littleEndian = true)
 * **writeChar**(char, isUTF8)
 * **writeString**(chars, isUTF8)
-* **writeBytes**(bytes, littleEndian)
+* **writeBytes**(bytes, littleEndian = true)
 
 Addition of 64-bit signed and unsigned integer types.
 
