@@ -87,8 +87,8 @@ function testGetters(type, getters) {
 }
 
 testGetters('Bytes', [
-	[function (bytes) { deepEqual(bytes, [0xfe, 0xfd]) }, [2, 1]],
-	[function (bytes) { deepEqual(bytes, [0xfd, 0xfe, 0xff]) }, [3, 0, false]]
+	[function (bytes) { deepEqual(Array.prototype.slice.call(bytes), [0xfe, 0xfd]) }, [2, 1]],
+	[function (bytes) { deepEqual(Array.prototype.slice.call(bytes), [0xfd, 0xfe, 0xff]) }, [3, 0, false]]
 ]);
 
 testGetters('Char', [
@@ -327,13 +327,13 @@ test('slice', function () {
 	}
 
 	var pointerCopy = view.slice(1, 4);
-	deepEqual(pointerCopy.getBytes(), [0xfe, 0xfd, 0xfc]);
+	deepEqual(Array.prototype.slice.call(pointerCopy.getBytes()), [0xfe, 0xfd, 0xfc]);
 	pointerCopy.setChar(0, chr(1));
 	equal(view.getChar(1), chr(1));
 	pointerCopy.setChar(0, chr(0xfe));
 
 	var copy = view.slice(1, 4, true);
-	deepEqual(copy.getBytes(), [0xfe, 0xfd, 0xfc]);
+	deepEqual(Array.prototype.slice.call(copy.getBytes()), [0xfe, 0xfd, 0xfc]);
 	copy.setChar(0, chr(1));
 	notEqual(view.getChar(1), chr(1));
 });
