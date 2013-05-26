@@ -549,6 +549,23 @@ jDataView.prototype = {
 	},
 
 	getString: function (length, byteOffset, isUTF8) {
+		if (this._isNodeBuffer) {
+			// Handle the lack of byteOffset
+			if (byteOffset === undefined) {
+				byteOffset = this._offset;
+			}
+
+			// Error Checking
+			if (typeof byteOffset !== 'number') {
+				throw new TypeError('jDataView byteOffset is not a number');
+			}
+			if (length < 0 || byteOffset + length > this.byteLength) {
+				throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
+			}
+
+			this._offset = byteOffset + length;
+			return this.buffer.toString(isUTF8 ? 'utf8' : 'binary', this._start + byteOffset, this._start + this._offset);
+		}
 		var bytes = this._getBytes(length, byteOffset, true), string = '';
 		for (var i = 0, length = bytes.length; i < length; i++) {
 			string += String.fromCharCode(bytes[i]);
@@ -560,6 +577,21 @@ jDataView.prototype = {
 	},
 
 	setString: function (byteOffset, subString, isUTF8) {
+		if (this._isNodeBuffer) {
+			// Handle the lack of byteOffset
+			if (byteOffset === undefined) {
+				byteOffset = this._offset;
+			}
+			// Error Checking
+			if (typeof byteOffset !== 'number') {
+				throw new TypeError('jDataView byteOffset is not a number');
+			}
+			if (byteOffset + subString.length > this.byteLength) {
+				throw new Error('jDataView length or (byteOffset+length) value is out of bounds');
+			}
+			this._offset = byteOffset + this.buffer.write(subString, this._start + byteOffset, isUTF8 ? 'utf8' : 'binary');
+			return;
+		}
 		if (isUTF8) {
 			subString = unescape(encodeURIComponent(subString));
 		}
