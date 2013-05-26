@@ -109,6 +109,16 @@ testGetters('String', [
 	[chr(127) + chr(0) + chr(1) + chr(65) + chr(66), 5, b(127, 0, 1, 65, 66)]
 ]);
 
+test('Big String', function () {
+	var view = new jDataView(2000000);
+	try {
+		view.getString();
+		ok(true);
+	} catch(e) {
+		ok(false);
+	}
+});
+
 testGetters('Int8', [
 	[-1, 0],
 	-2,
