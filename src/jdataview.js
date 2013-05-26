@@ -41,6 +41,11 @@ var nodeNaming = {
 	'Float64': 'Double'
 };
 
+function arrayFrom(arrayLike, forceCopy) {
+	if (!forceCopy && (arrayLike instanceof Array)) return arrayLike;
+	return Array.prototype.slice.call(arrayLike);
+}
+
 var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	if (!(this instanceof jDataView)) {
 		throw new Error("jDataView constructor may not be called as a function");
@@ -327,21 +332,11 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 };
 
 function getCharCodes(string) {
-	var codes = new Array(string.length);
+	var codes = new (compatibility.NodeBuffer ? Buffer : compatibility.ArrayBuffer ? Uint8Array : Array)(string.length);
 	for (var i = 0, length = string.length; i < length; i++) {
 		codes[i] = string.charCodeAt(i) & 0xff;
 	}
 	return codes;
-}
-
-function inherit(obj) {
-	if ('create' in Object) {
-		return Object.create(obj);
-	} else {
-		function ClonedObject() {}
-		ClonedObject.prototype = obj;
-		return new ClonedObject();
-	}
 }
 
 function Uint64(lo, hi) {
@@ -369,7 +364,7 @@ function Int64(lo, hi) {
 	Uint64.apply(this, arguments);
 }
 
-Int64.prototype = inherit(Uint64.prototype);
+Int64.prototype = 'create' in Object ? Object.create(Uint64.prototype) : new Uint64;
 
 Int64.prototype.valueOf = function () {
 	if (this.hi < Math.pow(2, 31)) {
@@ -395,34 +390,38 @@ Int64.fromNumber = function (number) {
 // mostly internal function for wrapping any supported input (String or Array-like) to best suitable buffer format
 jDataView.wrapBuffer = function (buffer) {
 	switch (typeof buffer) {
+		case 'number':
+			if (compatibility.NodeBuffer) {
+				buffer = new Buffer(buffer);
+				buffer.fill(0);
+			} else
+			if (compatibility.ArrayBuffer) {
+				buffer = new Uint8Array(buffer).buffer;
+			} else {
+				buffer = new Array(buffer);
+				for (var i = 0, length = buffer.length; i < length; i++) {
+					buffer[i] = 0;
+				}
+			}
+			return buffer;
+
 		case 'string':
 			buffer = getCharCodes(buffer);
-			break;
 
-		case 'number':
-			buffer = {length: buffer};
-			break;
-	}
-
-	if ('length' in buffer && !((compatibility.NodeBuffer && buffer instanceof Buffer) || (compatibility.ArrayBuffer && buffer instanceof ArrayBuffer))) {
-		if (compatibility.NodeBuffer) {
-			buffer = new Buffer(buffer);
-		} else
-		if (compatibility.ArrayBuffer) {
-			var bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
-			buffer = bytes.buffer;
-		} else {
-			if (!(buffer instanceof Array)) {
-				buffer = Array.prototype.slice.call(buffer);
+		default:
+			if ('length' in buffer && !((compatibility.NodeBuffer && buffer instanceof Buffer) || (compatibility.ArrayBuffer && buffer instanceof ArrayBuffer))) {
+				if (compatibility.NodeBuffer) {
+					buffer = new Buffer(buffer);
+				} else
+				if (compatibility.ArrayBuffer) {
+					var bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+					buffer = bytes.buffer;
+				} else {
+					buffer = arrayFrom(buffer);
+				}
 			}
-			// as simple Array may contain non-byte values (incl. undefined)
-			for (var i = 0, length = buffer.length; i < length; i++) {
-				buffer[i] &= 0xff;
-			}
-		}
+			return buffer;
 	}
-
-	return buffer;
 };
 
 // left for backward compatibility
@@ -470,11 +469,7 @@ jDataView.prototype = {
 		}
 
 		if (!littleEndian && length > 1) {
-			if (!(result instanceof Array)) {
-				result = Array.prototype.slice.call(result);
-			}
-
-			result.reverse();
+			result = arrayFrom(result).reverse();
 		}
 
 		this._offset = byteOffset - this._start + length;
@@ -490,8 +485,8 @@ jDataView.prototype = {
 
 		var result = this._getBytes(length, byteOffset, littleEndian);
 
-		if (toArray && !(result instanceof Array)) {
-			result = Array.prototype.slice.call(result);
+		if (toArray) {
+			result = arrayFrom(result);
 		}
 
 		return result;
@@ -521,7 +516,7 @@ jDataView.prototype = {
 		}
 
 		if (!littleEndian && length > 1) {
-			bytes = Array.prototype.slice.call(bytes).reverse();
+			bytes = arrayFrom(bytes, true).reverse();
 		}
 
 		byteOffset += this._start;
@@ -554,7 +549,10 @@ jDataView.prototype = {
 	},
 
 	getString: function (length, byteOffset, isUTF8) {
-		var string = String.fromCharCode.apply(String, this._getBytes(length, byteOffset, true));
+		var bytes = this._getBytes(length, byteOffset, true), string = '';
+		for (var i = 0, length = bytes.length; i < length; i++) {
+			string += String.fromCharCode(bytes[i]);
+		}
 		if (isUTF8) {
 			string = decodeURIComponent(escape(string));
 		}
