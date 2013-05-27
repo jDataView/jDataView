@@ -10,9 +10,9 @@ There are three ways to read a binary file from the browser.
 
 * The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a **String**, convert it to byte **Array** and you have to rewrite all the decoding and encoding functions (getUint16, getFloat32, ...). All the browsers support this.
 
-* Then browsers that implemented WebGL also added **CanvasPixelArray** as part of **ImageData**. It is fast byte array that is created and used internally by **Canvas** element for manipulating low-level image data. We can create such host element and use it as factory for our own instances of this array.
+* Then browsers that implemented **Canvas** also added **CanvasPixelArray** as part of **ImageData**. It is fast byte array that is created and used internally by <canvas /> element for manipulating low-level image data. We can create such host element and use it as factory for our own instances of this array.
 
-* Then those browsers also implemented **ArrayBuffers**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. It has big drawback, it can't read non-aligned data (but we can actually hack that).
+* Then browsers that implemented **WebGL** added **ArrayBuffer**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. It has big drawback, it can't read non-aligned data (but we can actually hack that).
 
 * A new revision of the specification added **DataViews**. It is a view around your buffer that can read/write arbitrary data types directly through functions: getUint32, getFloat64 ...
 
