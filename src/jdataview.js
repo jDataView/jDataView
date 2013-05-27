@@ -12,12 +12,22 @@ var global = this;
 
 var compatibility = {
 	ArrayBuffer: typeof ArrayBuffer !== 'undefined',
+	PixelData: typeof CanvasPixelArray !== 'undefined',
 	DataView: typeof DataView !== 'undefined' &&
 		('getFloat64' in DataView.prototype ||				// Chrome
 		 'getFloat64' in new DataView(new ArrayBuffer(1))), // Node
 	// NodeJS Buffer in v0.5.5 and newer
 	NodeBuffer: typeof Buffer !== 'undefined' && 'readInt16LE' in Buffer.prototype
 };
+
+if (compatibility.PixelData) {
+	var createPixelData = function (length) {
+		var data = createPixelData.context2d.createImageData((length + 3) / 4, 1).data;
+		data.byteLength = length;
+		return data;
+	};
+	createPixelData.context2d = document.createElement('canvas').getContext('2d');
+}
 
 var dataTypes = {
 	'Int8': 1,
@@ -55,18 +65,19 @@ var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 
 	// Check parameters and existing functionnalities
 	this._isArrayBuffer = compatibility.ArrayBuffer && buffer instanceof ArrayBuffer;
+	this._isPixelData = compatibility.PixelData && buffer instanceof CanvasPixelArray;
 	this._isDataView = compatibility.DataView && this._isArrayBuffer;
 	this._isNodeBuffer = compatibility.NodeBuffer && buffer instanceof Buffer;
 
 	// Handle Type Errors
-	if (!this._isNodeBuffer && !this._isArrayBuffer && !(buffer instanceof Array)) {
+	if (!this._isNodeBuffer && !this._isArrayBuffer && !this._isPixelData && !(buffer instanceof Array)) {
 		throw new TypeError('jDataView buffer has an incompatible type');
 	}
 
 	// Default Values
 	this._littleEndian = Boolean(littleEndian);
 
-	var bufferLength = this._isArrayBuffer ? buffer.byteLength : buffer.length;
+	var bufferLength = 'byteLength' in buffer ? buffer.byteLength : buffer.length;
 	if (byteOffset === undefined) {
 		byteOffset = 0;
 	}
@@ -397,6 +408,9 @@ jDataView.wrapBuffer = function (buffer) {
 			} else
 			if (compatibility.ArrayBuffer) {
 				buffer = new Uint8Array(buffer).buffer;
+			} else
+			if (compatibility.PixelData) {
+				buffer = createPixelData(buffer);
 			} else {
 				buffer = new Array(buffer);
 				for (var i = 0, length = buffer.length; i < length; i++) {
@@ -409,13 +423,20 @@ jDataView.wrapBuffer = function (buffer) {
 			buffer = getCharCodes(buffer);
 
 		default:
-			if ('length' in buffer && !((compatibility.NodeBuffer && buffer instanceof Buffer) || (compatibility.ArrayBuffer && buffer instanceof ArrayBuffer))) {
+			if ('length' in buffer && !((compatibility.NodeBuffer && buffer instanceof Buffer) || (compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) || (compatibility.PixelData && buffer instanceof CanvasPixelArray))) {
 				if (compatibility.NodeBuffer) {
 					buffer = new Buffer(buffer);
 				} else
 				if (compatibility.ArrayBuffer) {
 					var bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
 					buffer = bytes.buffer;
+				} else
+				if (compatibility.PixelData) {
+					var bytes = buffer, length = bytes.length;
+					buffer = createPixelData(length);
+					for (var i = 0; i < length; i++) {
+						buffer[i] = bytes[i];
+					}
 				} else {
 					buffer = arrayFrom(buffer);
 				}
@@ -465,7 +486,7 @@ jDataView.prototype = {
 			result = new Uint8Array(this.buffer, byteOffset, length);
 		}
 		else {
-			result = this.buffer.slice(byteOffset, byteOffset + length);
+			result = (this.buffer.slice || Array.prototype.slice).call(this.buffer, byteOffset, byteOffset + length);
 		}
 
 		if (!littleEndian && length > 1) {
@@ -553,6 +574,10 @@ jDataView.prototype = {
 			// Handle the lack of byteOffset
 			if (byteOffset === undefined) {
 				byteOffset = this._offset;
+			}
+
+			if (length === undefined) {
+				length = this.byteLength - byteOffset;
 			}
 
 			// Error Checking
@@ -701,6 +726,8 @@ jDataView.prototype = {
 			parts[i] = this.getUint32(byteOffset + parts[i], littleEndian);
 		}
 
+		this._offset = byteOffset + 8;
+
 		return new className(parts[0], parts[1]);
 	},
 
@@ -815,6 +842,8 @@ jDataView.prototype = {
 		for (var partName in parts) {
 			this.setUint32(byteOffset + parts[partName], value[partName], littleEndian);
 		}
+
+		this._offset = byteOffset + 8;
 	},
 
 	setInt64: function (byteOffset, value, littleEndian) {
@@ -845,12 +874,12 @@ jDataView.prototype = {
 	_setInt16: function (byteOffset, value, littleEndian) {
 		this._setBytes(byteOffset, [
 			value & 0xff,
-			value >>> 8
+			(value >>> 8) & 0xff
 		], littleEndian);
 	},
 
 	_setInt8: function (byteOffset, value) {
-		this._setBytes(byteOffset, [value]);
+		this._setBytes(byteOffset, [value & 0xff]);
 	}
 };
 

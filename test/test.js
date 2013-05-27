@@ -31,6 +31,7 @@ function testEngine(name) {
 }
 
 testEngine('ArrayBuffer');
+testEngine('PixelData');
 testEngine('DataView');
 testEngine('NodeBuffer');
 
