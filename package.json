@@ -17,5 +17,9 @@
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/vjeux/jDataView.git"
+	},
+	"devDependencies": {
+		"qunit": "*",
+		"jshint": ">= 2.1.0"
 	}
 }
