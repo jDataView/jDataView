@@ -100,50 +100,14 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 
 	// Create uniform methods (action wrappers) for the following data types
 
-	if (this._isDataView) { // DataView: we use the direct method
-		this._engineAction = function (type, isReadAction, byteOffset, littleEndian, value) {
-			// Move the internal offset forward
-			this._offset = byteOffset + dataTypes[type];
-
-			return isReadAction ? this._view['get' + type](byteOffset, littleEndian) : this._view['set' + type](byteOffset, value, littleEndian);
-		};
-	} else if (this._isNodeBuffer) {
-		this._engineAction = function (type, isReadAction, byteOffset, littleEndian, value) {
-			// Move the internal offset forward
-			this._offset = byteOffset + dataTypes[type];
-
-			var nodeName = nodeNaming[type] + ((type === 'Int8' || type === 'Uint8') ? '' : littleEndian ? 'LE' : 'BE');
-
-			byteOffset += this.byteOffset;
-
-			return isReadAction ? this.buffer['read' + nodeName](byteOffset) : this.buffer['write' + nodeName](value, byteOffset);
-		};
-	} else if (this._isArrayBuffer) {
-		this._engineAction = function (type, isReadAction, byteOffset, littleEndian, value) {
-			var size = dataTypes[type], TypedArray = global[type + 'Array'], typedArray;
-
-			// ArrayBuffer: we use a typed array of size 1 from original buffer if alignment is good and from slice when it's not
-			if (size === 1 || ((this.byteOffset + byteOffset) % size === 0 && littleEndian)) {
-				typedArray = new TypedArray(this.buffer, this.byteOffset + byteOffset, 1);
-				this._offset = byteOffset + size;
-				return isReadAction ? typedArray[0] : (typedArray[0] = value);
-			} else {
-				var bytes = new Uint8Array(isReadAction ? this._getBytes(size, byteOffset, littleEndian) : size);
-				typedArray = new TypedArray(bytes.buffer, 0, 1);
-
-				if (isReadAction) {
-					return typedArray[0];
-				} else {
-					typedArray[0] = value;
-					this._setBytes(byteOffset, bytes, littleEndian);
-				}
-			}
-		};
-	} else {
-		this._engineAction = function execute(type, isReadAction, byteOffset, littleEndian, value) {
-			return isReadAction ? this['_get' + type](byteOffset, littleEndian) : this['_set' + type.replace('Uint', 'Int')](byteOffset, value, littleEndian);
-		};
-	}
+	this._engineAction =
+		this._isDataView
+			? this._dataViewAction
+		: this._isNodeBuffer
+			? this._nodeBufferAction
+		: this._isArrayBuffer
+			? this._arrayBufferAction
+		: this._arrayAction;
 }
 
 function getCharCodes(string) {
@@ -284,6 +248,48 @@ jDataView.prototype = {
 			defined(littleEndian, this._littleEndian),
 			value
 		);
+	},
+
+	_dataViewAction: function (type, isReadAction, byteOffset, littleEndian, value) {
+		// Move the internal offset forward
+		this._offset = byteOffset + dataTypes[type];
+		return isReadAction ? this._view['get' + type](byteOffset, littleEndian) : this._view['set' + type](byteOffset, value, littleEndian);
+	},
+
+	_nodeBufferAction: function (type, isReadAction, byteOffset, littleEndian, value) {
+		// Move the internal offset forward
+		this._offset = byteOffset + dataTypes[type];
+
+		var nodeName = nodeNaming[type] + ((type === 'Int8' || type === 'Uint8') ? '' : littleEndian ? 'LE' : 'BE');
+
+		byteOffset += this.byteOffset;
+
+		return isReadAction ? this.buffer['read' + nodeName](byteOffset) : this.buffer['write' + nodeName](value, byteOffset);
+	},
+
+	_arrayBufferAction: function (type, isReadAction, byteOffset, littleEndian, value) {
+		var size = dataTypes[type], TypedArray = global[type + 'Array'], typedArray;
+
+		// ArrayBuffer: we use a typed array of size 1 from original buffer if alignment is good and from slice when it's not
+		if (size === 1 || ((this.byteOffset + byteOffset) % size === 0 && littleEndian)) {
+			typedArray = new TypedArray(this.buffer, this.byteOffset + byteOffset, 1);
+			this._offset = byteOffset + size;
+			return isReadAction ? typedArray[0] : (typedArray[0] = value);
+		} else {
+			var bytes = new Uint8Array(isReadAction ? this._getBytes(size, byteOffset, littleEndian) : size);
+			typedArray = new TypedArray(bytes.buffer, 0, 1);
+
+			if (isReadAction) {
+				return typedArray[0];
+			} else {
+				typedArray[0] = value;
+				this._setBytes(byteOffset, bytes, littleEndian);
+			}
+		}
+	},
+
+	_arrayAction: function (type, isReadAction, byteOffset, littleEndian, value) {
+		return isReadAction ? this['_get' + type](byteOffset, littleEndian) : this['_set' + type.replace('Uint', 'Int')](byteOffset, value, littleEndian);
 	},
 
 	// Helpers
