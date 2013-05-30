@@ -112,7 +112,7 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 
 function getCharCodes(string) {
 	var Type = compatibility.NodeBuffer ? Buffer : compatibility.ArrayBuffer ? Uint8Array : Array,
-	    codes = new Type(string.length);
+		codes = new Type(string.length);
 
 	for (var i = 0, length = string.length; i < length; i++) {
 		codes[i] = string.charCodeAt(i) & 0xff;
@@ -185,8 +185,9 @@ Uint64.prototype = {
 };
 
 Uint64.fromNumber = function (number) {
-	var hi = Math.floor(number / Math.pow(2, 32));
-	var lo = number - hi * Math.pow(2, 32);
+	var hi = Math.floor(number / Math.pow(2, 32)),
+		lo = number - hi * Math.pow(2, 32);
+
 	return new Uint64(lo, hi);
 };
 
@@ -306,8 +307,8 @@ jDataView.prototype = {
 		this._offset = byteOffset - this.byteOffset + length;
 
 		var result = this._isArrayBuffer
-		             ? new Uint8Array(this.buffer, byteOffset, length)
-		             : (this.buffer.slice || Array.prototype.slice).call(this.buffer, byteOffset, byteOffset + length);
+					 ? new Uint8Array(this.buffer, byteOffset, length)
+					 : (this.buffer.slice || Array.prototype.slice).call(this.buffer, byteOffset, byteOffset + length);
 
 		return littleEndian || length <= 1 ? result : arrayFrom(result).reverse();
 	},
@@ -422,8 +423,8 @@ jDataView.prototype = {
 
 	slice: function (start, end, forceCopy) {
 		return forceCopy
-		       ? new jDataView(this.getBytes(end - start, start, true, true), undefined, undefined, this._littleEndian)
-		       : new jDataView(this.buffer, this.byteOffset + start, end - start, this._littleEndian);
+			   ? new jDataView(this.getBytes(end - start, start, true, true), undefined, undefined, this._littleEndian)
+			   : new jDataView(this.buffer, this.byteOffset + start, end - start, this._littleEndian);
 	},
 
 	// Compatibility functions on a String Buffer
