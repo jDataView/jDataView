@@ -99,7 +99,7 @@ String operations globally support only 'binary' (by default) and 'utf8' encodin
 Addition of 64-bit signed and unsigned integer types.
 
 **IMPORTANT**: Those types behave like primitive numbers (you can manipulate with them using arithmetic operations, convert them to strings etc.)., **BUT** due to IEEE.754 limitations, there is precision loss for numbers outside the ±2^53 range, and that's why they also contain
-`lo` and `hi` fields for retrieving corresponding 32-bit unsigned parts. You can pass both primitive numbers (with the same restriction as above) or original values with modified `lo` and `hi` fields to writer functions as well.
+`lo` and `hi` fields for retrieving corresponding 32-bit unsigned parts. You can pass both primitive numbers (with the same restriction as above) or `jDataView.Uint64`/`jDataView.Int64` instances with `lo` and `hi` fields to writer functions as well.
 
 * **getInt64**(byteOffset, littleEndian)
 * **getUint64**(byteOffset, littleEndian)
