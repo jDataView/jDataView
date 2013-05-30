@@ -11,6 +11,9 @@
 	},
 	"files": ["src/jdataview.js"],
 	"main": "src/jdataview.js",
+	"scripts": {
+		"test": "cd test && node test.runner"
+	},
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/vjeux/jDataView.git"

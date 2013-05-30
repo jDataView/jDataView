@@ -11,13 +11,13 @@
 var global = this;
 
 var compatibility = {
-	ArrayBuffer: typeof ArrayBuffer !== 'undefined',
-	PixelData: typeof CanvasPixelArray !== 'undefined',
+	// NodeJS Buffer in v0.5.5 and newer
+	NodeBuffer: typeof Buffer !== 'undefined' && 'readInt16LE' in Buffer.prototype,
 	DataView: typeof DataView !== 'undefined' &&
 		('getFloat64' in DataView.prototype ||				// Chrome
 		 'getFloat64' in new DataView(new ArrayBuffer(1))), // Node
-	// NodeJS Buffer in v0.5.5 and newer
-	NodeBuffer: typeof Buffer !== 'undefined' && 'readInt16LE' in Buffer.prototype
+	ArrayBuffer: typeof ArrayBuffer !== 'undefined',
+	PixelData: typeof CanvasPixelArray !== 'undefined' && typeof ImageData !== 'undefined'
 };
 
 if (compatibility.PixelData) {
@@ -58,7 +58,7 @@ function arrayFrom(arrayLike, forceCopy) {
 
 var jDataView = function (buffer, byteOffset, byteLength, littleEndian) {
 	if (!(this instanceof jDataView)) {
-		throw new Error("jDataView constructor may not be called as a function");
+		return new jDataView(buffer, byteOffset, byteLength, littleEndian);
 	}
 
 	this.buffer = buffer = jDataView.wrapBuffer(buffer);
@@ -819,7 +819,7 @@ jDataView.prototype = {
 	},
 
 	_setFloat64: function (byteOffset, value, littleEndian) {
-		this._setBinaryFloat(byteOffset, value ,52, 11, littleEndian);
+		this._setBinaryFloat(byteOffset, value, 52, 11, littleEndian);
 	},
 
 	_set64: function (className, byteOffset, value, littleEndian) {
