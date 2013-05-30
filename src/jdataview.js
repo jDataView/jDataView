@@ -101,14 +101,14 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 	// Create uniform methods (action wrappers) for the following data types
 
 	if (this._isDataView) { // DataView: we use the direct method
-		this._action = function (type, isReadAction, byteOffset, littleEndian, value) {
+		this._engineAction = function (type, isReadAction, byteOffset, littleEndian, value) {
 			// Move the internal offset forward
 			this._offset = byteOffset + dataTypes[type];
 
 			return isReadAction ? this._view['get' + type](byteOffset, littleEndian) : this._view['set' + type](byteOffset, value, littleEndian);
 		};
 	} else if (this._isNodeBuffer) {
-		this._action = function (type, isReadAction, byteOffset, littleEndian, value) {
+		this._engineAction = function (type, isReadAction, byteOffset, littleEndian, value) {
 			// Move the internal offset forward
 			this._offset = byteOffset + dataTypes[type];
 
@@ -119,7 +119,7 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 			return isReadAction ? this.buffer['read' + nodeName](byteOffset) : this.buffer['write' + nodeName](value, byteOffset);
 		};
 	} else if (this._isArrayBuffer) {
-		this._action = function (type, isReadAction, byteOffset, littleEndian, value) {
+		this._engineAction = function (type, isReadAction, byteOffset, littleEndian, value) {
 			var size = dataTypes[type], TypedArray = global[type + 'Array'], typedArray;
 
 			// ArrayBuffer: we use a typed array of size 1 from original buffer if alignment is good and from slice when it's not
@@ -140,7 +140,7 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 			}
 		};
 	} else {
-		this._action = function execute(type, isReadAction, byteOffset, littleEndian, value) {
+		this._engineAction = function execute(type, isReadAction, byteOffset, littleEndian, value) {
 			return isReadAction ? this['_get' + type](byteOffset, littleEndian) : this['_set' + type.replace('Uint', 'Int')](byteOffset, value, littleEndian);
 		};
 	}
@@ -276,8 +276,8 @@ jDataView.prototype = {
 		}
 	},
 
-	action: function (type, isReadAction, byteOffset, littleEndian, value) {
-		return this._action(
+	_action: function (type, isReadAction, byteOffset, littleEndian, value) {
+		return this._engineAction(
 			type,
 			isReadAction,
 			defined(byteOffset, this._offset),
@@ -634,10 +634,10 @@ var proto = jDataView.prototype;
 for (var type in dataTypes) {
 	(function (type) {
 		proto['get' + type] = function (byteOffset, littleEndian) {
-			return this.action(type, true, byteOffset, littleEndian);
+			return this._action(type, true, byteOffset, littleEndian);
 		};
 		proto['set' + type] = function (byteOffset, value, littleEndian) {
-			this.action(type, false, byteOffset, littleEndian, value);
+			this._action(type, false, byteOffset, littleEndian, value);
 		};
 		proto['write' + type] = function (value, littleEndian) {
 			this['set' + type](undefined, value, littleEndian);
