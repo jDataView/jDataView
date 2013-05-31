@@ -1,5 +1,71 @@
-if (typeof jDataView === 'undefined') {
-	jDataView = require('..');
+if (typeof require !== 'undefined') {
+	if (typeof jDataView === 'undefined') {
+		jDataView = require('..');
+	}
+
+	if (typeof JSHINT === 'undefined') {
+		JSHINT = require('jshint').JSHINT;
+	}
+}
+
+if (typeof JSHINT !== 'undefined') {
+	asyncTest('JSHint', function () {
+		var paths = {
+			source: '../src/jdataview.js',
+			options: '../src/.jshintrc'
+		},
+		contents = {};
+
+		function onLoad(err, name, text) {
+			if (err) {
+				start();
+				return ok(false, 'Error while loading ' + name + ': ' + err);
+			}
+
+			contents[name] = text;
+			for (var name in paths) {
+				if (!(name in contents)) {
+					return;
+				}
+			}
+
+			var options = JSON.parse(contents.options), globals = options.globals;
+			delete options.globals;
+
+			start();
+
+			if (JSHINT(contents.source, options, globals)) {
+				ok(true);
+			} else {
+				var errors = JSHINT.errors;
+				for (var i = 0, length = errors.length; i < length; i++) {
+					var error = errors[i];
+					if (error) {
+						ok(false, 'Line ' + error.line + ', character ' + error.character + ': ' + error.reason);
+					}
+				}
+			}
+		}
+
+		function load(name) {
+			if (typeof XMLHttpRequest !== 'undefined') {
+				var ajax = new XMLHttpRequest();
+				ajax.onload = function () {
+					this.status === 200 ? onLoad(null, name, this.responseText) : onLoad(this.statusText, name);
+				};
+				ajax.open('GET', paths[name], true);
+				ajax.send();
+			} else {
+				require('fs').readFile(paths[name], function (err, data) {
+					onLoad(err, name, String(data));
+				});
+			}
+		}
+
+		for (var name in paths) {
+			load(name);
+		}
+	});
 }
 
 var
@@ -74,7 +140,7 @@ function testForInt64(expected) {
 	};
 }
 
-// setter = [value, offset, getterArgs, checkFn]
+// setter = [value, args, getterArgs, checkFn]
 function testSetters(type, setters) {
 	test(type, function () {
 		for (var i = 0; i < setters.length; i++) {
@@ -85,11 +151,12 @@ function testSetters(type, setters) {
 			}
 
 			var value = setter[0],
-				offset = setter[1] || 0,
+				args = setter[1] instanceof Array ? setter[1] : [setter[1] || 0],
+				offset = args[0],
 				getterArgs = setter[2] === undefined ? [offset] : setter[2] instanceof Array ? setter[2] : [setter[2]],
 				check = setter[3] || equal;
 
-			view['set' + type](offset, value);
+			view['set' + type].apply(view, [offset, value].concat(args.slice(1)));
 			check(view['get' + type].apply(view, getterArgs), value);
 		}
 	});
@@ -141,7 +208,8 @@ function testNextEngine() {
 			[chr(0xff), [1, 0]],
 			[chr(0), [1, 5]],
 			[chr(1), [1, 7]],
-			[chr(127) + chr(0) + chr(1) + chr(65) + chr(66), 5, b(127, 0, 1, 65, 66)]
+			[chr(127) + chr(0) + chr(1) + chr(65) + chr(66), 5, b(127, 0, 1, 65, 66)],
+			[chr(1092) + chr(1099) + chr(1074), [, , 'utf8'], b(0xd1, 0x84, 0xd1, 0x8b, 0xd0, 0xb2)]
 		]);
 
 		test('Big String', function () {
@@ -263,7 +331,8 @@ function testNextEngine() {
 
 		testSetters('String', [
 			[chr(1) + chr(2) + chr(3), 2, [3, 2]],
-			[chr(8) + chr(9), 1, [2, 1]]
+			[chr(8) + chr(9), 1, [2, 1]],
+			[chr(1092) + chr(1099) + chr(1074), [0, 'utf8'], [6, 0, 'utf8']]
 		]);
 
 		testSetters('Int8', [

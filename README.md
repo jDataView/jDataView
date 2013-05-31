@@ -84,21 +84,22 @@ You can use ```writeXXX``` methods instead, which will set values at current pos
 * **writeFloat64**(value, littleEndian)
 
 Addition of Char, String and Bytes utilities.
+String operations globally support only 'binary' (by default) and 'utf8' encodings; Char is always one-byte 'binary'.
 
 * **getChar**(byteOffset, isUTF8)
-* **getString**(length, byteOffset, isUTF8)
+* **getString**(byteLength, byteOffset, encoding = 'binary')
 * **getBytes**(length, byteOffset, littleEndian = true, toArray = false)
-* **setChar**(byteOffset, char, isUTF8)
-* **setString**(byteOffset, chars, isUTF8)
+* **setChar**(byteOffset, char)
+* **setString**(byteOffset, chars, encoding = 'binary')
 * **setBytes**(byteOffset, bytes, littleEndian = true)
-* **writeChar**(char, isUTF8)
-* **writeString**(chars, isUTF8)
+* **writeChar**(char)
+* **writeString**(chars, encoding = 'binary')
 * **writeBytes**(bytes, littleEndian = true)
 
 Addition of 64-bit signed and unsigned integer types.
 
 **IMPORTANT**: Those types behave like primitive numbers (you can manipulate with them using arithmetic operations, convert them to strings etc.)., **BUT** due to IEEE.754 limitations, there is precision loss for numbers outside the ±2^53 range, and that's why they also contain
-`lo` and `hi` fields for retrieving corresponding 32-bit unsigned parts. You can pass both primitive numbers (with the same restriction as above) or original values with modified `lo` and `hi` fields to writer functions as well.
+`lo` and `hi` fields for retrieving corresponding 32-bit unsigned parts. You can pass both primitive numbers (with the same restriction as above) or `jDataView.Uint64`/`jDataView.Int64` instances with `lo` and `hi` fields to writer functions as well.
 
 * **getInt64**(byteOffset, littleEndian)
 * **getUint64**(byteOffset, littleEndian)
@@ -165,10 +166,13 @@ $.get(
 
 Changelog
 ========
-* **May 28 2013**:
+* **May 30 2013**:
   * [RReverser](https://github.com/rreverser) added support for UTF-8 strings
   * Added support for 64-bit signed and unsigned integers (with precision loss outside the ±2^53 range when using primitive JS numbers due to IEEE.754 restrictions)
   * Added support for CanvasPixelArray as fast byte array for browsers that don't support Typed Arrays yet (like IE9)
+  * Refactored code.
+  * Added ability to test library on all the engines that are supported on current platform at once.
+  * Added JSHint configuration according to project code guidelines and implemented corresponding QUnit test.
 * **April 8 2013**:
   * [mmthomas](http://blog.coolmuse.com/) implemented support for denormalized float values in setters
 * **March 16 2013**:
