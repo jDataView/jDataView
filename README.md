@@ -200,14 +200,13 @@ Changelog
 Demos
 ==== 
 
-* A <a href="http://fooo.fr/~vjeux/github/jsDataView/demo/untar/untar.html">simple tar viewer</a>. It is a "Hello World" demo of how easy it is to use the library.
+* A <a href="http://rreverser.github.io/jDataView/untar/">simple tar viewer</a>. It is a "Hello World" demo of how easy it is to use the library.
 
-* A <a href="http://fooo.fr/~vjeux/github/jsWoWModelViewer/modelviewer.html">World of Warcraft Model Viewer</a>. It uses jDataView to read the binary file and then WebGL to display it.
-<a href="http://fooo.fr/~vjeux/github/jsWoWModelViewer/modelviewer.html"><img src="http://fooo.fr/~vjeux/github/jsWoWModelViewer/images/modelviewer.png"></a>
+* <a href="http://rreverser.com/dev/bmp/">BMP viewer</a> with ability to load files by URL or using File API, parsing them using library and rendering with Canvas (no `<img />` elements at all).
 
 * A <a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/">PhotoSynth WebGL Viewer</a> by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
 <a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/"><img src="http://i.imgur.com/HRHXo.jpg"/></a>
 
-Please tell me if you made something with jDataView :)
+Please tell us if you made something with jDataView :)
 
 Licence: [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/)
