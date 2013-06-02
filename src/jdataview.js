@@ -22,11 +22,11 @@ var compatibility = {
 };
 
 if (compatibility.PixelData) {
-	var createPixelData = function (length, buffer) {
-		var data = createPixelData.context2d.createImageData((length + 3) / 4, 1).data;
-		data.byteLength = length;
+	var createPixelData = function (byteLength, buffer) {
+		var data = createPixelData.context2d.createImageData((byteLength + 3) / 4, 1).data;
+		data.byteLength = byteLength;
 		if (buffer !== undefined) {
-			for (var i = 0; i < length; i++) {
+			for (var i = 0; i < byteLength; i++) {
 				data[i] = buffer[i];
 			}
 		}
@@ -373,7 +373,7 @@ jDataView.prototype = {
 			return this.buffer.toString(encoding || 'binary', this.byteOffset + byteOffset, this.byteOffset + this._offset);
 		}
 		var bytes = this._getBytes(byteLength, byteOffset, true), string = '';
-		for (var i = 0, length = bytes.length; i < length; i++) {
+		for (var i = 0; i < byteLength; i++) {
 			string += String.fromCharCode(bytes[i]);
 		}
 		if (encoding === 'utf8') {
@@ -419,6 +419,10 @@ jDataView.prototype = {
 		this._checkBounds(byteOffset, 0);
 		/* jshint boss: true */
 		return this._offset = byteOffset;
+	},
+
+	skip: function (byteLength) {
+		return this.seek(this._offset + byteLength);
 	},
 
 	slice: function (start, end, forceCopy) {
@@ -582,9 +586,9 @@ jDataView.prototype = {
 		this._setBinaryFloat(byteOffset, value, 52, 11, littleEndian);
 	},
 
-	_set64: function (className, byteOffset, value, littleEndian) {
-		if (!(value instanceof className)) {
-			value = className.fromNumber(value);
+	_set64: function (Type, byteOffset, value, littleEndian) {
+		if (!(value instanceof Type)) {
+			value = Type.fromNumber(value);
 		}
 
 		littleEndian = defined(littleEndian, this._littleEndian);

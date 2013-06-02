@@ -1,14 +1,14 @@
 {
 	"name": "jDataView",
-	"version": "1.1.0",
-	"description": "A unique way to read a binary file in the browser and the server.",
-	"keywords": ["buffer", "binary", "file", "read"],
+	"version": "2.2.0",
+	"description": "A unique way to work with a binary file in the browser and the server.",
+	"keywords": ["buffer", "binary", "data", "file", "dataview", "read", "write", "manipulation"],
 	"homepage": "http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html",
-	"author": {
-		"name": "Vjeux",
-		"email": "vjeuxx@gmail.com",
-		"url": "http://blog.vjeux.com/"
-	},
+	"author": "Vjeux <vjeuxx@gmail.com> (http://blog.vjeux.com/)",
+	"contributors": [
+		"Vjeux <vjeuxx@gmail.com> (http://blog.vjeux.com/)",
+		"RReverser <me@rreverser.com> (http://rreverser.com)"
+	],
 	"files": ["src/jdataview.js"],
 	"main": "src/jdataview.js",
 	"scripts": {

@@ -68,6 +68,8 @@ The byteOffset parameter is now optional. If you omit it, it will read right aft
     * Moves the internal pointer to the position
 * **tell**()
     * Returns the current position
+* **skip**(byteLength)
+    * Skips given count of bytes
 * **slice**(start, end, forceCopy = false)
     * Returns view (jDataView) on part of original one; may point to the same memory buffer or copy data into new one depending on forceCopy parameter.
 
