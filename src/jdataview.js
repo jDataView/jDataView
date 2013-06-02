@@ -373,6 +373,7 @@ jDataView.prototype = {
 			return this.buffer.toString(encoding || 'binary', this.byteOffset + byteOffset, this.byteOffset + this._offset);
 		}
 		var bytes = this._getBytes(byteLength, byteOffset, true), string = '';
+		byteLength = bytes.length;
 		for (var i = 0; i < byteLength; i++) {
 			string += String.fromCharCode(bytes[i]);
 		}
