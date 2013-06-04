@@ -68,6 +68,12 @@ function defined(value, defaultValue) {
 function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 	/* jshint validthis:true */
 
+	if (buffer instanceof jDataView) {
+		var result = buffer.slice(byteOffset, byteOffset + byteLength);
+		result._littleEndian = defined(littleEndian, result._littleEndian);
+		return result;
+	}
+
 	if (!(this instanceof jDataView)) {
 		return new jDataView(buffer, byteOffset, byteLength, littleEndian);
 	}
