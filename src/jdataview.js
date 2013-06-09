@@ -156,7 +156,7 @@ jDataView.wrapBuffer = function (buffer) {
 					buffer = new Buffer(buffer);
 				} else
 				if (compatibility.ArrayBuffer) {
-					buffer = (buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer)).buffer;
+					buffer = buffer instanceof ArrayBuffer ? buffer : new Uint8Array(buffer).buffer;
 				} else
 				if (compatibility.PixelData) {
 					buffer = createPixelData(buffer.length, buffer);
