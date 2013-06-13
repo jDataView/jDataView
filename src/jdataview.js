@@ -18,7 +18,7 @@ var compatibility = {
 		'getFloat64' in new DataView(new ArrayBuffer(1)) // Node
 	),
 	ArrayBuffer: 'ArrayBuffer' in global,
-	PixelData: 'CanvasPixelArray' in global && 'ImageData' in global
+	PixelData: 'CanvasPixelArray' in global && 'ImageData' in global && 'document' in global
 };
 
 if (compatibility.PixelData) {
