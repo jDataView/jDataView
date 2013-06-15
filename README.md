@@ -202,7 +202,7 @@ Changelog
 Demos
 ==== 
 
-* A <a href="http://rreverser.github.io/jDataView/untar/">simple tar viewer</a>. It is a "Hello World" demo of how easy it is to use the library.
+* A <a href="http://jdataview.github.io/jDataView/untar/">simple tar viewer</a>. It is a "Hello World" demo of how easy it is to use the library.
 
 * <a href="http://rreverser.com/dev/bmp/">BMP viewer</a> with ability to load files by URL or using File API, parsing them using library and rendering with Canvas (no `<img />` elements at all).
 
