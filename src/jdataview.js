@@ -6,7 +6,7 @@
 // http://blog.vjeux.com/ <vjeuxx@gmail.com>
 //
 
-(function (exports, global) {
+(function (global) {
 
 'use strict';
 
@@ -663,10 +663,13 @@ for (var type in dataTypes) {
 	})(type);
 }
 
-if ('module' in global && exports === module.exports) {
+if (typeof module === 'object' && module && typeof module.exports === 'object') {
 	module.exports = jDataView;
+} else
+if (typeof define === 'function' && define.amd) {
+	define('jdataview', [], function () { return jDataView });
 } else {
-	exports.jDataView = jDataView;
+	global.jDataView = jDataView;
 }
 
-})(this, (function () { /* jshint strict: false */ return this })());
+})((function () { /* jshint strict: false */ return this })());
