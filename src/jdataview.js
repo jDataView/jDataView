@@ -117,7 +117,11 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 }
 
 function getCharCodes(string) {
-	var Type = compatibility.NodeBuffer ? Buffer : compatibility.ArrayBuffer ? Uint8Array : Array,
+	if (compatibility.NodeBuffer) {
+		return new Buffer(string, 'binary');
+	}
+
+	var Type = compatibility.ArrayBuffer ? Uint8Array : Array,
 		codes = new Type(string.length);
 
 	for (var i = 0, length = string.length; i < length; i++) {
