@@ -172,6 +172,10 @@ jDataView.wrapBuffer = function (buffer) {
 	}
 };
 
+function pow2(n) {
+	return (n >= 0 && n < 31) ? (1 << n) : (pow2[n] || (pow2[n] = Math.pow(2, n)));
+}
+
 // left for backward compatibility
 jDataView.createBuffer = function () {
 	return jDataView.wrapBuffer(arguments);
@@ -186,7 +190,7 @@ jDataView.Uint64 = Uint64;
 
 Uint64.prototype = {
 	valueOf: function () {
-		return this.lo + Math.pow(2, 32) * this.hi;
+		return this.lo + pow2(32) * this.hi;
 	},
 
 	toString: function () {
@@ -195,8 +199,8 @@ Uint64.prototype = {
 };
 
 Uint64.fromNumber = function (number) {
-	var hi = Math.floor(number / Math.pow(2, 32)),
-		lo = number - hi * Math.pow(2, 32);
+	var hi = Math.floor(number / pow2(32)),
+		lo = number - hi * pow2(32);
 
 	return new Uint64(lo, hi);
 };
@@ -210,10 +214,10 @@ jDataView.Int64 = Int64;
 Int64.prototype = 'create' in Object ? Object.create(Uint64.prototype) : new Uint64();
 
 Int64.prototype.valueOf = function () {
-	if (this.hi < Math.pow(2, 31)) {
+	if (this.hi < pow2(31)) {
 		return Uint64.prototype.valueOf.apply(this, arguments);
 	}
-	return -((Math.pow(2, 32) - this.lo) + Math.pow(2, 32) * (Math.pow(2, 32) - 1 - this.hi));
+	return -((pow2(32) - this.lo) + pow2(32) * (pow2(32) - 1 - this.hi));
 };
 
 Int64.fromNumber = function (number) {
@@ -223,9 +227,9 @@ Int64.fromNumber = function (number) {
 		lo = unsigned.lo;
 		hi = unsigned.hi;
 	} else {
-		hi = Math.floor(number / Math.pow(2, 32));
-		lo = number - hi * Math.pow(2, 32);
-		hi += Math.pow(2, 32);
+		hi = Math.floor(number / pow2(32));
+		lo = number - hi * pow2(32);
+		hi += pow2(32);
 	}
 	return new Int64(lo, hi);
 };
@@ -451,8 +455,8 @@ jDataView.prototype = {
 			exponent = ((((b[7] << 1) & 0xff) << 3) | (b[6] >> 4)) - ((1 << 10) - 1),
 
 		// Binary operators such as | and << operate on 32 bit values, using + and Math.pow(2) instead
-			mantissa = ((b[6] & 0x0f) * Math.pow(2, 48)) + (b[5] * Math.pow(2, 40)) + (b[4] * Math.pow(2, 32)) +
-						(b[3] * Math.pow(2, 24)) + (b[2] * Math.pow(2, 16)) + (b[1] * Math.pow(2, 8)) + b[0];
+			mantissa = ((b[6] & 0x0f) * pow2(48)) + (b[5] * pow2(40)) + (b[4] * pow2(32)) +
+						(b[3] * pow2(24)) + (b[2] * pow2(16)) + (b[1] * pow2(8)) + b[0];
 
 		if (exponent === 1024) {
 			if (mantissa !== 0) {
@@ -463,10 +467,10 @@ jDataView.prototype = {
 		}
 
 		if (exponent === -1023) { // Denormalized
-			return sign * mantissa * Math.pow(2, -1022 - 52);
+			return sign * mantissa * pow2(-1022 - 52);
 		}
 
-		return sign * (1 + mantissa * Math.pow(2, -52)) * Math.pow(2, exponent);
+		return sign * (1 + mantissa * pow2(-52)) * pow2(exponent);
 	},
 
 	_getFloat32: function (byteOffset, littleEndian) {
@@ -485,10 +489,10 @@ jDataView.prototype = {
 		}
 
 		if (exponent === -127) { // Denormalized
-			return sign * mantissa * Math.pow(2, -126 - 23);
+			return sign * mantissa * pow2(-126 - 23);
 		}
 
-		return sign * (1 + mantissa * Math.pow(2, -23)) * Math.pow(2, exponent);
+		return sign * (1 + mantissa * pow2(-23)) * pow2(exponent);
 	},
 
 	_get64: function (Type, byteOffset, littleEndian) {
@@ -563,10 +567,10 @@ jDataView.prototype = {
 		} else {
 			exponent = Math.floor(Math.log(value) / Math.LN2);
 			if (exponent >= eMin && exponent <= eMax) {
-				mantissa = Math.floor((value * Math.pow(2, -exponent) - 1) * Math.pow(2, mantSize));
+				mantissa = Math.floor((value * pow2(-exponent) - 1) * pow2(mantSize));
 				exponent += eMax;
 			} else {
-				mantissa = Math.floor(value / Math.pow(2, eMin - mantSize));
+				mantissa = Math.floor(value / pow2(eMin - mantSize));
 				exponent = 0;
 			}
 		}

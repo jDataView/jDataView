@@ -12,7 +12,7 @@ There are three ways to read a binary file from the browser.
 
 * Then browsers that implemented **Canvas** also added **CanvasPixelArray** as part of **ImageData**. It is fast byte array that is created and used internally by `<canvas />` element for manipulating low-level image data. We can create such host element and use it as factory for our own instances of this array.
 
-* Then browsers that implemented **WebGL** added **ArrayBuffer**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. It has big drawback, it can't read non-aligned data (but we can actually hack that).
+* Then browsers that implemented **WebGL** added **ArrayBuffer**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. It has big drawback, it can't read non-aligned data (but we can actually hack that). So they replaced **CanvasPixelArray** with **Uint8ClampedArray** (same as Uint8Array, but cuts off numbers outside 0..255 range).
 
 * A new revision of the specification added **DataViews**. It is a view around your buffer that can read/write arbitrary data types directly through functions: getUint32, getFloat64 ...
 
@@ -86,16 +86,16 @@ You can use ```writeXXX``` methods instead, which will set values at current pos
 * **writeFloat64**(value, littleEndian)
 
 Addition of Char, String and Bytes utilities.
-String operations globally support only 'binary' (by default) and 'utf8' encodings; Char is always one-byte 'binary'.
+String operations globally support 'binary' (by default) and 'utf8' encodings; Char is always one-byte 'binary'.
 
-* **getChar**(byteOffset, isUTF8)
-* **getString**(byteLength, byteOffset, encoding = 'binary')
-* **getBytes**(length, byteOffset, littleEndian = true, toArray = false)
+* **getChar**(byteOffset)
 * **setChar**(byteOffset, char)
-* **setString**(byteOffset, chars, encoding = 'binary')
-* **setBytes**(byteOffset, bytes, littleEndian = true)
 * **writeChar**(char)
+* **getString**(byteLength, byteOffset, encoding = 'binary')
+* **setString**(byteOffset, chars, encoding = 'binary')
 * **writeString**(chars, encoding = 'binary')
+* **getBytes**(length, byteOffset, littleEndian = true, toArray = false)
+* **setBytes**(byteOffset, bytes, littleEndian = true)
 * **writeBytes**(bytes, littleEndian = true)
 
 Addition of 64-bit signed and unsigned integer types.
@@ -104,10 +104,10 @@ Addition of 64-bit signed and unsigned integer types.
 `lo` and `hi` fields for retrieving corresponding 32-bit unsigned parts. You can pass both primitive numbers (with the same restriction as above) or `jDataView.Uint64`/`jDataView.Int64` instances with `lo` and `hi` fields to writer functions as well.
 
 * **getInt64**(byteOffset, littleEndian)
-* **getUint64**(byteOffset, littleEndian)
 * **setInt64**(byteOffset, value, littleEndian)
-* **setUint64**(byteOffset, value, littleEndian)
 * **writeInt64**(value, littleEndian)
+* **getUint64**(byteOffset, littleEndian)
+* **setUint64**(byteOffset, value, littleEndian)
 * **writeUint64**(value, littleEndian)
 
 Addition of wrapBuffer and createBuffer, utilities to easily create buffers with the latest available storage type (Node.js Buffer, ArrayBuffer, CanvasPixelArray or simple Array).
@@ -145,8 +145,8 @@ var view = new jDataView(file);
 version = view.getInt32(); // 272
 float = view.getFloat32(); // 39887.5625
 
-// You can move around with tell() and seek()
-view.seek(view.tell() + 8);
+// You can move around with tell(), seek() and skip()
+view.skip(8);
 
 // Two helpers: getChar and getString will make your life easier
 var tag = view.getString(4); // MD20
@@ -168,6 +168,8 @@ $.get(
 
 Changelog
 ========
+* **May 15 2013**
+  * jDataView got [own account](https://github.com/jDataView)! More projects and demos coming soon.
 * **May 30 2013**:
   * [RReverser](https://github.com/rreverser) added support for UTF-8 strings
   * Added support for 64-bit signed and unsigned integers (with precision loss outside the ±2^53 range when using primitive JS numbers due to IEEE.754 restrictions)
