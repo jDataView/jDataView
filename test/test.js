@@ -215,9 +215,9 @@ function testNextEngine() {
 		]);
 
 		testGetters('String', [
- 			{args: [1, 0], value: chr(0xff)},
- 			{args: [1, 5], value: chr(0)},
- 			{args: [1, 7], value: chr(1)},
+			{args: [1, 0], value: chr(0xff)},
+			{args: [1, 5], value: chr(0)},
+			{args: [1, 7], value: chr(1)},
 			{view: b(127, 0, 1, 65, 66), args: [5], value: chr(127) + chr(0) + chr(1) + chr(65) + chr(66)},
 			{view: b(0xd1, 0x84, 0xd1, 0x8b, 0xd0, 0xb2), args: [, , 'utf8'], value: chr(1092) + chr(1099) + chr(1074)}
 		]);
