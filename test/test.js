@@ -11,7 +11,7 @@ if (typeof require !== 'undefined') {
 if (typeof JSHINT !== 'undefined') {
 	asyncTest('JSHint', function () {
 		var paths = {
-			source: '../src/jdataview.js',
+			source: '../src/jDataView.js',
 			options: '../src/.jshintrc'
 		},
 		contents = {};

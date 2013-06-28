@@ -4,6 +4,6 @@ testrunner.options.assertions = false;
 testrunner.options.summary = false;
 testrunner.options.coverage = false;
 testrunner.run({
-	code: '../src/jdataview.js',
+	code: '../src/jDataView.js',
 	tests: './test.js'
 });
