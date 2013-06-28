@@ -320,6 +320,11 @@ function testNextEngine() {
 			{view: b(0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01), check: compareWithNaN}
 		]);
 
+		testGetters('Uint64', [
+			{view: b(0x00, 0x67, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe), value: 29273397577908224, check: compareInt64},
+			{view: b(0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77), value: 4822678189205111, check: compareInt64}
+		]);
+
 		testGetters('Int64', [
 			{args: [0, false], value: -283686985483775, check: compareInt64},
 			{view: b(0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe), value: -2, check: compareInt64},
@@ -412,6 +417,11 @@ function testNextEngine() {
 			1.0000000000000004,
 			-2,
 			{value: NaN, check: compareWithNaN}
+		]);
+
+		testSetters('Uint64', [
+			{value: 29273397577908224, check: compareInt64},
+			{value: 4822678189205111, check: compareInt64}
 		]);
 
 		testSetters('Int64', [
