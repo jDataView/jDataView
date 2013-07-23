@@ -675,7 +675,7 @@ if (typeof module === 'object' && module && typeof module.exports === 'object') 
 	module.exports = jDataView;
 } else
 if (typeof define === 'function' && define.amd) {
-	define('jDataView', [], function () { return jDataView });
+	define(function () { return jDataView });
 } else {
 	global.jDataView = jDataView;
 }
