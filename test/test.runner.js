@@ -14,4 +14,9 @@ testrunner.setup({
 testrunner.run({
 	code: '../src/jDataView.js',
 	tests: './test.js'
+}, function (err, stats) {
+	// ignoring PixelData support "error", counting others
+	if (err || stats.failed > 1) {
+		throw new Error('Some tests failed.');
+	}
 });
