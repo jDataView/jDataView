@@ -453,13 +453,13 @@ function testNextEngine() {
 
 	module('');
 
-	test('Supported', function () {
-		ok(isSupported);
+	test('Support check', function () {
+		ok(true, engineName + ' is' + (isSupported ? '' : ' not') + ' supported.');
 	});
 }
 
 QUnit.testDone(function (test) {
-	if (test.name === 'Supported') {
+	if (test.name === 'Support check') {
 		compatibility[test.module] = false;
 		testNextEngine();
 	}

@@ -296,13 +296,15 @@ jDataView.prototype = {
 	_arrayBufferAction: function (type, isReadAction, byteOffset, littleEndian, value) {
 		var size = dataTypes[type], TypedArray = global[type + 'Array'], typedArray;
 
+		littleEndian = defined(littleEndian, this._littleEndian);
+
 		// ArrayBuffer: we use a typed array of size 1 from original buffer if alignment is good and from slice when it's not
 		if (size === 1 || ((this.byteOffset + byteOffset) % size === 0 && littleEndian)) {
 			typedArray = new TypedArray(this.buffer, this.byteOffset + byteOffset, 1);
 			this._offset = byteOffset + size;
 			return isReadAction ? typedArray[0] : (typedArray[0] = value);
 		} else {
-			var bytes = new Uint8Array(isReadAction ? this._getBytes(size, byteOffset, littleEndian) : size);
+			var bytes = new Uint8Array(isReadAction ? this.getBytes(size, byteOffset, littleEndian, true) : size);
 			typedArray = new TypedArray(bytes.buffer, 0, 1);
 
 			if (isReadAction) {
