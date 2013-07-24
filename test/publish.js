@@ -7,11 +7,11 @@ if (env.TRAVIS_JOB_NUMBER && env.TRAVIS_JOB_NUMBER.slice(-2) !== '.1') {
 
 npm.load(function () {
 	npm.registry.adduser(env.NPM_USERNAME, env.NPM_PASSWORD, env.NPM_EMAIL, function (err) {
-		if (err) throw err;
+		if (err) return console.error(err);
 
 		npm.config.set('email', env.NPM_EMAIL, 'user');
 		npm.commands.publish(function (err) {
-			if (err) throw err;
+			if (err) return console.error(err.code === 'EPUBLISHCONFLICT' ? err.pkgid + ' was already published.' : err);
 			console.log('Published to registry');
 		});
 	});
