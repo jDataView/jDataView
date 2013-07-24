@@ -11,12 +11,16 @@ testrunner.setup({
 	}
 });
 
+process.on('uncaughtException', function (error) {
+	console.error(error);
+	throw error;
+});
+
 testrunner.run({
 	code: '../src/jDataView.js',
 	tests: './test.js'
-}, function (err, stats) {
-	// ignoring PixelData support "error", counting others
-	if (err || stats.failed) {
-		throw new Error(err || 'Some tests failed.');
+}, function (error, stats) {
+	if (error || stats.failed) {
+		throw error || new Error(stats.failed + ' test(s) failed.');
 	}
 });
