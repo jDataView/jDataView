@@ -17,6 +17,6 @@ testrunner.run({
 }, function (err, stats) {
 	// ignoring PixelData support "error", counting others
 	if (err || stats.failed) {
-		throw new Error('Some tests failed.');
+		throw new Error(err || 'Some tests failed.');
 	}
 });
