@@ -1,4 +1,4 @@
-<a href="http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html">jDataView</a> - A unique way to work with a binary file in JavaScript.
+[![Build Status](https://travis-ci.org/jDataView/jDataView.png?branch=master)](https://travis-ci.org/jDataView/jDataView) <a href="http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html">jDataView</a> - A unique way to work with a binary file in JavaScript.
 ================================
 
 jDataView provides a standard way to read and/or modify binary files in all the browsers. It follows the [DataView Specification](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6) and even extends it for a more practical use.
