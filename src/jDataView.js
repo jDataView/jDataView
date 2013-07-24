@@ -21,6 +21,17 @@ var compatibility = {
 	PixelData: 'CanvasPixelArray' in global && 'ImageData' in global && 'document' in global
 };
 
+// we don't want to bother with old Buffer implementation
+if (compatibility.NodeBuffer) {
+	(function (buffer) {
+		try {
+			buffer.writeFloatLE(Infinity, 0);
+		} catch (e) {
+			compatibility.NodeBuffer = false;
+		}
+	})(new Buffer(4));
+}
+
 if (compatibility.PixelData) {
 	var createPixelData = function (byteLength, buffer) {
 		var data = createPixelData.context2d.createImageData((byteLength + 3) / 4, 1).data;
