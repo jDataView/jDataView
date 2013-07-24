@@ -72,7 +72,7 @@ var
 	test = QUnit.test,
 	chr = String.fromCharCode,
 	// workaround for http://code.google.com/p/v8/issues/detail?id=2578
-	_isNaN = Number.isNaN || window.isNaN,
+	_isNaN = Number.isNaN || (function () { return this })().isNaN,
 	isNaN = function (obj) {
 		return _isNaN(obj) || (typeof obj === 'number' && obj.toString() === 'NaN');
 	},
