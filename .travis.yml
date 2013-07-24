@@ -6,4 +6,7 @@ node_js:
 - '0.6'
 env:
   matrix:
-    secure: CkkZFe97bFjtJCvyNcmVFDOdmWdAH+jtm8mVy8vqKVjX8iyj2v8D8Gj5i5BFwJOJcSuXP2y1dkdov7lM16J6G1JDe/NEPb+uus6MaC67to/ptS5kdsE++72XCJfLR6SSXY+nNxmgq197qxU4nWOBWToAMmi3vmYBWHTCgW08i1Y=
+  - secure: CkkZFe97bFjtJCvyNcmVFDOdmWdAH+jtm8mVy8vqKVjX8iyj2v8D8Gj5i5BFwJOJcSuXP2y1dkdov7lM16J6G1JDe/NEPb+uus6MaC67to/ptS5kdsE++72XCJfLR6SSXY+nNxmgq197qxU4nWOBWToAMmi3vmYBWHTCgW08i1Y=
+  - 
+  - 
+  - 
