@@ -17,7 +17,7 @@ process.on('uncaughtException', function (error) {
 });
 
 testrunner.run({
-	code: '../src/jDataView.js',
+	code: '../src/jdataview.js',
 	tests: './test.js'
 }, function (error, stats) {
 	if (error || stats.failed) {
