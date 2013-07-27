@@ -21,17 +21,6 @@ var compatibility = {
 	PixelData: 'CanvasPixelArray' in global && 'ImageData' in global && 'document' in global
 };
 
-// we don't want to bother with old Buffer implementation
-if (compatibility.NodeBuffer) {
-	(function (buffer) {
-		try {
-			buffer.writeFloatLE(Infinity, 0);
-		} catch (e) {
-			compatibility.NodeBuffer = false;
-		}
-	})(new Buffer(4));
-}
-
 if (compatibility.PixelData) {
 	var createPixelData = function (byteLength, buffer) {
 		var data = createPixelData.context2d.createImageData((byteLength + 3) / 4, 1).data;
@@ -682,6 +671,18 @@ for (var type in dataTypes) {
 			this['set' + type](undefined, value, littleEndian);
 		};
 	})(type);
+}
+
+// some problems with big floats and old Buffer implementation
+if (compatibility.NodeBuffer) {
+	(function (buffer) {
+		try {
+			buffer.writeFloatLE(Infinity, 0);
+		} catch (e) {
+			proto.setFloat32 = proto._setFloat32;
+			proto.setFloat64 = proto._setFloat64;
+		}
+	})(new Buffer(4));
 }
 
 if (typeof module === 'object' && module && typeof module.exports === 'object') {
