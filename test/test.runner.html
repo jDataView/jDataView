@@ -1,14 +1,61 @@
 <!DOCTYPE html>
 
-<link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css" media="screen" />
-<script type="text/javascript" src="http://code.jquery.com/qunit/git/qunit.js"></script>
-<script type="text/javascript" src="../lib/jshint-2.1.3.js"></script>
-<script type="text/javascript" src="../src/jdataview.js"></script>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>jDataView Test Runner</title>
+	<link rel="stylesheet" type="text/css" href="../lib/mocha.css">
+	<script src="../lib/mocha.js"></script>
+	<script>
+		if (!Array.prototype.forEach) {
+			Array.prototype.forEach = function (fn, scope) {
+				'use strict';
+				var i, len;
+				for (i = 0, len = this.length; i < len; ++i) {
+					if (i in this) {
+						fn.call(scope, this[i], i, this);
+					}
+				}
+			};
+		}
 
-<h1 id="qunit-header">QUnit example</h1>
-<h2 id="qunit-banner"></h2>
-<div id="qunit-testrunner-toolbar"></div>
-<h2 id="qunit-userAgent"></h2>
-<ol id="qunit-tests"></ol>
+		if (!Function.prototype.bind) {
+			Function.prototype.bind = function (oThis) {
+				if (typeof this !== "function") {
+					// closest thing possible to the ECMAScript 5 internal IsCallable function
+					throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+				}
 
-<script type="text/javascript" src="test.js"></script>
+				var aArgs = Array.prototype.slice.call(arguments, 1), 
+					fToBind = this, 
+					fNOP = function () {},
+					fBound = function () {
+					  return fToBind.apply(this instanceof fNOP && oThis
+											 ? this
+											 : oThis,
+										   aArgs.concat(Array.prototype.slice.call(arguments)));
+					};
+
+				fNOP.prototype = this.prototype;
+				fBound.prototype = new fNOP();
+
+				return fBound;
+			};
+		}
+	</script>
+	<script src="../lib/qunit-mocha-ui-browser.js"></script>
+	<script>
+		mocha.setup({ui: 'qunit-mocha-ui'});
+	</script>
+
+	<script src="../lib/jshint-2.1.3.js"></script>
+	<script src="../src/jdataview.js"></script>
+	<script src="test.js"></script>
+</head>
+<body>
+	<div id="mocha"></div>
+	<script>
+		mocha.run();
+	</script>
+</body>
+</html>

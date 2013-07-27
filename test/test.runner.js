@@ -1,26 +1,8 @@
-var testrunner = require('qunit');
+var Mocha = require('mocha');
+require('qunit-mocha-ui');
 
-testrunner.setup({
-	log: {
-		assertions: false,
-		errors: true,
-		tests: false,
-		summary: true,
-		globalSummary: false,
-		testing: true
-	}
-});
-
-process.on('uncaughtException', function (error) {
-	console.error(error);
-	throw error;
-});
-
-testrunner.run({
-	code: '../src/jdataview.js',
-	tests: './test.js'
-}, function (error, stats) {
-	if (error || stats.failed) {
-		throw error || new Error(stats.failed + ' test(s) failed.');
-	}
+var mocha = new Mocha({ui: 'qunit-mocha-ui'});
+mocha.addFile('test.js');
+mocha.run(function(failures){
+  process.exit(failures);
 });

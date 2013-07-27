@@ -1,6 +1,6 @@
 {
 	"name": "jdataview",
-	"version": "2.2.9",
+	"version": "2.2.10",
 	"description": "A unique way to work with a binary file in the browser and the server.",
 	"keywords": ["buffer", "binary", "data", "file", "dataview", "read", "write", "manipulation"],
 	"homepage": "http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html",
@@ -20,8 +20,9 @@
 		"url": "git://github.com/jDataView/jDataView.git"
 	},
 	"devDependencies": {
-		"qunit": "*",
 		"jshint": ">= 2.1.0",
-		"npm": "*"
+		"npm": "*",
+		"mocha": "~1.12.0",
+		"qunit-mocha-ui": "*"
 	}
 }
