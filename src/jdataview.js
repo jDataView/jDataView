@@ -249,6 +249,7 @@ Int64.fromNumber = function (number) {
 
 jDataView.prototype = {
 	_offset: 0,
+	_bitOffset: 0,
 
 	compatibility: compatibility,
 
@@ -287,11 +288,8 @@ jDataView.prototype = {
 	_nodeBufferAction: function (type, isReadAction, byteOffset, littleEndian, value) {
 		// Move the internal offset forward
 		this._offset = byteOffset + dataTypes[type];
-
 		var nodeName = nodeNaming[type] + ((type === 'Int8' || type === 'Uint8') ? '' : littleEndian ? 'LE' : 'BE');
-
 		byteOffset += this.byteOffset;
-
 		return isReadAction ? this.buffer['read' + nodeName](byteOffset) : this.buffer['write' + nodeName](value, byteOffset);
 	},
 
@@ -461,7 +459,7 @@ jDataView.prototype = {
 			   : new jDataView(this.buffer, this.byteOffset + start, end - start, this._littleEndian);
 	},
 
-	// Compatibility functions on a String Buffer
+	// Compatibility functions
 
 	_getFloat64: function (byteOffset, littleEndian) {
 		var b = this._getBytes(8, byteOffset, littleEndian),
@@ -557,6 +555,33 @@ jDataView.prototype = {
 
 	_getUint8: function (byteOffset) {
 		return this._getBytes(1, byteOffset)[0];
+	},
+
+	getSigned: function (bitLength, byteOffset) {
+		var shift = 32 - bitLength;
+		return (this.getUnsigned(bitLength, byteOffset) << shift) >> shift;
+	},
+
+	getUnsigned: function (bitLength, byteOffset) {
+		var startBit = (defined(byteOffset, this._offset) << 3) + this._bitOffset,
+			endBit = startBit + bitLength,
+			start = startBit >>> 3,
+			end = (endBit + 7) >>> 3,
+			b = this._getBytes(end - start, start, true),
+			value = 0;
+
+		/* jshint boss: true */
+		if (this._bitOffset = endBit & 7) {
+			this._bitOffset -= 8;
+		}
+
+		for (var i = 0, length = b.length; i < length; i++) {
+			value = (value << 8) | b[i];
+		}
+
+		value >>>= -this._bitOffset;
+
+		return bitLength < 32 ? (value & ~(-1 << bitLength)) : value;
 	},
 
 	_setBinaryFloat: function (byteOffset, value, mantSize, expSize, littleEndian) {

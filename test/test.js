@@ -99,16 +99,16 @@ function b() {
 	return new jDataView(arguments);
 }
 
-function compareInt64(value, expected) {
-	equal(Number(value), expected);
+function compareInt64(value, expected, message) {
+	equal(Number(value), expected, message);
 }
 
-function compareBytes(value, expected) {
-	deepEqual(Array.prototype.slice.call(value), expected);
+function compareBytes(value, expected, message) {
+	deepEqual(Array.prototype.slice.call(value), expected, message);
 }
 
-function compareWithNaN(value) {
-	ok(isNaN(value));
+function compareWithNaN(value, expected, message) {
+	ok(isNaN(value), message);
 }
 
 function testBounds(type) {
@@ -136,9 +136,11 @@ function testGetters(type, getters) {
 			var args = getter.args || [],
 				contextView = getter.view || view,
 				check = getter.check || equal,
-				value = getter.value;
+				value = getter.value,
+				offset = contextView.tell(),
+				realValue = contextView['get' + type].apply(contextView, args);
 
-			check(contextView['get' + type].apply(contextView, args), value);
+			check(realValue, value, 'get' + type + '(' + args.join(', ') + ') == ' + realValue + ' != ' + value + ' at offset ' + offset + (getter.view ? ' in view [' + getter.view.getBytes(undefined, 0, true, true).join(', ') + ']' : ''));
 		}
 	});
 }
@@ -153,14 +155,17 @@ function testSetters(type, setters) {
 				setter = {value: setter};
 			}
 
-			var args = setter.args || [0],
-				offset = args[0],
+			var offset = setter.args ? setter.args[0] : 0,
+				value = setter.value,
+				args = [offset, value].concat(setter.args ? setter.args.slice(1) : []),
 				getterArgs = setter.getterArgs || [offset],
-				check = setter.check || equal,
-				value = setter.value;
+				check = setter.check || equal;
 
-			view['set' + type].apply(view, [offset, value].concat(args.slice(1)));
-			check(view['get' + type].apply(view, getterArgs), value);
+			view['set' + type].apply(view, args);
+
+			var realValue = view['get' + type].apply(view, getterArgs);
+
+			check(realValue, value, 'set' + type + '(' + args.join(', ') + ') != get' + type + '(' + getterArgs.join(', ') + ') == ' + realValue);
 		}
 	});
 }
@@ -320,6 +325,28 @@ function testNextEngine() {
 		{args: [0, false], value: -283686985483775, check: compareInt64},
 		{view: b(0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe), value: -2, check: compareInt64},
 		{view: b(0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77), value: 4822678189205111, check: compareInt64}
+	]);
+
+	testGetters('Unsigned', [
+		// padded to byte here
+		{args: [3, 1], value: 7},
+		{args: [5], value: 30},
+		// padded to byte here
+		{args: [15], value: 32510},
+		{args: [17], value: 64000},
+		// padded to byte here
+		{view: b(0xff, 0xff, 0xff, 0xff), args: [32], value: 0xffffffff}
+	]);
+
+	testGetters('Signed', [
+		// padded to byte here
+		{args: [3, 1], value: -1},
+		{args: [5], value: -2},
+		// padded to byte here
+		{args: [15], value: -258},
+		{args: [17], value: 64000},
+		// padded to byte here
+		{view: b(0xff, 0xff, 0xff, 0xff), args: [32], value: -1}
 	]);
 
 	suite('Writing', {
