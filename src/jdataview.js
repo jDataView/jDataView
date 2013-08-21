@@ -172,7 +172,11 @@ jDataView.wrapBuffer = function (buffer) {
 				} else
 				if (compatibility.ArrayBuffer) {
 					if (!(buffer instanceof ArrayBuffer)) {
-						buffer = buffer instanceof Uint8Array ? buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) : new Uint8Array(buffer).buffer;
+						buffer = new Uint8Array(buffer).buffer;
+						// bug in Node.js <= 0.8:
+						if (buffer instanceof Uint8Array) {
+							buffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+						}
 					}
 				} else
 				if (compatibility.PixelData) {
