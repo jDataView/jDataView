@@ -175,7 +175,7 @@ jDataView.wrapBuffer = function (buffer) {
 						buffer = new Uint8Array(buffer).buffer;
 						// bug in Node.js <= 0.8:
 						if (buffer instanceof Uint8Array) {
-							buffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+							buffer = new Uint8Array(arrayFrom(buffer, true)).buffer;
 						}
 					}
 				} else
