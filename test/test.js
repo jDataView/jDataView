@@ -87,6 +87,19 @@ var	chr = String.fromCharCode,
 	view,
 	engineName;
 
+if (compatibility.ArrayBuffer) {
+	test('Create on part of Uint8Array', function () {
+		compatibility.ArrayBuffer = true;
+
+		var bytes = [1, 2, 3],
+			offset = 1,
+			original = new Uint8Array(bytes),
+			view = new jDataView(original.subarray(offset));
+
+		compareBytes(view.getBytes(), bytes.slice(offset));
+	});
+}
+
 compatibility.Array = true;
 
 for (engineName in compatibility) {
