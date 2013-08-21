@@ -97,6 +97,8 @@ if (compatibility.ArrayBuffer) {
 			view = new jDataView(original.subarray(offset));
 
 		compareBytes(view.getBytes(), bytes.slice(offset));
+
+		compatibility.ArrayBuffer = false;
 	});
 }
 
