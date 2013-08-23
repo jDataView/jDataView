@@ -174,7 +174,7 @@ jDataView.wrapBuffer = function (buffer) {
 					if (!(buffer instanceof ArrayBuffer)) {
 						buffer = new Uint8Array(buffer).buffer;
 						// bug in Node.js <= 0.8:
-						if (buffer instanceof Uint8Array) {
+						if (!(buffer instanceof ArrayBuffer)) {
 							buffer = new Uint8Array(arrayFrom(buffer, true)).buffer;
 						}
 					}
