@@ -350,6 +350,7 @@ engines.forEach(function (engineName) {
 							getterArgs = setter.getterArgs || [offset],
 							check = setter.check || equal;
 
+						ok(('write' + type) in view, 'jDataView does not have `write' + type + '` method.');
 						view['set' + type].apply(view, args);
 
 						var realValue = view['get' + type].apply(view, getterArgs);
@@ -450,7 +451,59 @@ engines.forEach(function (engineName) {
 				{value: -283686985483775, check: compareInt64},
 				{value: -2, check: compareInt64},
 				{value: 4822678189205111, check: compareInt64}
-			]);		
+			]);
+
+			// setter = {value, bitLength}
+			function testBitfieldSetters(type, setters) {
+				it(type, function () {
+					var view = new jDataView(13);
+
+					function eachValue(callback) {
+						view.seek(0);
+
+						setters.forEach(function (setter) {
+							callback.call(view, setter.value, setter.bitLength);
+						});
+					}
+
+					eachValue(function (value, bitLength) {
+						this['write' + type](value, bitLength);
+					});
+
+					eachValue(function (value, bitLength) {
+						var realValue = this['get' + type](bitLength);
+						equal(realValue, value, 'write' + type + '(' + value + ', ' + bitLength + ') != get' + type + '(' + bitLength + ') == ' + realValue);
+					});
+				});
+			}
+
+			testBitfieldSetters('Unsigned', [
+				// padded to byte here
+				{value: 5, bitLength: 3},
+				{value: 29, bitLength: 5},
+				// padded to byte here
+				{value: 19781, bitLength: 15},
+				{value: 68741, bitLength: 17},
+				// padded to byte here
+				{value: 0xffffffff, bitLength: 32},
+				// padded to byte here
+				{value: 0x7fffffff, bitLength: 31},
+				{value: 1, bitLength: 1}
+			]);
+
+			testBitfieldSetters('Signed', [
+				// padded to byte here
+				{value: -1, bitLength: 3},
+				{value: -2, bitLength: 5},
+				// padded to byte here
+				{value: -258, bitLength: 15},
+				{value: 64000, bitLength: 17},
+				// padded to byte here
+				{value: -1, bitLength: 32},
+				// padded to byte here
+				{value: -0x40000000, bitLength: 31},
+				{value: -1, bitLength: 1}
+			]);
 		});
 
 		describe('should be sliced', function () {

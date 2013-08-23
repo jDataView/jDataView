@@ -110,6 +110,15 @@ Addition of 64-bit signed and unsigned integer types.
 * **setUint64**(byteOffset, value, littleEndian)
 * **writeUint64**(value, littleEndian)
 
+Addition of bitfield support. Allows to use bitLength <= 32 bits. Don't forget to ensure byte padding before reading non-bitfield values after calling those methods.
+
+* **getSigned**(bitLength, byteOffset)
+* **setSigned**(byteOffset, value, bitLength)
+* **writeSigned**(value, bitLength)
+* **getUnsigned**(bitLength, byteOffset)
+* **setUnsigned**(byteOffset, value, bitLength)
+* **writeUnsigned**(value, bitLength)
+
 Addition of wrapBuffer and createBuffer, utilities to easily create buffers with the latest available storage type (Node.js Buffer, ArrayBuffer, CanvasPixelArray or simple Array).
 
 * **wrapBuffer**(string_or_bytes_or_byteCount)
@@ -168,6 +177,10 @@ $.get(
 
 Changelog
 ========
+* **August 23 2013**
+  * Added bitfield support (was considered to be borrowed from [jBinary](https://github.com/jDataView/jBinary), but implemented faster and simpler version).
+  * Completely dynamic one-time write* definition for all the set* methods.
+  * Restructured tests using Mocha's BDD style, so now possible to test separate features and/or engines.
 * **May 15 2013**
   * jDataView got [own account](https://github.com/jDataView)! More projects and demos coming soon.
 * **May 30 2013**:

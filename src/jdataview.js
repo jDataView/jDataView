@@ -321,7 +321,7 @@ jDataView.prototype = {
 	},
 
 	_arrayAction: function (type, isReadAction, byteOffset, littleEndian, value) {
-		return isReadAction ? this['_get' + type](byteOffset, littleEndian) : this['_set' + type.replace('Uint', 'Int')](byteOffset, value, littleEndian);
+		return isReadAction ? this['_get' + type](byteOffset, littleEndian) : this['_set' + type](byteOffset, value, littleEndian);
 	},
 
 	// Helpers
@@ -389,10 +389,6 @@ jDataView.prototype = {
 		this._setBytes(byteOffset, bytes, defined(littleEndian, true));
 	},
 
-	writeBytes: function (bytes, littleEndian) {
-		this.setBytes(undefined, bytes, littleEndian);
-	},
-
 	getString: function (byteLength, byteOffset, encoding) {
 		if (this._isNodeBuffer) {
 			byteOffset = defined(byteOffset, this._offset);
@@ -427,20 +423,12 @@ jDataView.prototype = {
 		this._setBytes(byteOffset, getCharCodes(subString), true);
 	},
 
-	writeString: function (subString, encoding) {
-		this.setString(undefined, subString, encoding);
-	},
-
 	getChar: function (byteOffset) {
 		return this.getString(1, byteOffset);
 	},
 
 	setChar: function (byteOffset, character) {
 		this.setString(byteOffset, character);
-	},
-
-	writeChar: function (character) {
-		this.setChar(undefined, character);
 	},
 
 	tell: function () {
@@ -561,18 +549,13 @@ jDataView.prototype = {
 		return this._getBytes(1, byteOffset)[0];
 	},
 
-	getSigned: function (bitLength, byteOffset) {
-		var shift = 32 - bitLength;
-		return (this.getUnsigned(bitLength, byteOffset) << shift) >> shift;
-	},
-
-	getUnsigned: function (bitLength, byteOffset) {
+	_getBitRangeData: function (bitLength, byteOffset) {
 		var startBit = (defined(byteOffset, this._offset) << 3) + this._bitOffset,
 			endBit = startBit + bitLength,
 			start = startBit >>> 3,
 			end = (endBit + 7) >>> 3,
 			b = this._getBytes(end - start, start, true),
-			value = 0;
+			wideValue = 0;
 
 		/* jshint boss: true */
 		if (this._bitOffset = endBit & 7) {
@@ -580,11 +563,23 @@ jDataView.prototype = {
 		}
 
 		for (var i = 0, length = b.length; i < length; i++) {
-			value = (value << 8) | b[i];
+			wideValue = (wideValue << 8) | b[i];
 		}
 
-		value >>>= -this._bitOffset;
+		return {
+			start: start,
+			bytes: b,
+			wideValue: wideValue
+		};
+	},
 
+	getSigned: function (bitLength, byteOffset) {
+		var shift = 32 - bitLength;
+		return (this.getUnsigned(bitLength, byteOffset) << shift) >> shift;
+	},
+
+	getUnsigned: function (bitLength, byteOffset) {
+		var value = this._getBitRangeData(bitLength, byteOffset).wideValue >>> -this._bitOffset;
 		return bitLength < 32 ? (value & ~(-1 << bitLength)) : value;
 	},
 
@@ -666,19 +661,11 @@ jDataView.prototype = {
 		this._set64(Int64, byteOffset, value, littleEndian);
 	},
 
-	writeInt64: function (value, littleEndian) {
-		this.setInt64(undefined, value, littleEndian);
-	},
-
 	setUint64: function (byteOffset, value, littleEndian) {
 		this._set64(Uint64, byteOffset, value, littleEndian);
 	},
 
-	writeUint64: function (value, littleEndian) {
-		this.setUint64(undefined, value, littleEndian);
-	},
-
-	_setInt32: function (byteOffset, value, littleEndian) {
+	_setUint32: function (byteOffset, value, littleEndian) {
 		this._setBytes(byteOffset, [
 			value & 0xff,
 			(value >>> 8) & 0xff,
@@ -687,15 +674,31 @@ jDataView.prototype = {
 		], littleEndian);
 	},
 
-	_setInt16: function (byteOffset, value, littleEndian) {
+	_setUint16: function (byteOffset, value, littleEndian) {
 		this._setBytes(byteOffset, [
 			value & 0xff,
 			(value >>> 8) & 0xff
 		], littleEndian);
 	},
 
-	_setInt8: function (byteOffset, value) {
+	_setUint8: function (byteOffset, value) {
 		this._setBytes(byteOffset, [value & 0xff]);
+	},
+
+	setUnsigned: function (byteOffset, value, bitLength) {
+		var data = this._getBitRangeData(bitLength, byteOffset),
+			wideValue = data.wideValue,
+			b = data.bytes;
+
+		wideValue &= ~(~(-1 << bitLength) << -this._bitOffset); // clearing bit range before binary "or"
+		wideValue |= (bitLength < 32 ? (value & ~(-1 << bitLength)) : value) << -this._bitOffset; // setting bits
+
+		for (var i = b.length - 1; i >= 0; i--) {
+			b[i] = wideValue & 0xff;
+			wideValue >>>= 8;
+		}
+
+		this._setBytes(data.start, b, true);
 	}
 };
 
@@ -709,10 +712,23 @@ for (var type in dataTypes) {
 		proto['set' + type] = function (byteOffset, value, littleEndian) {
 			this._action(type, false, byteOffset, littleEndian, value);
 		};
-		proto['write' + type] = function (value, littleEndian) {
-			this['set' + type](undefined, value, littleEndian);
-		};
 	})(type);
+}
+
+proto._setInt32 = proto._setUint32;
+proto._setInt16 = proto._setUint16;
+proto._setInt8 = proto._setUint8;
+proto.setSigned = proto.setUnsigned;
+
+for (var method in proto) {
+	if (method.slice(0, 3) === 'set') {
+		(function (type) {
+			proto['write' + type] = function () {
+				Array.prototype.unshift.call(arguments, undefined);
+				this['set' + type].apply(this, arguments);
+			};
+		})(method.slice(3));
+	}
 }
 
 if (typeof module === 'object' && module && typeof module.exports === 'object') {
