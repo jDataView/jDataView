@@ -374,7 +374,8 @@ jDataView.prototype = {
 		}
 		else {
 			if (this._isNodeBuffer) {
-				new Buffer(bytes).copy(this.buffer, byteOffset);
+				// workaround for Node.js v0.11.6 (`new Buffer(bufferInstance)` call corrupts original data)
+				(bytes instanceof Buffer ? bytes : new Buffer(bytes)).copy(this.buffer, byteOffset);
 			} else {
 				for (var i = 0; i < length; i++) {
 					this.buffer[byteOffset + i] = bytes[i];
