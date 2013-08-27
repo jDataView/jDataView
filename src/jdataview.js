@@ -732,7 +732,7 @@ for (var method in proto) {
 	}
 }
 
-if (typeof module === 'object' && module && typeof module.exports === 'object') {
+if (typeof module !== 'undefined' && typeof module.exports === 'object') {
 	module.exports = jDataView;
 } else
 if (typeof define === 'function' && define.amd) {
