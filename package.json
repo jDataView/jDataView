@@ -24,5 +24,9 @@
 		"npm": "*",
 		"mocha": "~1.12.0",
 		"qunit-mocha-ui": "*"
-	}
+	},
+	"licenses": [{
+		"type": "WTFPL",
+		"url": "http://sam.zoy.org/wtfpl/"
+	}]
 }
