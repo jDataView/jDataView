@@ -447,6 +447,13 @@ jDataView.prototype = {
 	},
 
 	slice: function (start, end, forceCopy) {
+		function normalizeOffset(offset, byteLength) {
+			return offset < 0 ? offset + byteLength : offset;
+		}
+
+		start = normalizeOffset(start, this.byteLength);
+		end = normalizeOffset(defined(end, this.byteLength), this.byteLength);
+
 		return forceCopy
 			   ? new jDataView(this.getBytes(end - start, start, true, true), undefined, undefined, this._littleEndian)
 			   : new jDataView(this.buffer, this.byteOffset + start, end - start, this._littleEndian);

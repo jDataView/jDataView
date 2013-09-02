@@ -100,15 +100,17 @@ function b() {
 }
 
 function compareInt64(value, expected, message) {
-	equal(Number(value), expected, message);
+	value = Number(value);
+	equal(value, expected, message || (value + ' != ' + expected));
 }
 
 function compareBytes(value, expected, message) {
-	deepEqual(Array.prototype.slice.call(value), expected, message);
+	value = Array.prototype.slice.call(value);
+	deepEqual(value, expected, message || '[' + value + '] != [' + expected + ']');
 }
 
 function compareWithNaN(value, expected, message) {
-	ok(isNaN(value), message);
+	ok(isNaN(value), message || value + ' != NaN');
 }
 
 engines.forEach(function (engineName) {
@@ -529,6 +531,21 @@ engines.forEach(function (engineName) {
 				compareBytes(copy.getBytes(), [0xfe, 0xfd, 0xfc]);
 				copy.setChar(0, chr(1));
 				notEqual(view.getChar(1), chr(1));
+			});
+
+			it('with only start offset argument given', function () {
+				var pointerCopy = view.slice(1);
+				compareBytes(pointerCopy.getBytes(), [0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]);
+			});
+
+			it('with negative start offset given', function () {
+				var pointerCopy = view.slice(-2);
+				compareBytes(pointerCopy.getBytes(), [0xba, 0x01]);
+			});
+
+			it('with negative end offset given', function () {
+				var pointerCopy = view.slice(1, -2);
+				compareBytes(pointerCopy.getBytes(), [0xfe, 0xfd, 0xfc, 0xfa, 0x00]);
 			});
 		});
 
