@@ -38,12 +38,35 @@ Documentation
   * [Example](https://github.com/jDataView/jDataView/wiki/Example)
   * [Changelog](https://github.com/jDataView/jDataView/blob/master/CHANGELOG.md)
 
+Advanced usage ([jBinary](https://github.com/jDataView/jBinary))
+========================
+
+For complicated binary structures, it may be hard enough to use only low-level get/set operations for parsing,
+processing and writing data.
+
+In addition, most likely you might need convenient I/O methods for retrieving data from external sources such like
+local files (using File API or from Node.js), remote files (via HTTP(S)), data-URIs, Node.js streams etc. as well
+as for displaying generated content to user on webpage in image/video/audio/... containers
+or even as simple download link.
+
+If you faced any of these problems, you might want to check out new [jBinary](https://github.com/jDataView/jBinary)
+library that works on top of **jDataView** and allows to operate with binary data in structured and convenient way.
+
 Demos
 =====
 
 * A <a href="http://jdataview.github.io/jDataView/untar/">simple tar viewer</a>. It is a "Hello World" demo of how easy it is to use the library.
 
 * <a href="http://rreverser.com/dev/bmp/">BMP viewer</a> with ability to load files by URL or using File API, parsing them using library and rendering with Canvas (no `<img />` elements at all).
+
+* [jBinary.Repo](https://jdataview.github.io/jBinary.Repo) ready-to-use typesets and corresponding demos of using
+[jDataView](https://github.com/jDataView/jDataView)+[jBinary](https://github.com/jDataView/jBinary)
+for reading popular file formats like
+[GZIP archives](https://jdataview.github.io/jBinary.Repo/demo/#gzip),
+[TAR archives](https://jdataview.github.io/jBinary.Repo/demo/#tar),
+[ICO images](https://jdataview.github.io/jBinary.Repo/demo/#ico),
+[MP3 tags](https://jdataview.github.io/jBinary.Repo/demo/#mp3)
+etc.
 
 * A <a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/">PhotoSynth WebGL Viewer</a> by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
 <a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/"><img src="http://i.imgur.com/HRHXo.jpg"/></a>
