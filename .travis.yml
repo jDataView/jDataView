@@ -10,4 +10,5 @@ env:
   - secure: Hcvr+JcCUaAt+CYXuxnnaVkmLv9ofF2DxVI0wl1MQ3N3GuvXonx/iv45quchgw3IU0RUWWaJcqisbytBW0j2l+f6ixYGn8yz9fCsMVxlCHsBs5EOYaPe6gMsfGl7XTZtWW5EzLyYjMOgokjy46+/4lKQx7EKp6q96kXKhuq8j+w=
   - secure: EKfXvSeXF+WR7yOFQtZbAc+z2dSjMBEqa69uPNbgD9sxCTSxVNWwYjz3EN0xppWrSo3IJD3wDENQKNBa5lBcuisIASkEDeZTu2J/y+7ZTRkWkOwRGetBV9X6HzOsnHLfvFPpg1FiO74Wf1hyjmdn3Kjb27N7zVC1SJZn3/WHCWg=
 script:
-  - "cd test && phantomjs --local-to-remote-url-access=true --web-security=false phantom-mocha.js index.html && npm test"
+  - "phantomjs --local-to-remote-url-access=true --web-security=false test/phantom-mocha.js test/index.html"
+  - "npm test"
