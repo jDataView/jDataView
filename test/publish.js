@@ -21,7 +21,6 @@ part('Checking configuration', function () {
 		process.exit();
 	}
 
-	return false;
 	var missingEnv = ['NPM_USERNAME', 'NPM_PASSWORD', 'NPM_EMAIL', 'GH_TOKEN'].filter(function (name) { return !(name in env) });
 
 	if (missingEnv.length) {
@@ -29,7 +28,7 @@ part('Checking configuration', function () {
 	}
 });
 
-if (false) part('Publishing to npm', function (npm) {
+part('Publishing to npm', function (npm) {
 	npm.load(function () {
 		console.log(npm.config);
 		npm.registry.adduser(env.NPM_USERNAME, env.NPM_PASSWORD, env.NPM_EMAIL, function (err) {
@@ -62,7 +61,7 @@ part('Publishing to GitHub', function (fs, rimraf) {
 						outSourceMap: scriptName + '.map'
 					});
 
-					fs.writeFileSync('dist/' + scriptName, minified.code);
+					fs.writeFileSync('dist/' + scriptName, minified.code + ['#', '@'].map(function (c) { return '\n//# sourceMappingURL=' + scriptName + '.map' }));
 					fs.writeFileSync('dist/' + scriptName + '.map', minified.map);
 				});
 
