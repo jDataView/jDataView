@@ -48,15 +48,20 @@ part('Publishing to GitHub', function (fs, rimraf) {
 			var exec = child_process.exec,
 				distRepo = process.argv[2];
 
-			exec('git clone https://' + env.GH_TOKEN + '@github.com/' + distRepo + '.git dist', function (err) {
-				if (err) return console.error(err);
+			exec('git clone https://' + env.GH_TOKEN + '@github.com/' + distRepo + '.git dist', function (err, stdout, stderr) {
+				if (err) {
+					console.error(err);
+					console.error('Output (stdout): ' + stdout);
+					console.error('Output (stderr): ' + stderr);
+					return;
+				}
 
 				var pkgInfo = JSON.parse(fs.readFileSync('package.json')),
 					scriptName = pkgInfo.name + '.js';
 					
 				part('Minifying script', function (uglifyJs) {
 					var minified = uglifyJs.minify(pkgInfo.main, {
-						sourceRoot: '//raw.github.com/jDataView/jDataView/master',
+						sourceRoot: '//raw.github.com/' + env.TRAVIS_REPO_SLUG + '/master',
 						outSourceMap: scriptName + '.map'
 					});
 
@@ -71,8 +76,13 @@ part('Publishing to GitHub', function (fs, rimraf) {
 						'git add .',
 						'git commit -m "Updated ' + scriptName + '"',
 						'git push origin'
-					].join(' && '), {cwd: 'dist'}, function (err) {
-						if (err) return console.error(err);
+					].join(' && '), {cwd: 'dist'}, function (err, stdout, stderr) {
+						if (err) {
+							console.error(err);
+							console.error('Output (stdout): ' + stdout);
+							console.error('Output (stderr): ' + stderr);
+							return;
+						}
 						console.log('Pushed to dist repo.');
 					});
 				});
