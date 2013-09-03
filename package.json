@@ -23,7 +23,9 @@
 		"jshint": ">= 2.1.0",
 		"npm": "*",
 		"mocha": "~1.12.0",
-		"qunit-mocha-ui": "*"
+		"qunit-mocha-ui": "*",
+		"uglify-js": "~2.4.0",
+		"rimraf": "~2.2.2"
 	},
 	"licenses": [{
 		"type": "WTFPL",
