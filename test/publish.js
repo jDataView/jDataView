@@ -67,7 +67,13 @@ part('Publishing to GitHub', function (fs, rimraf) {
 				});
 
 				part('Pushing to dist repo', function () {
-					exec('git add . && git commit -m "Updated ' + scriptName + '" && git push origin', {cwd: 'dist'}, function (err) {
+					exec([
+						'git config user.name "' + env.NPM_USERNAME + '"',
+						'git config user.email "' + env.NPM_EMAIL + '"',
+						'git add .',
+						'git commit -m "Updated ' + scriptName + '"',
+						'git push origin'
+					].join(' && '), {cwd: 'dist'}, function (err) {
 						if (err) return console.error(err);
 						console.log('Pushed to dist repo.');
 					});
