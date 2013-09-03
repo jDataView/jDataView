@@ -13,7 +13,7 @@
 	"main": "src/jdataview.js",
 	"scripts": {
 		"test": "cd test && node test.runner",
-		"posttest": "node test/publish"
+		"posttest": "node test/publish jDataView/dist"
 	},
 	"repository": {
 		"type": "git",
