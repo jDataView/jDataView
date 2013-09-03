@@ -60,7 +60,7 @@ part('Publishing to GitHub', function (fs, rimraf) {
 						outSourceMap: scriptName + '.map'
 					});
 
-					fs.writeFileSync('dist/' + scriptName, minified.code + ['#', '@'].map(function (c) { return '\n//# sourceMappingURL=' + scriptName + '.map' }).join(''));
+					fs.writeFileSync('dist/' + scriptName, minified.code + ['#', '@'].map(function (c) { return '\n//' + c + ' sourceMappingURL=' + scriptName + '.map' }).join(''));
 					fs.writeFileSync('dist/' + scriptName + '.map', minified.map);
 				});
 
