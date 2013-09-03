@@ -30,7 +30,6 @@ part('Checking configuration', function () {
 
 part('Publishing to npm', function (npm) {
 	npm.load(function () {
-		console.log(npm.config);
 		npm.registry.adduser(env.NPM_USERNAME, env.NPM_PASSWORD, env.NPM_EMAIL, function (err) {
 			if (err) return console.error(err);
 
@@ -61,7 +60,7 @@ part('Publishing to GitHub', function (fs, rimraf) {
 						outSourceMap: scriptName + '.map'
 					});
 
-					fs.writeFileSync('dist/' + scriptName, minified.code + ['#', '@'].map(function (c) { return '\n//# sourceMappingURL=' + scriptName + '.map' }));
+					fs.writeFileSync('dist/' + scriptName, minified.code + ['#', '@'].map(function (c) { return '\n//# sourceMappingURL=' + scriptName + '.map' }).join(''));
 					fs.writeFileSync('dist/' + scriptName + '.map', minified.map);
 				});
 
