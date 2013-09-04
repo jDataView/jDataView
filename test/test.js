@@ -1,4 +1,6 @@
-if (typeof require !== 'undefined') {
+var hasNodeRequire = typeof require === 'function' && typeof window === 'undefined';
+
+if (hasNodeRequire) {
 	if (typeof jDataView === 'undefined') {
 		jDataView = require('..');
 	}
@@ -68,6 +70,17 @@ describe('Library code', function () {
 			for (var name in paths) {
 				load(name);
 			}
+		});
+	}
+
+	if (!hasNodeRequire) {
+		it('should be able to self-remove from global namespace', function () {
+			var realJD = jDataView,
+				jd = jDataView.noConflict();
+
+			equal(jd, realJD);
+			ok(!jDataView);
+			jDataView = realJD;
 		});
 	}
 });
