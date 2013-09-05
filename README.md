@@ -55,9 +55,11 @@ library that works on top of **jDataView** and allows to operate with binary dat
 Demos
 =====
 
-* A <a href="http://jdataview.github.io/jDataView/untar/">simple tar viewer</a>. It is a "Hello World" demo of how easy it is to use the library.
+* A [simple tar viewer](http://jdataview.github.io/jDataView/untar/). It is a "Hello World" demo of how easy it is to use the library.
 
-* <a href="http://rreverser.com/dev/bmp/">BMP viewer</a> with ability to load files by URL or using File API, parsing them using library and rendering with Canvas (no `<img />` elements at all).
+* [BMP viewer](http://rreverser.com/dev/bmp/) with ability to load files by URL or using File API, parsing them using library and rendering with Canvas (no `<img />` elements at all).
+
+* JavaScript [TrueTypeFont library demo](http://ynakajima.github.io/ttf.js/demo/glyflist/) which uses jDataView to read and display glyphs from TrueType file.
 
 * [jBinary.Repo](https://jdataview.github.io/jBinary.Repo) ready-to-use typesets and corresponding demos of using
 [jDataView](https://github.com/jDataView/jDataView)+[jBinary](https://github.com/jDataView/jBinary)
@@ -68,8 +70,8 @@ for reading popular file formats like
 [MP3 tags](https://jdataview.github.io/jBinary.Repo/demo/#mp3)
 etc.
 
-* A <a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/">PhotoSynth WebGL Viewer</a> by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
-<a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/"><img src="http://i.imgur.com/HRHXo.jpg"/></a>
+* A [PhotoSynth WebGL Viewer](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/) by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
+[![Screenshot](http://i.imgur.com/HRHXo.jpg)](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/)
 
 Please tell us if you made something with jDataView :)
 
