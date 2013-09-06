@@ -1,55 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=640" />
-
-    <link rel="stylesheet" href="stylesheets/core.css" media="screen"/>
-    <link rel="stylesheet" href="stylesheets/mobile.css" media="handheld, only screen and (max-device-width:640px)"/>
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
-
-    <script type="text/javascript" src="javascripts/modernizr.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
-    <script type="text/javascript">
-      $(document).ready(function () {
-        $('#main_content').headsmart()
-      })
-    </script>
     <title>jDataView by jDataView</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
-
   <body>
-    <a id="forkme_banner" href="https://github.com/jDataView/jDataView">View on GitHub</a>
-    <div class="shell">
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/jDataView/jDataView">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/jDataView/jDataView/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/jDataView/jDataView/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-      <header>
-        <span class="ribbon-outer">
-          <span class="ribbon-inner">
-            <h1>jDataView</h1>
-            <h2>DataView. Extended. Anywhere.</h2>
-          </span>
-          <span class="left-tail"></span>
-          <span class="right-tail"></span>
-        </span>
-      </header>
+    <div class="wrapper">
 
-      <section id="downloads">
-        <span class="inner">
-          <a href="https://github.com/jDataView/jDataView/zipball/master" class="zip"><em>download</em> .ZIP</a><a href="https://github.com/jDataView/jDataView/tarball/master" class="tgz"><em>download</em> .TGZ</a>
-        </span>
-      </section>
+      <section>
+        <div id="title">
+          <h1>jDataView</h1>
+          <p>DataView. Extended. Anywhere.</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/jDataView">jDataView</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
 
-
-      <span class="banner-fix"></span>
-
-
-      <section id="main_content">
-        <h1>
-<a name="jdataview---a-unique-way-to-work-with-a-binary-file-in-javascript" class="anchor" href="#jdataview---a-unique-way-to-work-with-a-binary-file-in-javascript"><span class="octicon octicon-link"></span></a><a href="http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html">jDataView</a> - A unique way to work with a binary file in JavaScript.</h1>
-
-<p>jDataView provides a standard way to read and/or modify binary files in all the browsers. It follows the <a href="http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#6">DataView Specification</a> and even extends it for a more practical use.</p>
+        <p>jDataView provides convenient way to read and/or modify binary data in all the browsers. It follows the <a href="http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#8">DataView Specification</a> and even extends it for a more practical use.</p>
 
 <h1>
 <a name="explanation" class="anchor" href="#explanation"><span class="octicon octicon-link"></span></a>Explanation</h1>
@@ -66,321 +55,75 @@
 <ul>
 <li>
 <strong>NodeJS Buffers</strong>. They appeared in <a href="http://nodejs.org/docs/v0.4.0/api/buffers.html">Node 0.4.0</a>. <a href="http://nodejs.org/docs/v0.5.0/api/buffers.html">Node 0.5.0</a> added a DataView-like API. And <a href="http://nodejs.org/docs/v0.6.0/api/buffers.html">Node 0.6.0</a> changed the API naming convention.</li>
-</ul><p>jDataView provides the DataView API using the best available option between Arrays, TypedArrays, NodeJS Buffers and DataViews.</p>
+</ul><p><strong>jDataView</strong> provides the <strong>DataView API</strong> with own convenient extensions using the best available option between Arrays, TypedArrays, NodeJS Buffers and DataViews.</p>
 
 <h1>
-<a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h1>
-
-<p>See the <a href="http://www.khronos.org/registry/typedarray/specs/latest/#8">Typed Array Specification</a> for a detailed API.</p>
-
-<h2>
-<a name="constructor" class="anchor" href="#constructor"><span class="octicon octicon-link"></span></a>Constructor</h2>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h1>
 
 <ul>
-<li>new <strong>jDataView</strong>(buffer, offset, length, littleEndian = false)
+<li>API
 
 <ul>
-<li>buffer can be either a binary String, any Array-like byte storage (Array, Uint8Array, Arguments, jQuery(Array), ...) or count of bytes if you want to operate on new empty buffer.</li>
-<li>littleEndian = false (Big Endian mode) is a default value for the view</li>
+<li><a href="https://github.com/jDataView/jDataView/wiki/jDataView-constructor">jDataView constructor</a></li>
+<li><a href="http://www.khronos.org/registry/typedarray/specs/latest/#8">DataView Specification</a></li>
+<li>Extended Specification
+
+<ul>
+<li><a href="https://github.com/jDataView/jDataView/wiki/Operation-control">Operation control</a></li>
+<li><a href="https://github.com/jDataView/jDataView/wiki/writeXXX-methods">writeXXX methods</a></li>
+<li><a href="https://github.com/jDataView/jDataView/wiki/Strings-and-Blobs">Strings and Blobs</a></li>
+<li><a href="https://github.com/jDataView/jDataView/wiki/64-bit-integers">64-bit integers</a></li>
+<li><a href="https://github.com/jDataView/jDataView/wiki/Bitfields">Bitfields</a></li>
+<li><a href="https://github.com/jDataView/jDataView/wiki/Internal-utilities">Internal utilities</a></li>
 </ul>
 </li>
-</ul><h2>
-<a name="specification-api" class="anchor" href="#specification-api"><span class="octicon octicon-link"></span></a>Specification API</h2>
-
-<p>The wrapper satisfies all the specification getters:</p>
-
-<ul>
-<li>
-<strong>getInt8</strong>(byteOffset)</li>
-<li>
-<strong>getUint8</strong>(byteOffset)</li>
-<li>
-<strong>getInt16</strong>(byteOffset, littleEndian)</li>
-<li>
-<strong>getUint16</strong>(byteOffset, littleEndian)</li>
-<li>
-<strong>getInt32</strong>(byteOffset, littleEndian)</li>
-<li>
-<strong>getUint32</strong>(byteOffset, littleEndian)</li>
-<li>
-<strong>getFloat32</strong>(byteOffset, littleEndian)</li>
-<li>
-<strong>getFloat64</strong>(byteOffset, littleEndian)</li>
-</ul><p>And setters:</p>
-
-<ul>
-<li>
-<strong>setInt8</strong>(byteOffset, value)</li>
-<li>
-<strong>setUint8</strong>(byteOffset, value)</li>
-<li>
-<strong>setInt16</strong>(byteOffset, value, littleEndian)</li>
-<li>
-<strong>setUint16</strong>(byteOffset, value, littleEndian)</li>
-<li>
-<strong>setInt32</strong>(byteOffset, value, littleEndian)</li>
-<li>
-<strong>setUint32</strong>(byteOffset, value, littleEndian)</li>
-<li>
-<strong>setFloat32</strong>(byteOffset, value, littleEndian)</li>
-<li>
-<strong>setFloat64</strong>(byteOffset, value, littleEndian)</li>
-</ul><h2>
-<a name="extended-specification" class="anchor" href="#extended-specification"><span class="octicon octicon-link"></span></a>Extended Specification</h2>
-
-<p>Addition of a littleEndian argument to the constructor. Big Endian will be the default mode of getters if their littleEndian value is undefined.</p>
-
-<ul>
-<li>
-<strong>jDataView</strong>(buffer, offset, length, littleEndian = false)</li>
-</ul><p>The byteOffset parameter is now optional. If you omit it, it will read right after the latest read offset. You can interact with the internal pointer with those two functions.</p>
-
-<ul>
-<li>
-<strong>seek</strong>(byteOffset)
-
-<ul>
-<li>Moves the internal pointer to the position</li>
 </ul>
 </li>
-<li>
-<strong>tell</strong>()
-
-<ul>
-<li>Returns the current position</li>
-</ul>
-</li>
-<li>
-<strong>skip</strong>(byteLength)
-
-<ul>
-<li>Skips given count of bytes</li>
-</ul>
-</li>
-<li>
-<strong>slice</strong>(start, end, forceCopy = false)
-
-<ul>
-<li>Returns view (jDataView) on part of original one; may point to the same memory buffer or copy data into new one depending on forceCopy parameter.</li>
-</ul>
-</li>
-</ul><p>Also, specification DataView setters require byteOffset as first argument, and passing "undefined" for sequential writes can be not very convenient.
-You can use <code>writeXXX</code> methods instead, which will set values at current position automatically:</p>
-
-<ul>
-<li>
-<strong>writeInt8</strong>(value)</li>
-<li>
-<strong>writeUint8</strong>(value)</li>
-<li>
-<strong>writeInt16</strong>(value, littleEndian)</li>
-<li>
-<strong>writeUint16</strong>(value, littleEndian)</li>
-<li>
-<strong>writeInt32</strong>(value, littleEndian)</li>
-<li>
-<strong>writeUint32</strong>(value, littleEndian)</li>
-<li>
-<strong>writeFloat32</strong>(value, littleEndian)</li>
-<li>
-<strong>writeFloat64</strong>(value, littleEndian)</li>
-</ul><p>Addition of Char, String and Bytes utilities.
-String operations globally support 'binary' (by default) and 'utf8' encodings; Char is always one-byte 'binary'.</p>
-
-<ul>
-<li>
-<strong>getChar</strong>(byteOffset)</li>
-<li>
-<strong>setChar</strong>(byteOffset, char)</li>
-<li>
-<strong>writeChar</strong>(char)</li>
-<li>
-<strong>getString</strong>(byteLength, byteOffset, encoding = 'binary')</li>
-<li>
-<strong>setString</strong>(byteOffset, chars, encoding = 'binary')</li>
-<li>
-<strong>writeString</strong>(chars, encoding = 'binary')</li>
-<li>
-<strong>getBytes</strong>(length, byteOffset, littleEndian = true, toArray = false)</li>
-<li>
-<strong>setBytes</strong>(byteOffset, bytes, littleEndian = true)</li>
-<li>
-<strong>writeBytes</strong>(bytes, littleEndian = true)</li>
-</ul><p>Addition of 64-bit signed and unsigned integer types.</p>
-
-<p><strong>IMPORTANT</strong>: Those types behave like primitive numbers (you can manipulate with them using arithmetic operations, convert them to strings etc.)., <strong>BUT</strong> due to IEEE.754 limitations, there is precision loss for numbers outside the ±2^53 range, and that's why they also contain
-<code>lo</code> and <code>hi</code> fields for retrieving corresponding 32-bit unsigned parts. You can pass both primitive numbers (with the same restriction as above) or <code>jDataView.Uint64</code>/<code>jDataView.Int64</code> instances with <code>lo</code> and <code>hi</code> fields to writer functions as well.</p>
-
-<ul>
-<li>
-<strong>getInt64</strong>(byteOffset, littleEndian)</li>
-<li>
-<strong>setInt64</strong>(byteOffset, value, littleEndian)</li>
-<li>
-<strong>writeInt64</strong>(value, littleEndian)</li>
-<li>
-<strong>getUint64</strong>(byteOffset, littleEndian)</li>
-<li>
-<strong>setUint64</strong>(byteOffset, value, littleEndian)</li>
-<li>
-<strong>writeUint64</strong>(value, littleEndian)</li>
-</ul><p>Addition of wrapBuffer and createBuffer, utilities to easily create buffers with the latest available storage type (Node.js Buffer, ArrayBuffer, CanvasPixelArray or simple Array).</p>
-
-<ul>
-<li>
-<strong>wrapBuffer</strong>(string_or_bytes_or_byteCount)</li>
-<li>
-<strong>createBuffer</strong>(byte1, byte2, ...)</li>
+<li><a href="https://github.com/jDataView/jDataView/wiki/Example">Example</a></li>
+<li><a href="https://github.com/jDataView/jDataView/blob/master/CHANGELOG.md">Changelog</a></li>
 </ul><h1>
-<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h1>
+<a name="advanced-usage-jbinary" class="anchor" href="#advanced-usage-jbinary"><span class="octicon octicon-link"></span></a>Advanced usage (<a href="https://github.com/jDataView/jBinary">jBinary</a>)</h1>
 
-<p>First we need a file. Either you get it through XHR or use the createBuffer utility.</p>
+<p>For complicated binary structures, it may be hard enough to use only low-level get/set operations for parsing,
+processing and writing data.</p>
 
-<div class="highlight"><pre><span class="kd">var</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">jDataView</span><span class="p">.</span><span class="nx">createBuffer</span><span class="p">(</span>
-    <span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="c1">// Int32 - 272</span>
-    <span class="mh">0x90</span><span class="p">,</span> <span class="mh">0xcf</span><span class="p">,</span> <span class="mh">0x1b</span><span class="p">,</span> <span class="mh">0x47</span><span class="p">,</span> <span class="c1">// Float32 - 39887.5625</span>
-    <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="c1">// 8 blank bytes</span>
-    <span class="mh">0x4d</span><span class="p">,</span> <span class="mh">0x44</span><span class="p">,</span> <span class="mh">0x32</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">,</span> <span class="c1">// String - MD20</span>
-    <span class="mh">0x61</span>                    <span class="c1">// Char - a</span>
-<span class="p">);</span>
-</pre></div>
+<p>In addition, most likely you might need convenient I/O methods for retrieving data from external sources such like
+local files (using File API or from Node.js), remote files (via HTTP(S)), data-URIs, Node.js streams etc. as well
+as for displaying generated content to user on webpage in image/video/audio/... containers
+or even as simple download link.</p>
 
-<p>Now we use the DataView as defined in the specification, the only thing that changes is the j before jDataView.</p>
-
-<div class="highlight"><pre><span class="kd">var</span> <span class="nx">view</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">jDataView</span><span class="p">(</span><span class="nx">file</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">version</span> <span class="o">=</span> <span class="nx">view</span><span class="p">.</span><span class="nx">getInt32</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="c1">// 272</span>
-<span class="kd">var</span> <span class="kr">float</span> <span class="o">=</span> <span class="nx">view</span><span class="p">.</span><span class="nx">getFloat32</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span> <span class="c1">// 39887.5625</span>
-</pre></div>
-
-<p>The wrapper extends the specification to make the DataView easier to use.</p>
-
-<div class="highlight"><pre><span class="kd">var</span> <span class="nx">view</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">jDataView</span><span class="p">(</span><span class="nx">file</span><span class="p">);</span>
-<span class="c1">// A position counter is managed. Remove the argument to read right after the last read.</span>
-<span class="nx">version</span> <span class="o">=</span> <span class="nx">view</span><span class="p">.</span><span class="nx">getInt32</span><span class="p">();</span> <span class="c1">// 272</span>
-<span class="kr">float</span> <span class="o">=</span> <span class="nx">view</span><span class="p">.</span><span class="nx">getFloat32</span><span class="p">();</span> <span class="c1">// 39887.5625</span>
-
-<span class="c1">// You can move around with tell(), seek() and skip()</span>
-<span class="nx">view</span><span class="p">.</span><span class="nx">skip</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
-
-<span class="c1">// Two helpers: getChar and getString will make your life easier</span>
-<span class="kd">var</span> <span class="nx">tag</span> <span class="o">=</span> <span class="nx">view</span><span class="p">.</span><span class="nx">getString</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span> <span class="c1">// MD20</span>
-<span class="kd">var</span> <span class="kr">char</span> <span class="o">=</span> <span class="nx">view</span><span class="p">.</span><span class="nx">getChar</span><span class="p">();</span> <span class="c1">// a</span>
-</pre></div>
-
-<p>You can use a <a href="http://blog.vjeux.com/2011/javascript/jquery-binary-ajax.html">patched version of jQuery</a> that supports ArrayBuffer for AJAX.</p>
-
-<div class="highlight"><pre><span class="nx">$</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span>
-  <span class="s1">'data.bin'</span><span class="p">,</span>
-  <span class="kd">function</span> <span class="p">(</span><span class="nx">view</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">tag</span> <span class="o">=</span> <span class="nx">view</span><span class="p">.</span><span class="nx">getString</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span> <span class="c1">// 'MD20'</span>
-    <span class="kd">var</span> <span class="nx">version</span> <span class="o">=</span> <span class="nx">view</span><span class="p">.</span><span class="nx">getUint32</span><span class="p">();</span> <span class="c1">// 732</span>
-  <span class="p">},</span>
-  <span class="s1">'dataview'</span>
-<span class="p">);</span>
-</pre></div>
+<p>If you faced any of these problems, you might want to check out new <a href="https://github.com/jDataView/jBinary">jBinary</a>
+library that works on top of <strong>jDataView</strong> and allows to operate with binary data in structured and convenient way.</p>
 
 <h1>
-<a name="changelog" class="anchor" href="#changelog"><span class="octicon octicon-link"></span></a>Changelog</h1>
-
-<ul>
-<li>
-<strong>May 15 2013</strong>
-
-<ul>
-<li>jDataView got <a href="https://github.com/jDataView">own account</a>! More projects and demos coming soon.</li>
-</ul>
-</li>
-<li>
-<strong>May 30 2013</strong>:
-
-<ul>
-<li>
-<a href="https://github.com/rreverser">RReverser</a> added support for UTF-8 strings</li>
-<li>Added support for 64-bit signed and unsigned integers (with precision loss outside the ±2^53 range when using primitive JS numbers due to IEEE.754 restrictions)</li>
-<li>Added support for CanvasPixelArray as fast byte array for browsers that don't support Typed Arrays yet (like IE9)</li>
-<li>Refactored code.</li>
-<li>Added ability to test library on all the engines that are supported on current platform at once.</li>
-<li>Added JSHint configuration according to project code guidelines and implemented corresponding QUnit test.</li>
-</ul>
-</li>
-<li>
-<strong>April 8 2013</strong>:
-
-<ul>
-<li>
-<a href="http://blog.coolmuse.com/">mmthomas</a> implemented support for denormalized float values in setters</li>
-</ul>
-</li>
-<li>
-<strong>March 16 2013</strong>:
-
-<ul>
-<li>
-<a href="https://github.com/rreverser">RReverser</a> added support for setters in all supported implementations!</li>
-<li>Performance improvements changing lower level constructs and type of inner buffers</li>
-<li>Addition of [gs]etBytes, write*, wrapBuffer and slice helpers</li>
-<li>Added support for any Array-like byte storage as input (Array, Uint8Array, Arguments, jQuery(Array), ...)</li>
-<li>Added ability to create empty buffer (and operate on it) by passing count of bytes to wrapBuffer.</li>
-</ul>
-</li>
-<li>
-<strong>June 30 2012</strong>: Thanks to <a href="https://github.com/Mithgol">Mithgol</a> for the changes!
-
-<ul>
-<li>Changed default to big endian from little endian to be compatible with DataView specification</li>
-<li>Dropped support for NodeJS &lt; 0.5.5, it was buggy anyway</li>
-<li>Fixed an issue where ArrayBuffer would not work on NodeJS</li>
-<li>Moved the compatibility checks outside of the read functions for hopefully better performance</li>
-</ul>
-</li>
-<li>
-<strong>December 22 2011</strong>: Added IE6-9 support by <a href="https://github.com/scintill">scintill</a>
-</li>
-<li>
-<strong>November 30 2011</strong>:
-
-<ul>
-<li>Added NodeJS Buffer support + NPM Package.</li>
-<li>Added support for NaN and Infinity in the float shim.</li>
-<li>Added <code>buffer</code>, <code>byteLength</code> and <code>byteOffset</code> attributes.</li>
-<li>Fixed bugs using non zero <code>byteOffset</code> and added more bound checks.</li>
-</ul>
-</li>
-<li>
-<strong>September 21 2011</strong>: Added a missing <code>littleEndian</code> argument on getInt16.</li>
-<li>
-<strong>April 28 2011</strong>: Seeking to the end of file no longer throws an error.</li>
-<li>
-<strong>April 26 2011</strong>: Fixed a bug with extremely large unsigned 32bit being considered as signed. (<a href="http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string/2954435#2954435">Solution</a>). </li>
-<li>
-<strong>April 8 2011</strong>: Added littleEndian argument on the constructor. Opera 11.50 does not fully implement DataView, improved check.</li>
-</ul><h1>
 <a name="demos" class="anchor" href="#demos"><span class="octicon octicon-link"></span></a>Demos</h1>
 
 <ul>
 <li><p>A <a href="http://jdataview.github.io/jDataView/untar/">simple tar viewer</a>. It is a "Hello World" demo of how easy it is to use the library.</p></li>
 <li><p><a href="http://rreverser.com/dev/bmp/">BMP viewer</a> with ability to load files by URL or using File API, parsing them using library and rendering with Canvas (no <code>&lt;img /&gt;</code> elements at all).</p></li>
+<li><p>JavaScript <a href="http://ynakajima.github.io/ttf.js/demo/glyflist/">TrueTypeFont library demo</a> which uses jDataView to read and display glyphs from TrueType file.</p></li>
+<li><p><a href="https://jdataview.github.io/jBinary.Repo">jBinary.Repo</a> ready-to-use typesets and corresponding demos of using
+<a href="https://github.com/jDataView/jDataView">jDataView</a>+<a href="https://github.com/jDataView/jBinary">jBinary</a>
+for reading popular file formats like
+<a href="https://jdataview.github.io/jBinary.Repo/demo/#gzip">GZIP archives</a>,
+<a href="https://jdataview.github.io/jBinary.Repo/demo/#tar">TAR archives</a>,
+<a href="https://jdataview.github.io/jBinary.Repo/demo/#ico">ICO images</a>,
+<a href="https://jdataview.github.io/jBinary.Repo/demo/#mp3">MP3 tags</a>
+etc.</p></li>
+<li><p><a href="http://hacksparrow.github.io/talking-image/">Talking image</a> - animation and audio in one package powered by
+HTML5 Audio, <a href="https://github.com/jDataView/jDataView">jDataView</a> and <a href="https://github.com/jDataView/jBinary">jBinary</a>.</p></li>
 <li><p>A <a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/">PhotoSynth WebGL Viewer</a> by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
-<a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/"><img src="http://i.imgur.com/HRHXo.jpg"></a></p></li>
+<a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/"><img src="http://i.imgur.com/HRHXo.jpg" alt="Screenshot"></a></p></li>
 </ul><p>Please tell us if you made something with jDataView :)</p>
 
-<p>Licence: <a href="http://sam.zoy.org/wtfpl/">Do What The Fuck You Want To Public License</a></p>
+<h1>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h1>
+
+<p>jDataView is issued under <a href="http://sam.zoy.org/wtfpl/">Do What The Fuck You Want To Public License</a> :)</p>
       </section>
 
-      <footer>
-        <span class="ribbon-outer">
-          <span class="ribbon-inner">
-            <p>this project by <a href="https://github.com/jDataView">jDataView</a> can be found on <a href="https://github.com/jDataView/jDataView">GitHub</a></p>
-          </span>
-          <span class="left-tail"></span>
-          <span class="right-tail"></span>
-        </span>
-        <p>Generated with <a href="http://pages.github.com">GitHub Pages</a> using Merlot</p>
-        <span class="octocat"></span>
-      </footer>
-
     </div>
-
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
   </body>
 </html>
