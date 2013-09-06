@@ -55,6 +55,9 @@ library that works on top of **jDataView** and allows to operate with binary dat
 Demos
 =====
 
+* A [World of Warcraft Model Viewer](http://jdataview.github.io/jDataView/modelviewer/). It uses [jDataView](https://github.com/jDataView/jDataView)+[jBinary](https://github.com/jDataView/jBinary) to read the binary file and then WebGL to display it.
+[![Screenshot](http://jdataview.github.io/modelviewer/images/modelviewer.png)](http://jdataview.github.io/jDataView/modelviewer/)
+
 * A [simple tar viewer](http://jdataview.github.io/jDataView/untar/). It is a "Hello World" demo of how easy it is to use the library.
 
 * [BMP viewer](http://rreverser.com/dev/bmp/) with ability to load files by URL or using File API, parsing them using library and rendering with Canvas (no `<img />` elements at all).
