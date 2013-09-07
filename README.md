@@ -60,8 +60,6 @@ Demos
 
 * A [simple tar viewer](http://jdataview.github.io/jDataView/untar/). It is a "Hello World" demo of how easy it is to use the library.
 
-* [BMP viewer](http://rreverser.com/dev/bmp/) with ability to load files by URL or using File API, parsing them using library and rendering with Canvas (no `<img />` elements at all).
-
 * JavaScript [TrueTypeFont library demo](http://ynakajima.github.io/ttf.js/demo/glyflist/) which uses jDataView to read and display glyphs from TrueType file.
 
 * [jBinary.Repo](https://jdataview.github.io/jBinary.Repo) ready-to-use typesets and corresponding demos of using
@@ -70,6 +68,7 @@ for reading popular file formats like
 [GZIP archives](https://jdataview.github.io/jBinary.Repo/demo/#gzip),
 [TAR archives](https://jdataview.github.io/jBinary.Repo/demo/#tar),
 [ICO images](https://jdataview.github.io/jBinary.Repo/demo/#ico),
+[BMP images](https://jdataview.github.io/jBinary.Repo/demo/#bmp),
 [MP3 tags](https://jdataview.github.io/jBinary.Repo/demo/#mp3)
 etc.
 
