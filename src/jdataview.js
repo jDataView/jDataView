@@ -745,7 +745,11 @@ if (typeof module !== 'undefined' && typeof module.exports === 'object') {
 if (typeof define === 'function' && define.amd) {
 	define([], function () { return jDataView });
 } else {
-	global.jDataView = jDataView;
+	var oldGlobal = global.jDataView;
+	(global.jDataView = jDataView).noConflict = function () {
+		global.jDataView = oldGlobal;
+		return this;
+	};
 }
 
 })((function () { /* jshint strict: false */ return this })());

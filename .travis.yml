@@ -9,6 +9,10 @@ env:
   - secure: TlVvZE6/LQ40P8znK8nY+BxQEIcoyDWWK3Fb79Iwd2pMamtcID8tkl569bW2M5KyOXfXuQaOjGoyxrnfKwkWLaw0a5c37z6R8gPv4HsFjzVZfqM3kMfiUiRfLMrd4AZ5KDlUGpwL+06gAcNgKJbvj330Vmc5d4zGSbFQXaIjigM=
   - secure: Hcvr+JcCUaAt+CYXuxnnaVkmLv9ofF2DxVI0wl1MQ3N3GuvXonx/iv45quchgw3IU0RUWWaJcqisbytBW0j2l+f6ixYGn8yz9fCsMVxlCHsBs5EOYaPe6gMsfGl7XTZtWW5EzLyYjMOgokjy46+/4lKQx7EKp6q96kXKhuq8j+w=
   - secure: EKfXvSeXF+WR7yOFQtZbAc+z2dSjMBEqa69uPNbgD9sxCTSxVNWwYjz3EN0xppWrSo3IJD3wDENQKNBa5lBcuisIASkEDeZTu2J/y+7ZTRkWkOwRGetBV9X6HzOsnHLfvFPpg1FiO74Wf1hyjmdn3Kjb27N7zVC1SJZn3/WHCWg=
+  - secure: Ei55mSAKdGrOB95yAlisBRcFEv62eAzVH+T3kGAAVZhLzdUBS9rQhRWW/jKtvB7wg+gJgGBnCeCc96IN5INMI7udNWijVnA5Mf7PGLJFQypxUE7LeCN3NRlDK7WInfRUQlgz4eEITjt70HSi3+SSchMjxvTpSLAvUBA580NSSEo=
+after_success:
+  - node publish/publish jDataView/dist
 matrix:
   include:
-    - script: "phantomjs --local-to-remote-url-access=true --web-security=false test/phantom-mocha.js test/index.html"
+    - node_js: '0.10'
+      script: phantomjs --local-to-remote-url-access=true --web-security=false test/phantom-mocha.js test/index.html
