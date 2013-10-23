@@ -459,6 +459,15 @@ jDataView.prototype = {
 			   : new jDataView(this.buffer, this.byteOffset + start, end - start, this._littleEndian);
 	},
 
+	alignBy: function (byteCount) {
+		this._bitOffset = 0;
+		if (byteCount !== undefined && byteCount !== 1) {
+			return this.skip(byteCount - (this._offset % byteCount || byteCount));
+		} else {
+			return this._offset;
+		}
+	},
+
 	// Compatibility functions
 
 	_getFloat64: function (byteOffset, littleEndian) {

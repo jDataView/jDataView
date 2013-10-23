@@ -562,6 +562,21 @@ engines.forEach(function (engineName) {
 			});
 		});
 
+		it('should be aligned by given count of bytes', function () {
+			function checkAlignBy(byteCount, expectedOffset) {
+				var offset = view.alignBy(byteCount);
+				equal(view._bitOffset, 0);
+				equal(view.tell(), offset);
+				equal(offset, expectedOffset);
+			}
+
+			view.seek(1);
+			checkAlignBy(undefined, 1);
+			view.getUnsigned(17);
+			checkAlignBy(undefined, 4);
+			checkAlignBy(3, 6);
+		});
+
 		if (engineName === 'ArrayBuffer') {
 			it('can be used in jDataView from Uint8Array::subarray', function () {
 				var bytes = [1, 2, 3],
