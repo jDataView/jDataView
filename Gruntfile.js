@@ -67,9 +67,7 @@ module.exports = function (grunt) {
 		grunt.log.ok('component.json written');
 	});
 
-	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-release');
+	require('load-grunt-tasks')(grunt);
 
 	grunt.registerTask('build:browser', ['uglify:browser', 'component']);
 	grunt.registerTask('build:node', ['uglify:node']);
