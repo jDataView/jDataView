@@ -33,11 +33,10 @@ module.exports = function (grunt) {
 		},
 		release: {
 			options: {
-				folder: 'dist',
 				npm: false,
 				tagName: 'v<%= version %>', //default: '<%= version %>'
 				github: { 
-					repo: 'RReverser/jbpublishtest', //put your user/repo here
+					repo: 'jDataView/jDataView', //put your user/repo here
 					usernameVar: 'GITHUB_USERNAME', //ENVIRONMENT VARIABLE that contains Github username 
 					passwordVar: 'GITHUB_PASSWORD' //ENVIRONMENT VARIABLE that contains Github password
 				}
