@@ -1,33 +1,50 @@
 {
-	"name": "jdataview",
-	"version": "2.4.4",
-	"description": "A unique way to work with a binary file in the browser and the server.",
-	"keywords": ["buffer", "binary", "data", "file", "dataview", "read", "write", "manipulation"],
-	"homepage": "http://jDataView.github.io/",
-	"author": "Vjeux <vjeuxx@gmail.com> (http://blog.vjeux.com/)",
-	"contributors": [
-		"Vjeux <vjeuxx@gmail.com> (http://blog.vjeux.com/)",
-		"RReverser <me@rreverser.com> (http://rreverser.com)"
-	],
-	"files": ["src/jdataview.js"],
-	"main": "src/jdataview.js",
-	"scripts": {
-		"test": "cd test && node test.runner"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/jDataView/jDataView.git"
-	},
-	"devDependencies": {
-		"jshint": ">= 2.1.0",
-		"npm": "*",
-		"mocha": "~1.12.0",
-		"qunit-mocha-ui": "*",
-		"uglify-js": "~2.4.0",
-		"rimraf": "~2.2.2"
-	},
-	"licenses": [{
-		"type": "WTFPL",
-		"url": "http://sam.zoy.org/wtfpl/"
-	}]
+  "name": "jdataview",
+  "version": "2.4.5",
+  "description": "A unique way to work with a binary file in the browser and the server.",
+  "keywords": [
+    "buffer",
+    "binary",
+    "data",
+    "file",
+    "dataview",
+    "read",
+    "write",
+    "manipulation"
+  ],
+  "homepage": "http://jDataView.github.io/",
+  "author": "Vjeux <vjeuxx@gmail.com> (http://blog.vjeux.com/)",
+  "contributors": [
+    "Vjeux <vjeuxx@gmail.com> (http://blog.vjeux.com/)",
+    "RReverser <me@rreverser.com> (http://rreverser.com)"
+  ],
+  "files": [
+    "dist/jdataview.node.js"
+  ],
+  "main": "dist/jdataview.node.js",
+  "scripts": {
+    "test": "cd test && node test.runner"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jDataView/jDataView.git"
+  },
+  "devDependencies": {
+    "jshint": ">= 2.1.0",
+    "npm": "*",
+    "mocha": "~1.12.0",
+    "qunit-mocha-ui": "*",
+    "uglify-js": "~2.4.0",
+    "rimraf": "~2.2.2",
+    "grunt": "~0.4.2",
+    "grunt-release": "~0.6.0",
+    "grunt-contrib-uglify": "~0.2.7",
+    "grunt-contrib-jshint": "~0.7.2"
+  },
+  "licenses": [
+    {
+      "type": "WTFPL",
+      "url": "http://sam.zoy.org/wtfpl/"
+    }
+  ]
 }
