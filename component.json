@@ -1,0 +1,21 @@
+{
+  "name": "jdataview",
+  "description": "A unique way to work with a binary file in the browser and the server.",
+  "version": "2.4.5",
+  "keywords": [
+    "buffer",
+    "binary",
+    "data",
+    "file",
+    "dataview",
+    "read",
+    "write",
+    "manipulation"
+  ],
+  "repo": "jDataView/jDataView",
+  "main": "dist/jdataview.js",
+  "scripts": [
+    "dist/jdataview.js"
+  ],
+  "license": "WTFPL"
+}
