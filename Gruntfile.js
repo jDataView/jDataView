@@ -3,10 +3,18 @@ module.exports = function (grunt) {
 		pkg: grunt.file.readJSON('package.json'),
 		repo: 'jDataView/jDataView',
 		jshint: {
-			files: ['src/**/*.js'],
 			options: {
 				jshintrc: true
-			}
+			},
+			files: ['src/**/*.js']
+		},
+		mochaTest: {
+			options: {
+				reporter: 'spec',
+				require: './test/bdd-qunit-mocha-ui',
+				ui: 'bdd-qunit-mocha-ui'
+			},
+			src: ['test/test.js']
 		},
 		uglify: {
 			browser: {
@@ -41,11 +49,11 @@ module.exports = function (grunt) {
 		},
 		release: {
 			options: {
-				tagName: 'v<%= version %>', //default: '<%= version %>'
+				tagName: 'v<%= version %>',
 				github: { 
-					repo: '<%= repo %>', //put your user/repo here
-					usernameVar: 'GITHUB_USERNAME', //ENVIRONMENT VARIABLE that contains Github username 
-					passwordVar: 'GITHUB_PASSWORD' //ENVIRONMENT VARIABLE that contains Github password
+					repo: '<%= repo %>',
+					usernameVar: 'GITHUB_USERNAME',
+					passwordVar: 'GITHUB_PASSWORD'
 				}
 			}
 		}
@@ -69,10 +77,14 @@ module.exports = function (grunt) {
 
 	require('load-grunt-tasks')(grunt);
 
+	grunt.registerTask('test', ['jshint', 'mochaTest']);
+
 	grunt.registerTask('build:browser', ['uglify:browser', 'component']);
 	grunt.registerTask('build:node', ['uglify:node']);
 
-	grunt.registerTask('default', ['jshint', 'build:browser', 'build:node']);
+	grunt.registerTask('browser', ['test', 'build:browser']);
+	grunt.registerTask('node', ['test', 'build:node']);
+	grunt.registerTask('default', ['test', 'build:browser', 'build:node']);
 	
 	grunt.registerTask('publish', ['default', 'release']);
 };

@@ -4,75 +4,9 @@ if (hasNodeRequire) {
 	if (typeof jDataView === 'undefined') {
 		jDataView = require('..');
 	}
-
-	if (typeof JSHINT === 'undefined') {
-		JSHINT = require('jshint').JSHINT;
-	}
 }
 
 describe('Library code', function () {
-	if (typeof JSHINT !== 'undefined') {
-		it('should pass JSHint tests', function (done) {
-			this.timeout(5000);
-
-			var paths = {
-				source: '../src/jdataview.js',
-				options: '../src/.jshintrc'
-			},
-			contents = {};
-
-			function onLoad(err, name, text) {
-				if (err) {
-					ok(false, 'Error while loading ' + name + ': ' + err);
-					return done();
-				}
-
-				contents[name] = text;
-				for (var name in paths) {
-					if (!(name in contents)) {
-						return;
-					}
-				}
-
-				var options = JSON.parse(contents.options), globals = options.globals;
-				delete options.globals;
-
-				if (JSHINT(contents.source, options, globals)) {
-					ok(true);
-				} else {
-					var errors = JSHINT.errors;
-					for (var i = 0, length = errors.length; i < length; i++) {
-						var error = errors[i];
-						if (error) {
-							ok(false, 'Line ' + error.line + ', character ' + error.character + ': ' + error.reason);
-						}
-					}
-				}
-
-				done();
-			}
-
-			function load(name) {
-				if (typeof XMLHttpRequest !== 'undefined') {
-					var ajax = new XMLHttpRequest();
-					ajax.onload = function () {
-						(this.status === 0 || this.status === 200) ? onLoad(null, name, this.responseText) : onLoad(this.statusText, name);
-					};
-					ajax.open('GET', paths[name], true);
-					ajax.send();
-				} else {
-					require('fs').readFile(paths[name], function (err, data) {
-						onLoad(err, name, String(data));
-					});
-				}
-			}
-
-			for (var name in paths) {
-				load(name);
-			}
-		});
-	}
-
 	if (!hasNodeRequire) {
 		it('should be able to self-remove from global namespace', function () {
 			var realJD = jDataView,
