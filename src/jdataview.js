@@ -374,8 +374,7 @@ jDataView.prototype = {
 		}
 		else {
 			if (this._isNodeBuffer) {
-				// workaround for Node.js v0.11.6 (`new Buffer(bufferInstance)` call corrupts original data)
-				(bytes instanceof Buffer ? bytes : new Buffer(bytes)).copy(this.buffer, byteOffset);
+				new Buffer(bytes).copy(this.buffer, byteOffset);
 			} else {
 				for (var i = 0; i < length; i++) {
 					this.buffer[byteOffset + i] = bytes[i];
@@ -457,6 +456,15 @@ jDataView.prototype = {
 		return forceCopy
 			   ? new jDataView(this.getBytes(end - start, start, true, true), undefined, undefined, this._littleEndian)
 			   : new jDataView(this.buffer, this.byteOffset + start, end - start, this._littleEndian);
+	},
+
+	alignBy: function (byteCount) {
+		this._bitOffset = 0;
+		if (defined(byteCount, 1) !== 1) {
+			return this.skip(byteCount - (this._offset % byteCount || byteCount));
+		} else {
+			return this._offset;
+		}
 	},
 
 	// Compatibility functions
