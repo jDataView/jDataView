@@ -61,6 +61,9 @@ Demos
 * A [World of Warcraft Model Viewer](http://jdataview.github.io/jsWoWModelViewer/). It uses [jDataView](https://github.com/jDataView/jDataView)+[jBinary](https://github.com/jDataView/jBinary) to read the binary file and then WebGL to display it.
 [![Screenshot](http://jdataview.github.io/jsWoWModelViewer/images/modelviewer.png)](http://jdataview.github.io/jsWoWModelViewer/)
 
+* A [PhotoSynth WebGL Viewer](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/) by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
+[![Screenshot](http://i.imgur.com/HRHXo.jpg)](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/)
+
 * A [simple tar viewer](http://jdataview.github.io/jDataView/untar/). It is a "Hello World" demo of how easy it is to use the library.
 
 * JavaScript [TrueTypeFont library demo](http://ynakajima.github.io/ttf.js/demo/glyflist/) which uses jDataView to read and display glyphs from TrueType file.
@@ -77,9 +80,6 @@ etc.
 
 * [Talking image](http://hacksparrow.github.io/talking-image/) - animation and audio in one package powered by
 HTML5 Audio, [jDataView](https://github.com/jDataView/jDataView) and [jBinary](https://github.com/jDataView/jBinary).
-
-* A [PhotoSynth WebGL Viewer](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/) by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
-[![Screenshot](http://i.imgur.com/HRHXo.jpg)](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/)
 
 Please tell us if you made something with jDataView :)
 
