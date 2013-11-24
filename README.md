@@ -55,6 +55,8 @@ library that works on top of **jDataView** and allows to operate with binary dat
 Demos
 =====
 
+* [HTTP Live Streaming realtime converter and player demo](http://rreverser.github.io/mpegts/) implemented using [jBinary](https://github.com/jDataView/jBinary) data structures.
+
 * A [World of Warcraft Model Viewer](http://jdataview.github.io/jsWoWModelViewer/). It uses [jDataView](https://github.com/jDataView/jDataView)+[jBinary](https://github.com/jDataView/jBinary) to read the binary file and then WebGL to display it.
 [![Screenshot](http://jdataview.github.io/jsWoWModelViewer/images/modelviewer.png)](http://jdataview.github.io/jsWoWModelViewer/)
 
