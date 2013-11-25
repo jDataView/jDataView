@@ -2,7 +2,7 @@ var hasNodeRequire = typeof require === 'function' && typeof window === 'undefin
 
 if (hasNodeRequire) {
 	if (typeof jDataView === 'undefined') {
-		jDataView = require('..');
+		jDataView = require('../dist/jdataview.node.js');
 	}
 }
 
