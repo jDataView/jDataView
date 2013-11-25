@@ -17,10 +17,15 @@ module.exports = function (grunt) {
 			src: ['test/test.js']
 		},
 		uglify: {
+			options: {
+				compress: {
+					pure_getters: true
+				}
+			},
 			browser: {
 				options: {
 					compress: {
-						global_defs: {NODE: false}
+						global_defs: {NODEJS: false, BROWSER: true}
 					},
 					sourceMap: 'dist/<%= pkg.name %>.js.map',
 					sourceMapRoot: '//raw.github.com/<%= repo %>/master',
@@ -33,7 +38,7 @@ module.exports = function (grunt) {
 			node: {
 				options: {
 					compress: {
-						global_defs: {NODE: true}
+						global_defs: {NODEJS: true, BROWSER: false}
 					}
 				},
 				files: {
@@ -77,14 +82,12 @@ module.exports = function (grunt) {
 
 	require('load-grunt-tasks')(grunt);
 
-	grunt.registerTask('test', ['jshint', 'mochaTest']);
-
 	grunt.registerTask('build:browser', ['uglify:browser', 'component']);
-	grunt.registerTask('build:node', ['uglify:node']);
+	grunt.registerTask('build:node', ['uglify:node', 'mochaTest']);
 
-	grunt.registerTask('browser', ['test', 'build:browser']);
-	grunt.registerTask('node', ['test', 'build:node']);
-	grunt.registerTask('default', ['test', 'build:browser', 'build:node']);
+	grunt.registerTask('browser', ['jshint', 'build:browser']);
+	grunt.registerTask('node', ['jshint', 'build:node']);
+	grunt.registerTask('default', ['jshint', 'build:browser', 'build:node']);
 	
 	grunt.registerTask('publish', ['default', 'release']);
 };

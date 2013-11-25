@@ -3,8 +3,12 @@
 	"node": true,
 	"nonstandard": true,
 	"worker": true,
-	"globals": {"CanvasPixelArray": false, "define": false},
-
+	"globals": {
+		"CanvasPixelArray": false,
+		"define": false,
+		"NODEJS": false,
+		"BROWSER": false
+	},
 	"camelcase": true,
 	"curly": true,
 	"eqeqeq": true,

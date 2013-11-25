@@ -12,17 +12,14 @@
 
 var compatibility = {
 	// NodeJS Buffer in v0.5.5 and newer
-	NodeBuffer: 'Buffer' in global && 'readInt16LE' in Buffer.prototype,
-	DataView: 'DataView' in global && (
-		'getFloat64' in DataView.prototype ||            // Chrome
-		'getFloat64' in new DataView(new ArrayBuffer(1)) // Node
-	),
+	NodeBuffer: NODEJS && 'Buffer' in global,
+	DataView: 'DataView' in global,
 	ArrayBuffer: 'ArrayBuffer' in global,
-	PixelData: 'CanvasPixelArray' in global && 'ImageData' in global && 'document' in global
+	PixelData: BROWSER && 'CanvasPixelArray' in global && 'ImageData' in global && 'document' in global
 };
 
 // we don't want to bother with old Buffer implementation
-if (compatibility.NodeBuffer) {
+if (NODEJS && compatibility.NodeBuffer) {
 	(function (buffer) {
 		try {
 			buffer.writeFloatLE(Infinity, 0);
@@ -32,7 +29,7 @@ if (compatibility.NodeBuffer) {
 	})(new Buffer(4));
 }
 
-if (compatibility.PixelData) {
+if (BROWSER && compatibility.PixelData) {
 	var createPixelData = function (byteLength, buffer) {
 		var data = createPixelData.context2d.createImageData((byteLength + 3) / 4, 1).data;
 		data.byteLength = byteLength;
@@ -55,17 +52,6 @@ var dataTypes = {
 	'Uint32': 4,
 	'Float32': 4,
 	'Float64': 8
-};
-
-var nodeNaming = {
-	'Int8': 'Int8',
-	'Int16': 'Int16',
-	'Int32': 'Int32',
-	'Uint8': 'UInt8',
-	'Uint16': 'UInt16',
-	'Uint32': 'UInt32',
-	'Float32': 'Float',
-	'Float64': 'Double'
 };
 
 function arrayFrom(arrayLike, forceCopy) {
@@ -93,12 +79,12 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 
 	// Check parameters and existing functionnalities
 	this._isArrayBuffer = compatibility.ArrayBuffer && buffer instanceof ArrayBuffer;
-	this._isPixelData = compatibility.PixelData && buffer instanceof CanvasPixelArray;
+	this._isPixelData = BROWSER && compatibility.PixelData && buffer instanceof CanvasPixelArray;
 	this._isDataView = compatibility.DataView && this._isArrayBuffer;
-	this._isNodeBuffer = compatibility.NodeBuffer && buffer instanceof Buffer;
+	this._isNodeBuffer = NODEJS && compatibility.NodeBuffer && buffer instanceof Buffer;
 
 	// Handle Type Errors
-	if (!this._isNodeBuffer && !this._isArrayBuffer && !this._isPixelData && !(buffer instanceof Array)) {
+	if (!(NODEJS && this._isNodeBuffer) && !this._isArrayBuffer && !(BROWSER && this._isPixelData) && !(buffer instanceof Array)) {
 		throw new TypeError('jDataView buffer has an incompatible type');
 	}
 
@@ -120,7 +106,7 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 	this._engineAction =
 		this._isDataView
 			? this._dataViewAction
-		: this._isNodeBuffer
+		: (NODEJS && this._isNodeBuffer)
 			? this._nodeBufferAction
 		: this._isArrayBuffer
 			? this._arrayBufferAction
@@ -128,7 +114,7 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 }
 
 function getCharCodes(string) {
-	if (compatibility.NodeBuffer) {
+	if (NODEJS && compatibility.NodeBuffer) {
 		return new Buffer(string, 'binary');
 	}
 
@@ -145,14 +131,14 @@ function getCharCodes(string) {
 jDataView.wrapBuffer = function (buffer) {
 	switch (typeof buffer) {
 		case 'number':
-			if (compatibility.NodeBuffer) {
+			if (NODEJS && compatibility.NodeBuffer) {
 				buffer = new Buffer(buffer);
 				buffer.fill(0);
 			} else
 			if (compatibility.ArrayBuffer) {
 				buffer = new Uint8Array(buffer).buffer;
 			} else
-			if (compatibility.PixelData) {
+			if (BROWSER && compatibility.PixelData) {
 				buffer = createPixelData(buffer);
 			} else {
 				buffer = new Array(buffer);
@@ -166,8 +152,8 @@ jDataView.wrapBuffer = function (buffer) {
 			buffer = getCharCodes(buffer);
 			/* falls through */
 		default:
-			if ('length' in buffer && !((compatibility.NodeBuffer && buffer instanceof Buffer) || (compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) || (compatibility.PixelData && buffer instanceof CanvasPixelArray))) {
-				if (compatibility.NodeBuffer) {
+			if ('length' in buffer && !((NODEJS && compatibility.NodeBuffer && buffer instanceof Buffer) || (compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) || (BROWSER && compatibility.PixelData && buffer instanceof CanvasPixelArray))) {
+				if (NODEJS && compatibility.NodeBuffer) {
 					buffer = new Buffer(buffer);
 				} else
 				if (compatibility.ArrayBuffer) {
@@ -179,7 +165,7 @@ jDataView.wrapBuffer = function (buffer) {
 						}
 					}
 				} else
-				if (compatibility.PixelData) {
+				if (BROWSER && compatibility.PixelData) {
 					buffer = createPixelData(buffer.length, buffer);
 				} else {
 					buffer = arrayFrom(buffer);
@@ -251,7 +237,7 @@ Int64.fromNumber = function (number) {
 	return new Int64(lo, hi);
 };
 
-jDataView.prototype = {
+var proto = jDataView.prototype = {
 	_offset: 0,
 	_bitOffset: 0,
 
@@ -287,14 +273,6 @@ jDataView.prototype = {
 		// Move the internal offset forward
 		this._offset = byteOffset + dataTypes[type];
 		return isReadAction ? this._view['get' + type](byteOffset, littleEndian) : this._view['set' + type](byteOffset, value, littleEndian);
-	},
-
-	_nodeBufferAction: function (type, isReadAction, byteOffset, littleEndian, value) {
-		// Move the internal offset forward
-		this._offset = byteOffset + dataTypes[type];
-		var nodeName = nodeNaming[type] + ((type === 'Int8' || type === 'Uint8') ? '' : littleEndian ? 'LE' : 'BE');
-		byteOffset += this.byteOffset;
-		return isReadAction ? this.buffer['read' + nodeName](byteOffset) : this.buffer['write' + nodeName](value, byteOffset);
 	},
 
 	_arrayBufferAction: function (type, isReadAction, byteOffset, littleEndian, value) {
@@ -373,7 +351,7 @@ jDataView.prototype = {
 			new Uint8Array(this.buffer, byteOffset, length).set(bytes);
 		}
 		else {
-			if (this._isNodeBuffer) {
+			if (NODEJS && this._isNodeBuffer) {
 				new Buffer(bytes).copy(this.buffer, byteOffset);
 			} else {
 				for (var i = 0; i < length; i++) {
@@ -390,7 +368,7 @@ jDataView.prototype = {
 	},
 
 	getString: function (byteLength, byteOffset, encoding) {
-		if (this._isNodeBuffer) {
+		if (NODEJS && this._isNodeBuffer) {
 			byteOffset = defined(byteOffset, this._offset);
 			byteLength = defined(byteLength, this.byteLength - byteOffset);
 
@@ -411,7 +389,7 @@ jDataView.prototype = {
 	},
 
 	setString: function (byteOffset, subString, encoding) {
-		if (this._isNodeBuffer) {
+		if (NODEJS && this._isNodeBuffer) {
 			byteOffset = defined(byteOffset, this._offset);
 			this._checkBounds(byteOffset, subString.length);
 			this._offset = byteOffset + this.buffer.write(subString, this.byteOffset + byteOffset, encoding || 'binary');
@@ -718,7 +696,26 @@ jDataView.prototype = {
 	}
 };
 
-var proto = jDataView.prototype;
+if (NODEJS) {
+	var nodeNaming = {
+		'Int8': 'Int8',
+		'Int16': 'Int16',
+		'Int32': 'Int32',
+		'Uint8': 'UInt8',
+		'Uint16': 'UInt16',
+		'Uint32': 'UInt32',
+		'Float32': 'Float',
+		'Float64': 'Double'
+	};
+
+	proto._nodeBufferAction = function (type, isReadAction, byteOffset, littleEndian, value) {
+		// Move the internal offset forward
+		this._offset = byteOffset + dataTypes[type];
+		var nodeName = nodeNaming[type] + ((type === 'Int8' || type === 'Uint8') ? '' : littleEndian ? 'LE' : 'BE');
+		byteOffset += this.byteOffset;
+		return isReadAction ? this.buffer['read' + nodeName](byteOffset) : this.buffer['write' + nodeName](value, byteOffset);
+	};
+}
 
 for (var type in dataTypes) {
 	(function (type) {
