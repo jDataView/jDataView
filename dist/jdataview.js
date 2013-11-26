@@ -751,6 +751,7 @@ for (var method in proto) {
 		})(method.slice(3));
 	}
 }
+
 return jDataView;
 
 }));
