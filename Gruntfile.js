@@ -1,7 +1,8 @@
 module.exports = function (grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		repo: 'jDataView/jDataView',
+		libName: 'jDataView',
+		repo: 'jDataView/<%= libName %>',
 		jshint: {
 			options: {
 				jshintrc: true
@@ -10,11 +11,11 @@ module.exports = function (grunt) {
 		},
 		umd: {
 			all: {
-				src: 'src/jdataview.js',
-				dest: 'dist/jdataview.js',
+				src: 'src/<%= pkg.name %>.js',
+				dest: 'dist/<%= pkg.name %>.js',
 				template: 'strict-umd.hbs',
-				objectToExport: 'jDataView',
-				globalAlias: 'jDataView'
+				objectToExport: '<%= libName %>',
+				globalAlias: '<%= libName %>'
 			}
 		},
 		uglify: {
