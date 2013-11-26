@@ -2,22 +2,9 @@ var hasNodeRequire = typeof require === 'function' && typeof window === 'undefin
 
 if (hasNodeRequire) {
 	if (typeof jDataView === 'undefined') {
-		jDataView = require('../dist/jdataview.node.js');
+		jDataView = require('..');
 	}
 }
-
-describe('Library code', function () {
-	if (!hasNodeRequire) {
-		it('should be able to self-remove from global namespace', function () {
-			var realJD = jDataView,
-				jd = jDataView.noConflict();
-
-			equal(jd, realJD);
-			ok(!jDataView);
-			jDataView = realJD;
-		});
-	}
-});
 
 var	chr = String.fromCharCode,
 	// workaround for http://code.google.com/p/v8/issues/detail?id=2578

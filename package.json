@@ -19,9 +19,9 @@
     "RReverser <me@rreverser.com> (http://rreverser.com)"
   ],
   "files": [
-    "dist/jdataview.node.js"
+    "dist/node/jdataview.js"
   ],
-  "main": "dist/jdataview.node.js",
+  "main": "dist/node/jdataview.js",
   "scripts": {
     "test": "cd test && node test.runner"
   },
@@ -37,7 +37,8 @@
     "load-grunt-tasks": "~0.2.0",
     "mocha": "~1.12.1",
     "qunit-mocha-ui": "0.0.4",
-    "grunt-mocha-test": "~0.7.0"
+    "grunt-mocha-test": "~0.7.0",
+    "grunt-umd": "~1.3.0"
   },
   "licenses": [
     {

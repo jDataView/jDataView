@@ -13,9 +13,9 @@
     "manipulation"
   ],
   "repo": "jDataView/jDataView",
-  "main": "dist/jdataview.js",
+  "main": "dist/browser/jdataview.js",
   "scripts": [
-    "dist/jdataview.js"
+    "dist/browser/jdataview.js"
   ],
   "license": "WTFPL"
 }
