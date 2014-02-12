@@ -83,6 +83,8 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 	this.byteOffset = byteOffset = defined(byteOffset, 0);
 	this.byteLength = byteLength = defined(byteLength, bufferLength - byteOffset);
 
+	this._offset = this._bitOffset = 0;
+
 	if (!this._isDataView) {
 		this._checkBounds(byteOffset, byteLength, bufferLength);
 	} else {
@@ -226,9 +228,6 @@ Int64.fromNumber = function (number) {
 };
 
 var proto = jDataView.prototype = {
-	_offset: 0,
-	_bitOffset: 0,
-
 	compatibility: compatibility,
 
 	_checkBounds: function (byteOffset, byteLength, maxLength) {
