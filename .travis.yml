@@ -14,8 +14,8 @@ env:
   global:
     - NPM_USERNAME=rreverser
     - EMAIL=me@rreverser.com
-    - secure: n++5XsU9SToUz4iLG6J//CfCoxAPdD91NyHV77pxsOm9C13mtnVPTByxF6DhRgP6MrBUER3MUfz1q4Zj7PxxJ9qOXgpuUcH1F1wMiJ4IemR7ct0qoaV6eCxBN+gg4nAZDA8798IMjnO8RZ5h2sJfWfm61V82Rg9vth7T0j38Lh8=
-    - secure: jRZCZK4i8cAxSV/YcyutjTKeWSZH6I2G25Bw/Ful96VQ175mxSwE8FdgNjKRHWYLB5PR3GtuuvVG7RK2kCEJ1U9LUkpZBDfmvtobx8dz/hYsqgcLWE+Z5nXW/IPjfpfOwEMdGnSenZ5XKnFOrtMPBK2/6VE9zcgarZRZ2NIsHoI=
+    - secure: HY4cNokv44M2EeTVuUWOHR4NNcum/lDT7Gkyaw5XUKDSkdtGFg7qbIxW7eydBFpb33xyCc3w5eVE5HHBhCYnykur78aBdkBmf2FYXU2c/luiX80ostK4K6CRsyDf0Q9DvlhoBHgl0iKjCEMYYa5cenZ5DUR/RqI7VPiKo+XJtfs=
+    - secure: IlxD/5cuFqhucQT8G8jwGmToPOGXehdKMkuZdzUyMGoLcVUxJ4GjACJNncSC0bIfvzhuK4O6SK/OlXu/7Z0IvgF5+I/PDR1iCPnyHJH2ehK9mOozLRuFxrmUa0l3VIXU5XmYRjKM0aQnebIdyiHUo1c9UbL446xw0s+t2KLiyRU=
 after_success:
   - |
       if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
