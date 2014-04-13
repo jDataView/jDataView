@@ -23,7 +23,7 @@
   ],
   "main": "dist/node/jdataview.js",
   "scripts": {
-    "test": "cd test && node test.runner"
+    "test": "grunt"
   },
   "repository": {
     "type": "git",
