@@ -4,7 +4,7 @@ module.exports = function (config) {
 	config.set({
 		basePath: '..',
 		frameworks: ['mocha', 'chai'],
-		browsers: CI ? ['PhantomJS'] : ['Chrome', 'Firefox', 'IE'],
+		browsers: CI ? ['Firefox'] : ['Chrome', 'Firefox', 'IE'],
 		files: [
 			'dist/browser/jdataview.js',
 			'test/karma.mocha.conf.js',
