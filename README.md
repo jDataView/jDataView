@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/jDataView/jDataView.png?branch=master)](https://travis-ci.org/jDataView/jDataView) <a href="http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html">jDataView</a> - A unique way to work with a binary file in JavaScript.
 ================================
 
-jDataView provides convenient way to read and/or modify binary data in all the browsers. It follows the [DataView Specification](http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#8) and even extends it for a more practical use.
+jDataView provides convenient way to read and/or modify binary data in all the browsers. It follows the [DataView Specification](http://www.khronos.org/registry/typedarray/specs/latest/#8) and even extends it for a more practical use.
 
 Explanation
 ===========
@@ -55,8 +55,14 @@ library that works on top of **jDataView** and allows to operate with binary dat
 Demos
 =====
 
+* [HTTP Live Streaming realtime converter and player demo](http://rreverser.github.io/mpegts/) implemented using [jBinary](https://github.com/jDataView/jBinary) data structures.
+[![Screenshot](http://rreverser.github.io/mpegts/screenshot.png?)](http://rreverser.github.io/mpegts/)
+
 * A [World of Warcraft Model Viewer](http://jdataview.github.io/jsWoWModelViewer/). It uses [jDataView](https://github.com/jDataView/jDataView)+[jBinary](https://github.com/jDataView/jBinary) to read the binary file and then WebGL to display it.
 [![Screenshot](http://jdataview.github.io/jsWoWModelViewer/images/modelviewer.png)](http://jdataview.github.io/jsWoWModelViewer/)
+
+* A [PhotoSynth WebGL Viewer](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/) by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
+[![Screenshot](http://i.imgur.com/HRHXo.jpg)](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/)
 
 * A [simple tar viewer](http://jdataview.github.io/jDataView/untar/). It is a "Hello World" demo of how easy it is to use the library.
 
@@ -75,12 +81,13 @@ etc.
 * [Talking image](http://hacksparrow.github.io/talking-image/) - animation and audio in one package powered by
 HTML5 Audio, [jDataView](https://github.com/jDataView/jDataView) and [jBinary](https://github.com/jDataView/jBinary).
 
-* A [PhotoSynth WebGL Viewer](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/) by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
-[![Screenshot](http://i.imgur.com/HRHXo.jpg)](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/)
-
 Please tell us if you made something with jDataView :)
 
 License
 =======
 
 jDataView is issued under [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/) :)
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/jDataView/jdataview/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
