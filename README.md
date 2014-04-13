@@ -87,7 +87,3 @@ License
 =======
 
 jDataView is issued under [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/) :)
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/jDataView/jdataview/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-

@@ -1,1 +1,331 @@
-!function(a){var b=function(){return this}();"object"==typeof exports?module.exports=a.call(b):"function"==typeof define&&define.amd?define([],function(){a.apply(b,arguments)}):b.jDataView=a.call(b)}(function(){"use strict";function a(a,b){return!b&&a instanceof Array?a:Array.prototype.slice.call(a)}function b(a,b){return void 0!==a?a:b}function c(a,d,e,f){if(a instanceof c){var g=a.slice(d,d+e);return g._littleEndian=b(f,g._littleEndian),g}if(!(this instanceof c))return new c(a,d,e,f);if(this.buffer=a=c.wrapBuffer(a),this._isArrayBuffer=i.ArrayBuffer&&a instanceof ArrayBuffer,this._isPixelData=!1,this._isDataView=i.DataView&&this._isArrayBuffer,this._isNodeBuffer=!0&&i.NodeBuffer&&a instanceof Buffer,!(this._isNodeBuffer||this._isArrayBuffer||a instanceof Array))throw new TypeError("jDataView buffer has an incompatible type");this._littleEndian=!!f;var h="byteLength"in a?a.byteLength:a.length;this.byteOffset=d=b(d,0),this.byteLength=e=b(e,h-d),this._isDataView?this._view=new DataView(a,d,e):this._checkBounds(d,e,h),this._engineAction=this._isDataView?this._dataViewAction:this._isNodeBuffer?this._nodeBufferAction:this._isArrayBuffer?this._arrayBufferAction:this._arrayAction}function d(a){if(i.NodeBuffer)return new Buffer(a,"binary");for(var b=i.ArrayBuffer?Uint8Array:Array,c=new b(a.length),d=0,e=a.length;e>d;d++)c[d]=255&a.charCodeAt(d);return c}function e(a){return a>=0&&31>a?1<<a:e[a]||(e[a]=Math.pow(2,a))}function f(a,b){this.lo=a,this.hi=b}function g(){f.apply(this,arguments)}var h=this,i={NodeBuffer:!0&&"Buffer"in h,DataView:"DataView"in h,ArrayBuffer:"ArrayBuffer"in h,PixelData:!1};i.NodeBuffer&&!function(a){try{a.writeFloatLE(1/0,0)}catch(b){i.NodeBuffer=!1}}(new Buffer(4));var j={Int8:1,Int16:2,Int32:4,Uint8:1,Uint16:2,Uint32:4,Float32:4,Float64:8};c.wrapBuffer=function(b){switch(typeof b){case"number":if(i.NodeBuffer)b=new Buffer(b),b.fill(0);else if(i.ArrayBuffer)b=new Uint8Array(b).buffer;else{b=new Array(b);for(var c=0;c<b.length;c++)b[c]=0}return b;case"string":b=d(b);default:return"length"in b&&!(i.NodeBuffer&&b instanceof Buffer||i.ArrayBuffer&&b instanceof ArrayBuffer)&&(i.NodeBuffer?b=new Buffer(b):i.ArrayBuffer?b instanceof ArrayBuffer||(b=new Uint8Array(b).buffer,b instanceof ArrayBuffer||(b=new Uint8Array(a(b,!0)).buffer)):b=a(b)),b}},c.createBuffer=function(){return c.wrapBuffer(arguments)},c.Uint64=f,f.prototype={valueOf:function(){return this.lo+e(32)*this.hi},toString:function(){return Number.prototype.toString.apply(this.valueOf(),arguments)}},f.fromNumber=function(a){var b=Math.floor(a/e(32)),c=a-b*e(32);return new f(c,b)},c.Int64=g,g.prototype="create"in Object?Object.create(f.prototype):new f,g.prototype.valueOf=function(){return this.hi<e(31)?f.prototype.valueOf.apply(this,arguments):-(e(32)-this.lo+e(32)*(e(32)-1-this.hi))},g.fromNumber=function(a){var b,c;if(a>=0){var d=f.fromNumber(a);b=d.lo,c=d.hi}else c=Math.floor(a/e(32)),b=a-c*e(32),c+=e(32);return new g(b,c)};var k=c.prototype={_offset:0,_bitOffset:0,compatibility:i,_checkBounds:function(a,c,d){if("number"!=typeof a)throw new TypeError("Offset is not a number.");if("number"!=typeof c)throw new TypeError("Size is not a number.");if(0>c)throw new RangeError("Length is negative.");if(0>a||a+c>b(d,this.byteLength))throw new RangeError("Offsets are out of bounds.")},_action:function(a,c,d,e,f){return this._engineAction(a,c,b(d,this._offset),b(e,this._littleEndian),f)},_dataViewAction:function(a,b,c,d,e){return this._offset=c+j[a],b?this._view["get"+a](c,d):this._view["set"+a](c,e,d)},_arrayBufferAction:function(a,c,d,e,f){var g,i=j[a],k=h[a+"Array"];if(e=b(e,this._littleEndian),1===i||(this.byteOffset+d)%i===0&&e)return g=new k(this.buffer,this.byteOffset+d,1),this._offset=d+i,c?g[0]:g[0]=f;var l=new Uint8Array(c?this.getBytes(i,d,e,!0):i);return g=new k(l.buffer,0,1),c?g[0]:(g[0]=f,this._setBytes(d,l,e),void 0)},_arrayAction:function(a,b,c,d,e){return b?this["_get"+a](c,d):this["_set"+a](c,e,d)},_getBytes:function(c,d,e){e=b(e,this._littleEndian),d=b(d,this._offset),c=b(c,this.byteLength-d),this._checkBounds(d,c),d+=this.byteOffset,this._offset=d-this.byteOffset+c;var f=this._isArrayBuffer?new Uint8Array(this.buffer,d,c):(this.buffer.slice||Array.prototype.slice).call(this.buffer,d,d+c);return e||1>=c?f:a(f).reverse()},getBytes:function(c,d,e,f){var g=this._getBytes(c,d,b(e,!0));return f?a(g):g},_setBytes:function(c,d,e){var f=d.length;if(0!==f){if(e=b(e,this._littleEndian),c=b(c,this._offset),this._checkBounds(c,f),!e&&f>1&&(d=a(d,!0).reverse()),c+=this.byteOffset,this._isArrayBuffer)new Uint8Array(this.buffer,c,f).set(d);else if(this._isNodeBuffer)new Buffer(d).copy(this.buffer,c);else for(var g=0;f>g;g++)this.buffer[c+g]=d[g];this._offset=c-this.byteOffset+f}},setBytes:function(a,c,d){this._setBytes(a,c,b(d,!0))},getString:function(a,c,d){if(this._isNodeBuffer)return c=b(c,this._offset),a=b(a,this.byteLength-c),this._checkBounds(c,a),this._offset=c+a,this.buffer.toString(d||"binary",this.byteOffset+c,this.byteOffset+this._offset);var e=this._getBytes(a,c,!0),f="";a=e.length;for(var g=0;a>g;g++)f+=String.fromCharCode(e[g]);return"utf8"===d&&(f=decodeURIComponent(escape(f))),f},setString:function(a,c,e){return this._isNodeBuffer?(a=b(a,this._offset),this._checkBounds(a,c.length),this._offset=a+this.buffer.write(c,this.byteOffset+a,e||"binary"),void 0):("utf8"===e&&(c=unescape(encodeURIComponent(c))),this._setBytes(a,d(c),!0),void 0)},getChar:function(a){return this.getString(1,a)},setChar:function(a,b){this.setString(a,b)},tell:function(){return this._offset},seek:function(a){return this._checkBounds(a,0),this._offset=a},skip:function(a){return this.seek(this._offset+a)},slice:function(a,d,e){function f(a,b){return 0>a?a+b:a}return a=f(a,this.byteLength),d=f(b(d,this.byteLength),this.byteLength),e?new c(this.getBytes(d-a,a,!0,!0),void 0,void 0,this._littleEndian):new c(this.buffer,this.byteOffset+a,d-a,this._littleEndian)},alignBy:function(a){return this._bitOffset=0,1!==b(a,1)?this.skip(a-(this._offset%a||a)):this._offset},_getFloat64:function(a,b){var c=this._getBytes(8,a,b),d=1-2*(c[7]>>7),f=((c[7]<<1&255)<<3|c[6]>>4)-1023,g=(15&c[6])*e(48)+c[5]*e(40)+c[4]*e(32)+c[3]*e(24)+c[2]*e(16)+c[1]*e(8)+c[0];return 1024===f?0!==g?0/0:1/0*d:-1023===f?d*g*e(-1074):d*(1+g*e(-52))*e(f)},_getFloat32:function(a,b){var c=this._getBytes(4,a,b),d=1-2*(c[3]>>7),f=(c[3]<<1&255|c[2]>>7)-127,g=(127&c[2])<<16|c[1]<<8|c[0];return 128===f?0!==g?0/0:1/0*d:-127===f?d*g*e(-149):d*(1+g*e(-23))*e(f)},_get64:function(a,c,d){d=b(d,this._littleEndian),c=b(c,this._offset);for(var e=d?[0,4]:[4,0],f=0;2>f;f++)e[f]=this.getUint32(c+e[f],d);return this._offset=c+8,new a(e[0],e[1])},getInt64:function(a,b){return this._get64(g,a,b)},getUint64:function(a,b){return this._get64(f,a,b)},_getInt32:function(a,b){var c=this._getBytes(4,a,b);return c[3]<<24|c[2]<<16|c[1]<<8|c[0]},_getUint32:function(a,b){return this._getInt32(a,b)>>>0},_getInt16:function(a,b){return this._getUint16(a,b)<<16>>16},_getUint16:function(a,b){var c=this._getBytes(2,a,b);return c[1]<<8|c[0]},_getInt8:function(a){return this._getUint8(a)<<24>>24},_getUint8:function(a){return this._getBytes(1,a)[0]},_getBitRangeData:function(a,c){var d=(b(c,this._offset)<<3)+this._bitOffset,e=d+a,f=d>>>3,g=e+7>>>3,h=this._getBytes(g-f,f,!0),i=0;(this._bitOffset=7&e)&&(this._bitOffset-=8);for(var j=0,k=h.length;k>j;j++)i=i<<8|h[j];return{start:f,bytes:h,wideValue:i}},getSigned:function(a,b){var c=32-a;return this.getUnsigned(a,b)<<c>>c},getUnsigned:function(a,b){var c=this._getBitRangeData(a,b).wideValue>>>-this._bitOffset;return 32>a?c&~(-1<<a):c},_setBinaryFloat:function(a,b,c,d,f){var g,h,i=0>b?1:0,j=~(-1<<d-1),k=1-j;0>b&&(b=-b),0===b?(g=0,h=0):isNaN(b)?(g=2*j+1,h=1):1/0===b?(g=2*j+1,h=0):(g=Math.floor(Math.log(b)/Math.LN2),g>=k&&j>=g?(h=Math.floor((b*e(-g)-1)*e(c)),g+=j):(h=Math.floor(b/e(k-c)),g=0));for(var l=[];c>=8;)l.push(h%256),h=Math.floor(h/256),c-=8;for(g=g<<c|h,d+=c;d>=8;)l.push(255&g),g>>>=8,d-=8;l.push(i<<d|g),this._setBytes(a,l,f)},_setFloat32:function(a,b,c){this._setBinaryFloat(a,b,23,8,c)},_setFloat64:function(a,b,c){this._setBinaryFloat(a,b,52,11,c)},_set64:function(a,c,d,e){d instanceof a||(d=a.fromNumber(d)),e=b(e,this._littleEndian),c=b(c,this._offset);var f=e?{lo:0,hi:4}:{lo:4,hi:0};for(var g in f)this.setUint32(c+f[g],d[g],e);this._offset=c+8},setInt64:function(a,b,c){this._set64(g,a,b,c)},setUint64:function(a,b,c){this._set64(f,a,b,c)},_setUint32:function(a,b,c){this._setBytes(a,[255&b,b>>>8&255,b>>>16&255,b>>>24],c)},_setUint16:function(a,b,c){this._setBytes(a,[255&b,b>>>8&255],c)},_setUint8:function(a,b){this._setBytes(a,[255&b])},setUnsigned:function(a,b,c){var d=this._getBitRangeData(c,a),e=d.wideValue,f=d.bytes;e&=~(~(-1<<c)<<-this._bitOffset),e|=(32>c?b&~(-1<<c):b)<<-this._bitOffset;for(var g=f.length-1;g>=0;g--)f[g]=255&e,e>>>=8;this._setBytes(d.start,f,!0)}},l={Int8:"Int8",Int16:"Int16",Int32:"Int32",Uint8:"UInt8",Uint16:"UInt16",Uint32:"UInt32",Float32:"Float",Float64:"Double"};k._nodeBufferAction=function(a,b,c,d,e){this._offset=c+j[a];var f=l[a]+("Int8"===a||"Uint8"===a?"":d?"LE":"BE");return c+=this.byteOffset,b?this.buffer["read"+f](c):this.buffer["write"+f](e,c)};for(var m in j)!function(a){k["get"+a]=function(b,c){return this._action(a,!0,b,c)},k["set"+a]=function(b,c,d){this._action(a,!1,b,d,c)}}(m);k._setInt32=k._setUint32,k._setInt16=k._setUint16,k._setInt8=k._setUint8,k.setSigned=k.setUnsigned;for(var n in k)"set"===n.slice(0,3)&&!function(a){k["write"+a]=function(){Array.prototype.unshift.call(arguments,void 0),this["set"+a].apply(this,arguments)}}(n.slice(3));return c});
+!function(factory) {
+    var global = this;
+    module.exports = factory(global);
+}(function(global) {
+    "use strict";
+    function arrayFrom(arrayLike, forceCopy) {
+        return !forceCopy && arrayLike instanceof Array ? arrayLike : Array.prototype.slice.call(arrayLike);
+    }
+    function defined(value, defaultValue) {
+        return void 0 !== value ? value : defaultValue;
+    }
+    function jDataView(buffer, byteOffset, byteLength, littleEndian) {
+        if (buffer instanceof jDataView) {
+            var result = buffer.slice(byteOffset, byteOffset + byteLength);
+            return result._littleEndian = defined(littleEndian, result._littleEndian), result;
+        }
+        if (!(this instanceof jDataView)) return new jDataView(buffer, byteOffset, byteLength, littleEndian);
+        if (this.buffer = buffer = jDataView.wrapBuffer(buffer), this._isArrayBuffer = compatibility.ArrayBuffer && buffer instanceof ArrayBuffer, 
+        this._isPixelData = !1, this._isDataView = compatibility.DataView && this._isArrayBuffer, 
+        this._isNodeBuffer = !0 && compatibility.NodeBuffer && buffer instanceof Buffer, 
+        !(this._isNodeBuffer || this._isArrayBuffer || buffer instanceof Array)) throw new TypeError("jDataView buffer has an incompatible type");
+        this._littleEndian = !!littleEndian;
+        var bufferLength = "byteLength" in buffer ? buffer.byteLength : buffer.length;
+        this.byteOffset = byteOffset = defined(byteOffset, 0), this.byteLength = byteLength = defined(byteLength, bufferLength - byteOffset), 
+        this._offset = this._bitOffset = 0, this._isDataView ? this._view = new DataView(buffer, byteOffset, byteLength) : this._checkBounds(byteOffset, byteLength, bufferLength), 
+        this._engineAction = this._isDataView ? this._dataViewAction : this._isNodeBuffer ? this._nodeBufferAction : this._isArrayBuffer ? this._arrayBufferAction : this._arrayAction;
+    }
+    function getCharCodes(string) {
+        if (compatibility.NodeBuffer) return new Buffer(string, "binary");
+        for (var Type = compatibility.ArrayBuffer ? Uint8Array : Array, codes = new Type(string.length), i = 0, length = string.length; length > i; i++) codes[i] = 255 & string.charCodeAt(i);
+        return codes;
+    }
+    function pow2(n) {
+        return n >= 0 && 31 > n ? 1 << n : pow2[n] || (pow2[n] = Math.pow(2, n));
+    }
+    function Uint64(lo, hi) {
+        this.lo = lo, this.hi = hi;
+    }
+    function Int64() {
+        Uint64.apply(this, arguments);
+    }
+    var compatibility = {
+        NodeBuffer: !0 && "Buffer" in global,
+        DataView: "DataView" in global,
+        ArrayBuffer: "ArrayBuffer" in global,
+        PixelData: !1
+    };
+    compatibility.NodeBuffer && !function(buffer) {
+        try {
+            buffer.writeFloatLE(1/0, 0);
+        } catch (e) {
+            compatibility.NodeBuffer = !1;
+        }
+    }(new Buffer(4));
+    var dataTypes = {
+        Int8: 1,
+        Int16: 2,
+        Int32: 4,
+        Uint8: 1,
+        Uint16: 2,
+        Uint32: 4,
+        Float32: 4,
+        Float64: 8
+    };
+    jDataView.wrapBuffer = function(buffer) {
+        switch (typeof buffer) {
+          case "number":
+            if (compatibility.NodeBuffer) buffer = new Buffer(buffer), buffer.fill(0); else if (compatibility.ArrayBuffer) buffer = new Uint8Array(buffer).buffer; else {
+                buffer = new Array(buffer);
+                for (var i = 0; i < buffer.length; i++) buffer[i] = 0;
+            }
+            return buffer;
+
+          case "string":
+            buffer = getCharCodes(buffer);
+
+          default:
+            return "length" in buffer && !(compatibility.NodeBuffer && buffer instanceof Buffer || compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) && (compatibility.NodeBuffer ? buffer = new Buffer(buffer) : compatibility.ArrayBuffer ? buffer instanceof ArrayBuffer || (buffer = new Uint8Array(buffer).buffer, 
+            buffer instanceof ArrayBuffer || (buffer = new Uint8Array(arrayFrom(buffer, !0)).buffer)) : buffer = arrayFrom(buffer)), 
+            buffer;
+        }
+    }, jDataView.createBuffer = function() {
+        return jDataView.wrapBuffer(arguments);
+    }, jDataView.Uint64 = Uint64, Uint64.prototype = {
+        valueOf: function() {
+            return this.lo + pow2(32) * this.hi;
+        },
+        toString: function() {
+            return Number.prototype.toString.apply(this.valueOf(), arguments);
+        }
+    }, Uint64.fromNumber = function(number) {
+        var hi = Math.floor(number / pow2(32)), lo = number - hi * pow2(32);
+        return new Uint64(lo, hi);
+    }, jDataView.Int64 = Int64, Int64.prototype = "create" in Object ? Object.create(Uint64.prototype) : new Uint64(), 
+    Int64.prototype.valueOf = function() {
+        return this.hi < pow2(31) ? Uint64.prototype.valueOf.apply(this, arguments) : -(pow2(32) - this.lo + pow2(32) * (pow2(32) - 1 - this.hi));
+    }, Int64.fromNumber = function(number) {
+        var lo, hi;
+        if (number >= 0) {
+            var unsigned = Uint64.fromNumber(number);
+            lo = unsigned.lo, hi = unsigned.hi;
+        } else hi = Math.floor(number / pow2(32)), lo = number - hi * pow2(32), hi += pow2(32);
+        return new Int64(lo, hi);
+    };
+    var proto = jDataView.prototype = {
+        compatibility: compatibility,
+        _checkBounds: function(byteOffset, byteLength, maxLength) {
+            if ("number" != typeof byteOffset) throw new TypeError("Offset is not a number.");
+            if ("number" != typeof byteLength) throw new TypeError("Size is not a number.");
+            if (0 > byteLength) throw new RangeError("Length is negative.");
+            if (0 > byteOffset || byteOffset + byteLength > defined(maxLength, this.byteLength)) throw new RangeError("Offsets are out of bounds.");
+        },
+        _action: function(type, isReadAction, byteOffset, littleEndian, value) {
+            return this._engineAction(type, isReadAction, defined(byteOffset, this._offset), defined(littleEndian, this._littleEndian), value);
+        },
+        _dataViewAction: function(type, isReadAction, byteOffset, littleEndian, value) {
+            return this._offset = byteOffset + dataTypes[type], isReadAction ? this._view["get" + type](byteOffset, littleEndian) : this._view["set" + type](byteOffset, value, littleEndian);
+        },
+        _arrayBufferAction: function(type, isReadAction, byteOffset, littleEndian, value) {
+            var typedArray, size = dataTypes[type], TypedArray = global[type + "Array"];
+            if (littleEndian = defined(littleEndian, this._littleEndian), 1 === size || (this.byteOffset + byteOffset) % size === 0 && littleEndian) return typedArray = new TypedArray(this.buffer, this.byteOffset + byteOffset, 1), 
+            this._offset = byteOffset + size, isReadAction ? typedArray[0] : typedArray[0] = value;
+            var bytes = new Uint8Array(isReadAction ? this.getBytes(size, byteOffset, littleEndian, !0) : size);
+            return typedArray = new TypedArray(bytes.buffer, 0, 1), isReadAction ? typedArray[0] : (typedArray[0] = value, 
+            void this._setBytes(byteOffset, bytes, littleEndian));
+        },
+        _arrayAction: function(type, isReadAction, byteOffset, littleEndian, value) {
+            return isReadAction ? this["_get" + type](byteOffset, littleEndian) : this["_set" + type](byteOffset, value, littleEndian);
+        },
+        _getBytes: function(length, byteOffset, littleEndian) {
+            littleEndian = defined(littleEndian, this._littleEndian), byteOffset = defined(byteOffset, this._offset), 
+            length = defined(length, this.byteLength - byteOffset), this._checkBounds(byteOffset, length), 
+            byteOffset += this.byteOffset, this._offset = byteOffset - this.byteOffset + length;
+            var result = this._isArrayBuffer ? new Uint8Array(this.buffer, byteOffset, length) : (this.buffer.slice || Array.prototype.slice).call(this.buffer, byteOffset, byteOffset + length);
+            return littleEndian || 1 >= length ? result : arrayFrom(result).reverse();
+        },
+        getBytes: function(length, byteOffset, littleEndian, toArray) {
+            var result = this._getBytes(length, byteOffset, defined(littleEndian, !0));
+            return toArray ? arrayFrom(result) : result;
+        },
+        _setBytes: function(byteOffset, bytes, littleEndian) {
+            var length = bytes.length;
+            if (0 !== length) {
+                if (littleEndian = defined(littleEndian, this._littleEndian), byteOffset = defined(byteOffset, this._offset), 
+                this._checkBounds(byteOffset, length), !littleEndian && length > 1 && (bytes = arrayFrom(bytes, !0).reverse()), 
+                byteOffset += this.byteOffset, this._isArrayBuffer) new Uint8Array(this.buffer, byteOffset, length).set(bytes); else if (this._isNodeBuffer) new Buffer(bytes).copy(this.buffer, byteOffset); else for (var i = 0; length > i; i++) this.buffer[byteOffset + i] = bytes[i];
+                this._offset = byteOffset - this.byteOffset + length;
+            }
+        },
+        setBytes: function(byteOffset, bytes, littleEndian) {
+            this._setBytes(byteOffset, bytes, defined(littleEndian, !0));
+        },
+        getString: function(byteLength, byteOffset, encoding) {
+            if (this._isNodeBuffer) return byteOffset = defined(byteOffset, this._offset), byteLength = defined(byteLength, this.byteLength - byteOffset), 
+            this._checkBounds(byteOffset, byteLength), this._offset = byteOffset + byteLength, 
+            this.buffer.toString(encoding || "binary", this.byteOffset + byteOffset, this.byteOffset + this._offset);
+            var bytes = this._getBytes(byteLength, byteOffset, !0), string = "";
+            byteLength = bytes.length;
+            for (var i = 0; byteLength > i; i++) string += String.fromCharCode(bytes[i]);
+            return "utf8" === encoding && (string = decodeURIComponent(escape(string))), string;
+        },
+        setString: function(byteOffset, subString, encoding) {
+            return this._isNodeBuffer ? (byteOffset = defined(byteOffset, this._offset), this._checkBounds(byteOffset, subString.length), 
+            void (this._offset = byteOffset + this.buffer.write(subString, this.byteOffset + byteOffset, encoding || "binary"))) : ("utf8" === encoding && (subString = unescape(encodeURIComponent(subString))), 
+            void this._setBytes(byteOffset, getCharCodes(subString), !0));
+        },
+        getChar: function(byteOffset) {
+            return this.getString(1, byteOffset);
+        },
+        setChar: function(byteOffset, character) {
+            this.setString(byteOffset, character);
+        },
+        tell: function() {
+            return this._offset;
+        },
+        seek: function(byteOffset) {
+            return this._checkBounds(byteOffset, 0), this._offset = byteOffset;
+        },
+        skip: function(byteLength) {
+            return this.seek(this._offset + byteLength);
+        },
+        slice: function(start, end, forceCopy) {
+            function normalizeOffset(offset, byteLength) {
+                return 0 > offset ? offset + byteLength : offset;
+            }
+            return start = normalizeOffset(start, this.byteLength), end = normalizeOffset(defined(end, this.byteLength), this.byteLength), 
+            forceCopy ? new jDataView(this.getBytes(end - start, start, !0, !0), void 0, void 0, this._littleEndian) : new jDataView(this.buffer, this.byteOffset + start, end - start, this._littleEndian);
+        },
+        alignBy: function(byteCount) {
+            return this._bitOffset = 0, 1 !== defined(byteCount, 1) ? this.skip(byteCount - (this._offset % byteCount || byteCount)) : this._offset;
+        },
+        _getFloat64: function(byteOffset, littleEndian) {
+            var b = this._getBytes(8, byteOffset, littleEndian), sign = 1 - 2 * (b[7] >> 7), exponent = ((b[7] << 1 & 255) << 3 | b[6] >> 4) - 1023, mantissa = (15 & b[6]) * pow2(48) + b[5] * pow2(40) + b[4] * pow2(32) + b[3] * pow2(24) + b[2] * pow2(16) + b[1] * pow2(8) + b[0];
+            return 1024 === exponent ? 0 !== mantissa ? 0/0 : 1/0 * sign : -1023 === exponent ? sign * mantissa * pow2(-1074) : sign * (1 + mantissa * pow2(-52)) * pow2(exponent);
+        },
+        _getFloat32: function(byteOffset, littleEndian) {
+            var b = this._getBytes(4, byteOffset, littleEndian), sign = 1 - 2 * (b[3] >> 7), exponent = (b[3] << 1 & 255 | b[2] >> 7) - 127, mantissa = (127 & b[2]) << 16 | b[1] << 8 | b[0];
+            return 128 === exponent ? 0 !== mantissa ? 0/0 : 1/0 * sign : -127 === exponent ? sign * mantissa * pow2(-149) : sign * (1 + mantissa * pow2(-23)) * pow2(exponent);
+        },
+        _get64: function(Type, byteOffset, littleEndian) {
+            littleEndian = defined(littleEndian, this._littleEndian), byteOffset = defined(byteOffset, this._offset);
+            for (var parts = littleEndian ? [ 0, 4 ] : [ 4, 0 ], i = 0; 2 > i; i++) parts[i] = this.getUint32(byteOffset + parts[i], littleEndian);
+            return this._offset = byteOffset + 8, new Type(parts[0], parts[1]);
+        },
+        getInt64: function(byteOffset, littleEndian) {
+            return this._get64(Int64, byteOffset, littleEndian);
+        },
+        getUint64: function(byteOffset, littleEndian) {
+            return this._get64(Uint64, byteOffset, littleEndian);
+        },
+        _getInt32: function(byteOffset, littleEndian) {
+            var b = this._getBytes(4, byteOffset, littleEndian);
+            return b[3] << 24 | b[2] << 16 | b[1] << 8 | b[0];
+        },
+        _getUint32: function(byteOffset, littleEndian) {
+            return this._getInt32(byteOffset, littleEndian) >>> 0;
+        },
+        _getInt16: function(byteOffset, littleEndian) {
+            return this._getUint16(byteOffset, littleEndian) << 16 >> 16;
+        },
+        _getUint16: function(byteOffset, littleEndian) {
+            var b = this._getBytes(2, byteOffset, littleEndian);
+            return b[1] << 8 | b[0];
+        },
+        _getInt8: function(byteOffset) {
+            return this._getUint8(byteOffset) << 24 >> 24;
+        },
+        _getUint8: function(byteOffset) {
+            return this._getBytes(1, byteOffset)[0];
+        },
+        _getBitRangeData: function(bitLength, byteOffset) {
+            var startBit = (defined(byteOffset, this._offset) << 3) + this._bitOffset, endBit = startBit + bitLength, start = startBit >>> 3, end = endBit + 7 >>> 3, b = this._getBytes(end - start, start, !0), wideValue = 0;
+            (this._bitOffset = 7 & endBit) && (this._bitOffset -= 8);
+            for (var i = 0, length = b.length; length > i; i++) wideValue = wideValue << 8 | b[i];
+            return {
+                start: start,
+                bytes: b,
+                wideValue: wideValue
+            };
+        },
+        getSigned: function(bitLength, byteOffset) {
+            var shift = 32 - bitLength;
+            return this.getUnsigned(bitLength, byteOffset) << shift >> shift;
+        },
+        getUnsigned: function(bitLength, byteOffset) {
+            var value = this._getBitRangeData(bitLength, byteOffset).wideValue >>> -this._bitOffset;
+            return 32 > bitLength ? value & ~(-1 << bitLength) : value;
+        },
+        _setBinaryFloat: function(byteOffset, value, mantSize, expSize, littleEndian) {
+            var exponent, mantissa, signBit = 0 > value ? 1 : 0, eMax = ~(-1 << expSize - 1), eMin = 1 - eMax;
+            0 > value && (value = -value), 0 === value ? (exponent = 0, mantissa = 0) : isNaN(value) ? (exponent = 2 * eMax + 1, 
+            mantissa = 1) : 1/0 === value ? (exponent = 2 * eMax + 1, mantissa = 0) : (exponent = Math.floor(Math.log(value) / Math.LN2), 
+            exponent >= eMin && eMax >= exponent ? (mantissa = Math.floor((value * pow2(-exponent) - 1) * pow2(mantSize)), 
+            exponent += eMax) : (mantissa = Math.floor(value / pow2(eMin - mantSize)), exponent = 0));
+            for (var b = []; mantSize >= 8; ) b.push(mantissa % 256), mantissa = Math.floor(mantissa / 256), 
+            mantSize -= 8;
+            for (exponent = exponent << mantSize | mantissa, expSize += mantSize; expSize >= 8; ) b.push(255 & exponent), 
+            exponent >>>= 8, expSize -= 8;
+            b.push(signBit << expSize | exponent), this._setBytes(byteOffset, b, littleEndian);
+        },
+        _setFloat32: function(byteOffset, value, littleEndian) {
+            this._setBinaryFloat(byteOffset, value, 23, 8, littleEndian);
+        },
+        _setFloat64: function(byteOffset, value, littleEndian) {
+            this._setBinaryFloat(byteOffset, value, 52, 11, littleEndian);
+        },
+        _set64: function(Type, byteOffset, value, littleEndian) {
+            value instanceof Type || (value = Type.fromNumber(value)), littleEndian = defined(littleEndian, this._littleEndian), 
+            byteOffset = defined(byteOffset, this._offset);
+            var parts = littleEndian ? {
+                lo: 0,
+                hi: 4
+            } : {
+                lo: 4,
+                hi: 0
+            };
+            for (var partName in parts) this.setUint32(byteOffset + parts[partName], value[partName], littleEndian);
+            this._offset = byteOffset + 8;
+        },
+        setInt64: function(byteOffset, value, littleEndian) {
+            this._set64(Int64, byteOffset, value, littleEndian);
+        },
+        setUint64: function(byteOffset, value, littleEndian) {
+            this._set64(Uint64, byteOffset, value, littleEndian);
+        },
+        _setUint32: function(byteOffset, value, littleEndian) {
+            this._setBytes(byteOffset, [ 255 & value, value >>> 8 & 255, value >>> 16 & 255, value >>> 24 ], littleEndian);
+        },
+        _setUint16: function(byteOffset, value, littleEndian) {
+            this._setBytes(byteOffset, [ 255 & value, value >>> 8 & 255 ], littleEndian);
+        },
+        _setUint8: function(byteOffset, value) {
+            this._setBytes(byteOffset, [ 255 & value ]);
+        },
+        setUnsigned: function(byteOffset, value, bitLength) {
+            var data = this._getBitRangeData(bitLength, byteOffset), wideValue = data.wideValue, b = data.bytes;
+            wideValue &= ~(~(-1 << bitLength) << -this._bitOffset), wideValue |= (32 > bitLength ? value & ~(-1 << bitLength) : value) << -this._bitOffset;
+            for (var i = b.length - 1; i >= 0; i--) b[i] = 255 & wideValue, wideValue >>>= 8;
+            this._setBytes(data.start, b, !0);
+        }
+    }, nodeNaming = {
+        Int8: "Int8",
+        Int16: "Int16",
+        Int32: "Int32",
+        Uint8: "UInt8",
+        Uint16: "UInt16",
+        Uint32: "UInt32",
+        Float32: "Float",
+        Float64: "Double"
+    };
+    proto._nodeBufferAction = function(type, isReadAction, byteOffset, littleEndian, value) {
+        this._offset = byteOffset + dataTypes[type];
+        var nodeName = nodeNaming[type] + ("Int8" === type || "Uint8" === type ? "" : littleEndian ? "LE" : "BE");
+        return byteOffset += this.byteOffset, isReadAction ? this.buffer["read" + nodeName](byteOffset) : this.buffer["write" + nodeName](value, byteOffset);
+    };
+    for (var type in dataTypes) !function(type) {
+        proto["get" + type] = function(byteOffset, littleEndian) {
+            return this._action(type, !0, byteOffset, littleEndian);
+        }, proto["set" + type] = function(byteOffset, value, littleEndian) {
+            this._action(type, !1, byteOffset, littleEndian, value);
+        };
+    }(type);
+    proto._setInt32 = proto._setUint32, proto._setInt16 = proto._setUint16, proto._setInt8 = proto._setUint8, 
+    proto.setSigned = proto.setUnsigned;
+    for (var method in proto) "set" === method.slice(0, 3) && !function(type) {
+        proto["write" + type] = function() {
+            Array.prototype.unshift.call(arguments, void 0), this["set" + type].apply(this, arguments);
+        };
+    }(method.slice(3));
+    return jDataView;
+});

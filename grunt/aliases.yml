@@ -1,0 +1,25 @@
+build_common:
+  - 'clean'
+  - 'lintspaces'
+  - 'jshint:grunt'
+  - 'jshint:before_concat'
+  - 'concat_sourcemap'
+  - 'jshint:after_concat'
+
+default:
+  - 'build'
+  - 'test'
+  - 'compare_size'
+
+browser:
+  - 'build:browser'
+  - 'test:browser'
+  - 'compare_size:browser'
+
+node:
+  - 'build:node'
+  - 'test:node'
+
+live:
+  - 'karma:watch:start'
+  - 'watch'

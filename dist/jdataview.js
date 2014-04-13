@@ -1,22 +1,22 @@
 (function (factory) {
-	var root = (function () { return this })();
+	var global = this;
 
-	if (typeof exports === 'object') {
-		module.exports = factory.call(root);
+	if (NODE || typeof exports === 'object') {
+		module.exports = factory(global);
 	} else
-	if (typeof define === 'function' && define.amd) {
-		define([], function () {
-			factory.apply(root, arguments);
-		});
+	if (BROWSER) {
+		if (typeof define === 'function' && define.amd) {
+			define([], function () {
+				return factory(global);
+			});
+		}
+		else {
+			global.jDataView = factory(global);
+		}
 	}
-	else {
-		root['jDataView'] = factory.call(root);
-	}
-}(function() {
+}(function (global) {
 
 'use strict';
-
-var global = this;
 
 var compatibility = {
 	// NodeJS Buffer in v0.5.5 and newer
@@ -102,6 +102,8 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 	var bufferLength = 'byteLength' in buffer ? buffer.byteLength : buffer.length;
 	this.byteOffset = byteOffset = defined(byteOffset, 0);
 	this.byteLength = byteLength = defined(byteLength, bufferLength - byteOffset);
+
+	this._offset = this._bitOffset = 0;
 
 	if (!this._isDataView) {
 		this._checkBounds(byteOffset, byteLength, bufferLength);
@@ -246,9 +248,6 @@ Int64.fromNumber = function (number) {
 };
 
 var proto = jDataView.prototype = {
-	_offset: 0,
-	_bitOffset: 0,
-
 	compatibility: compatibility,
 
 	_checkBounds: function (byteOffset, byteLength, maxLength) {
@@ -323,9 +322,11 @@ var proto = jDataView.prototype = {
 
 		this._offset = byteOffset - this.byteOffset + length;
 
-		var result = this._isArrayBuffer
-					 ? new Uint8Array(this.buffer, byteOffset, length)
-					 : (this.buffer.slice || Array.prototype.slice).call(this.buffer, byteOffset, byteOffset + length);
+		var result = (
+			this._isArrayBuffer
+			? new Uint8Array(this.buffer, byteOffset, length)
+			: (this.buffer.slice || Array.prototype.slice).call(this.buffer, byteOffset, byteOffset + length)
+		);
 
 		return littleEndian || length <= 1 ? result : arrayFrom(result).reverse();
 	},
@@ -439,9 +440,11 @@ var proto = jDataView.prototype = {
 		start = normalizeOffset(start, this.byteLength);
 		end = normalizeOffset(defined(end, this.byteLength), this.byteLength);
 
-		return forceCopy
-			   ? new jDataView(this.getBytes(end - start, start, true, true), undefined, undefined, this._littleEndian)
-			   : new jDataView(this.buffer, this.byteOffset + start, end - start, this._littleEndian);
+		return (
+			forceCopy
+			? new jDataView(this.getBytes(end - start, start, true, true), undefined, undefined, this._littleEndian)
+			: new jDataView(this.buffer, this.byteOffset + start, end - start, this._littleEndian)
+		);
 	},
 
 	alignBy: function (byteCount) {
@@ -726,6 +729,7 @@ if (NODE) {
 }
 
 for (var type in dataTypes) {
+	/* jshint loopfunc: true */
 	(function (type) {
 		proto['get' + type] = function (byteOffset, littleEndian) {
 			return this._action(type, true, byteOffset, littleEndian);
@@ -734,6 +738,7 @@ for (var type in dataTypes) {
 			this._action(type, false, byteOffset, littleEndian, value);
 		};
 	})(type);
+	/* jshint loopfunc: false */
 }
 
 proto._setInt32 = proto._setUint32;
@@ -742,6 +747,7 @@ proto._setInt8 = proto._setUint8;
 proto.setSigned = proto.setUnsigned;
 
 for (var method in proto) {
+	/* jshint loopfunc: true */
 	if (method.slice(0, 3) === 'set') {
 		(function (type) {
 			proto['write' + type] = function () {
@@ -750,8 +756,12 @@ for (var method in proto) {
 			};
 		})(method.slice(3));
 	}
+	/* jshint loopfunc: false */
 }
+
 
 return jDataView;
 
 }));
+
+//# sourceMappingURL=jdataview.js.map

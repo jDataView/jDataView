@@ -1,3 +1,5 @@
+* **April 14 2014**
+  * Build process completely reworked and automated via Grunt + Travis CI.
 * **August 23 2013**
   * Added bitfield support (was considered to be borrowed from [jBinary](https://github.com/jDataView/jBinary), but implemented faster and simpler version).
   * Completely dynamic one-time write* definition for all the set* methods.
@@ -32,5 +34,5 @@
   * Fixed bugs using non zero ```byteOffset``` and added more bound checks.
 * **September 21 2011**: Added a missing ```littleEndian``` argument on getInt16.
 * **April 28 2011**: Seeking to the end of file no longer throws an error.
-* **April 26 2011**: Fixed a bug with extremely large unsigned 32bit being considered as signed. ([Solution](http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string/2954435#2954435)). 
+* **April 26 2011**: Fixed a bug with extremely large unsigned 32bit being considered as signed. ([Solution](http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string/2954435#2954435)).
 * **April 8 2011**: Added littleEndian argument on the constructor. Opera 11.50 does not fully implement DataView, improved check.

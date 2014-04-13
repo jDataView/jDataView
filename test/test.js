@@ -1,12 +1,12 @@
 var hasNodeRequire = typeof require === 'function' && typeof window === 'undefined';
 
 if (hasNodeRequire) {
-	if (typeof jDataView === 'undefined') {
-		jDataView = require('..');
-	}
+	jDataView = require('..');
+	chai = require('chai');
 }
 
-var	chr = String.fromCharCode,
+var assert = chai.assert,
+	chr = String.fromCharCode,
 	// workaround for http://code.google.com/p/v8/issues/detail?id=2578
 	_isNaN = Number.isNaN || (function () { return this })().isNaN,
 	isNaN = function (obj) {
@@ -23,7 +23,7 @@ var	chr = String.fromCharCode,
 
 compatibility.Array = true;
 
-for (engineName in compatibility) {
+for (var engineName in compatibility) {
 	if (compatibility[engineName]) {
 		engines.push(engineName);
 	}
@@ -35,40 +35,37 @@ function b() {
 
 function compareInt64(value, expected, message) {
 	value = Number(value);
-	equal(value, expected, message || (value + ' != ' + expected));
+	assert.equal(value, expected, message || (value + ' != ' + expected));
 }
 
 function compareBytes(value, expected, message) {
 	value = Array.prototype.slice.call(value);
-	deepEqual(value, expected, message || '[' + value + '] != [' + expected + ']');
+	assert.deepEqual(value, expected, message || '[' + value + '] != [' + expected + ']');
 }
 
 function compareWithNaN(value, expected, message) {
-	ok(isNaN(value), message || value + ' != NaN');
+	assert.ok(isNaN(value), message || value + ' != NaN');
 }
 
 engines.forEach(function (engineName) {
-	describe(engineName, function () {
+	suite(engineName, function () {
 		var view;
 
-		before(function () {
+		suiteSetup(function () {
 			view = new jDataView(dataBytes.slice(), dataStart, undefined, true);
 		});
 
-		after(function () {
+		suiteTeardown(function () {
 			compatibility[engineName] = false;
 		});
 
-		describe('should throw error on bound check for', function () {
+		suite('should throw error on bound check for', function () {
 			function testBounds(type) {
 				var args = Array.prototype.slice.call(arguments, 1);
-				it(type, function () {
-					try {
+				test(type, function () {
+					assert.Throw(function () {
 						view['get' + type].apply(view, args);
-						ok(false);
-					} catch(e) {
-						ok(true);
-					}
+					});
 				});
 			}
 
@@ -85,14 +82,14 @@ engines.forEach(function (engineName) {
 			testBounds('Float64', 1);
 		});
 
-		describe('should be correctly read for', function () {
-			beforeEach(function () {
+		suite('should be correctly read for', function () {
+			setup(function () {
 				view.seek(0);
 			});
 
 			// getter = value || {value, check?, view?, args?}
 			function testGetters(type, getters) {
-				it(type, function () {
+				test(type, function () {
 					getters.forEach(function (getter) {
 						if (typeof getter !== 'object') {
 							getter = {value: getter};
@@ -100,7 +97,7 @@ engines.forEach(function (engineName) {
 
 						var args = getter.args || [],
 							contextView = getter.view || view,
-							check = getter.check || equal,
+							check = getter.check || assert.equal,
 							value = getter.value,
 							offset = contextView.tell(),
 							realValue = contextView['get' + type].apply(contextView, args);
@@ -131,18 +128,15 @@ engines.forEach(function (engineName) {
 				{args: [1, 5], value: chr(0)},
 				{args: [1, 7], value: chr(1)},
 				{view: b(127, 0, 1, 65, 66), args: [5], value: chr(127) + chr(0) + chr(1) + chr(65) + chr(66)},
-				{view: b(0xd1, 0x84, 0xd1, 0x8b, 0xd0, 0xb2), args: [, , 'utf8'], value: chr(1092) + chr(1099) + chr(1074)}
+				{view: b(0xd1, 0x84, 0xd1, 0x8b, 0xd0, 0xb2), args: [undefined, undefined, 'utf8'], value: chr(1092) + chr(1099) + chr(1074)}
 			]);
 
-			it('Big String', function () {
+			test('Big String', function () {
 				this.timeout(5000);
 				var view = new jDataView(2000000);
-				try {
+				assert.doesNotThrow(function () {
 					view.getString();
-					ok(true);
-				} catch(e) {
-					ok(false);
-				}
+				});
 			});
 
 			testGetters('Int8', [
@@ -267,14 +261,14 @@ engines.forEach(function (engineName) {
 			]);
 		});
 
-		describe('should be correctly written for', function () {
-			afterEach(function () {
+		suite('should be correctly written for', function () {
+			teardown(function () {
 				view.setBytes(0, dataBytes.slice(dataStart), true);
 			});
 
 			// setter = value || {value, args?, getterArgs?, check?}
 			function testSetters(type, setters) {
-				it(type, function () {
+				test(type, function () {
 					setters.forEach(function (setter) {
 						if (typeof setter !== 'object') {
 							setter = {value: setter};
@@ -284,9 +278,9 @@ engines.forEach(function (engineName) {
 							value = setter.value,
 							args = [offset, value].concat(setter.args ? setter.args.slice(1) : []),
 							getterArgs = setter.getterArgs || [offset],
-							check = setter.check || equal;
+							check = setter.check || assert.equal;
 
-						ok(('write' + type) in view, 'jDataView does not have `write' + type + '` method.');
+						assert.ok(('write' + type) in view, 'jDataView does not have `write' + type + '` method.');
 						view['set' + type].apply(view, args);
 
 						var realValue = view['get' + type].apply(view, getterArgs);
@@ -365,7 +359,7 @@ engines.forEach(function (engineName) {
 
 			testSetters('Float64', [
 				Math.pow(2, -1074),
-				-Math.pow(2, -1074),   
+				-Math.pow(2, -1074),
 				Math.pow(2, -1022),
 				-Math.pow(2, -1022),
 				2.426842827241402e-300,
@@ -391,7 +385,7 @@ engines.forEach(function (engineName) {
 
 			// setter = {value, bitLength}
 			function testBitfieldSetters(type, setters) {
-				it(type, function () {
+				test(type, function () {
 					var view = new jDataView(13);
 
 					function eachValue(callback) {
@@ -408,7 +402,7 @@ engines.forEach(function (engineName) {
 
 					eachValue(function (value, bitLength) {
 						var realValue = this['get' + type](bitLength);
-						equal(realValue, value, 'write' + type + '(' + value + ', ' + bitLength + ') != get' + type + '(' + bitLength + ') == ' + realValue);
+						assert.equal(realValue, value, 'write' + type + '(' + value + ', ' + bitLength + ') != get' + type + '(' + bitLength + ') == ' + realValue);
 					});
 				});
 			}
@@ -442,53 +436,50 @@ engines.forEach(function (engineName) {
 			]);
 		});
 
-		describe('should be sliced', function () {
-			it('with bound check', function () {
-				try {
+		suite('should be sliced', function () {
+			test('with bound check', function () {
+				assert.Throw(function () {
 					view.slice(5, 10);
-					ok(false);
-				} catch(e) {
-					ok(true);
-				}
+				});
 			});
 
-			it('as pointer to original data', function () {
+			test('as pointer to original data', function () {
 				var pointerCopy = view.slice(1, 4);
 				compareBytes(pointerCopy.getBytes(), [0xfe, 0xfd, 0xfc]);
 				pointerCopy.setChar(0, chr(1));
-				equal(view.getChar(1), chr(1));
+				assert.equal(view.getChar(1), chr(1));
 				pointerCopy.setChar(0, chr(0xfe));
 			});
 
-			it('as copy of original data', function () {
+			test('as copy of original data', function () {
 				var copy = view.slice(1, 4, true);
 				compareBytes(copy.getBytes(), [0xfe, 0xfd, 0xfc]);
 				copy.setChar(0, chr(1));
-				notEqual(view.getChar(1), chr(1));
+				assert.notEqual(view.getChar(1), chr(1));
 			});
 
-			it('with only start offset argument given', function () {
+			test('with only start offset argument given', function () {
 				var pointerCopy = view.slice(1);
 				compareBytes(pointerCopy.getBytes(), [0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]);
 			});
 
-			it('with negative start offset given', function () {
+			test('with negative start offset given', function () {
 				var pointerCopy = view.slice(-2);
 				compareBytes(pointerCopy.getBytes(), [0xba, 0x01]);
 			});
 
-			it('with negative end offset given', function () {
+			test('with negative end offset given', function () {
 				var pointerCopy = view.slice(1, -2);
 				compareBytes(pointerCopy.getBytes(), [0xfe, 0xfd, 0xfc, 0xfa, 0x00]);
 			});
 		});
 
-		it('should be aligned by given count of bytes', function () {
+		test('should be aligned by given count of bytes', function () {
 			function checkAlignBy(byteCount, expectedOffset) {
 				var offset = view.alignBy(byteCount);
-				equal(view._bitOffset, 0);
-				equal(view.tell(), offset);
-				equal(offset, expectedOffset);
+				assert.equal(view._bitOffset, 0);
+				assert.equal(view.tell(), offset);
+				assert.equal(offset, expectedOffset);
 			}
 
 			view.seek(1);
@@ -499,7 +490,7 @@ engines.forEach(function (engineName) {
 		});
 
 		if (engineName === 'ArrayBuffer') {
-			it('can be used in jDataView from Uint8Array::subarray', function () {
+			test('can be used in jDataView from Uint8Array::subarray', function () {
 				var bytes = [1, 2, 3],
 					offset = 1,
 					original = new Uint8Array(bytes),
@@ -509,8 +500,8 @@ engines.forEach(function (engineName) {
 			});
 		}
 
-		it('should be available for testing', function () {
-			ok(compatibility[engineName]);
+		test('should be available for testing', function () {
+			assert.ok(compatibility[engineName]);
 		});
 	});
 });

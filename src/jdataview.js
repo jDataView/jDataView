@@ -302,9 +302,11 @@ var proto = jDataView.prototype = {
 
 		this._offset = byteOffset - this.byteOffset + length;
 
-		var result = this._isArrayBuffer
-					 ? new Uint8Array(this.buffer, byteOffset, length)
-					 : (this.buffer.slice || Array.prototype.slice).call(this.buffer, byteOffset, byteOffset + length);
+		var result = (
+			this._isArrayBuffer
+			? new Uint8Array(this.buffer, byteOffset, length)
+			: (this.buffer.slice || Array.prototype.slice).call(this.buffer, byteOffset, byteOffset + length)
+		);
 
 		return littleEndian || length <= 1 ? result : arrayFrom(result).reverse();
 	},
@@ -418,9 +420,11 @@ var proto = jDataView.prototype = {
 		start = normalizeOffset(start, this.byteLength);
 		end = normalizeOffset(defined(end, this.byteLength), this.byteLength);
 
-		return forceCopy
-			   ? new jDataView(this.getBytes(end - start, start, true, true), undefined, undefined, this._littleEndian)
-			   : new jDataView(this.buffer, this.byteOffset + start, end - start, this._littleEndian);
+		return (
+			forceCopy
+			? new jDataView(this.getBytes(end - start, start, true, true), undefined, undefined, this._littleEndian)
+			: new jDataView(this.buffer, this.byteOffset + start, end - start, this._littleEndian)
+		);
 	},
 
 	alignBy: function (byteCount) {
@@ -705,6 +709,7 @@ if (NODE) {
 }
 
 for (var type in dataTypes) {
+	/* jshint loopfunc: true */
 	(function (type) {
 		proto['get' + type] = function (byteOffset, littleEndian) {
 			return this._action(type, true, byteOffset, littleEndian);
@@ -713,6 +718,7 @@ for (var type in dataTypes) {
 			this._action(type, false, byteOffset, littleEndian, value);
 		};
 	})(type);
+	/* jshint loopfunc: false */
 }
 
 proto._setInt32 = proto._setUint32;
@@ -721,6 +727,7 @@ proto._setInt8 = proto._setUint8;
 proto.setSigned = proto.setUnsigned;
 
 for (var method in proto) {
+	/* jshint loopfunc: true */
 	if (method.slice(0, 3) === 'set') {
 		(function (type) {
 			proto['write' + type] = function () {
@@ -729,4 +736,5 @@ for (var method in proto) {
 			};
 		})(method.slice(3));
 	}
+	/* jshint loopfunc: false */
 }
