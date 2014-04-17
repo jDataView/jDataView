@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/jDataView/jDataView.png?branch=master)](https://travis-ci.org/jDataView/jDataView) <a href="http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html">jDataView</a> - A unique way to work with a binary file in JavaScript.
+[![Build Status](https://travis-ci.org/jDataView/jDataView.png?branch=master)](https://travis-ci.org/jDataView/jBinary) [![NPM version](https://badge.fury.io/js/jdataview.png)](https://npmjs.org/package/jdataview)
+<a href="http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html">jDataView</a> - A unique way to work with a binary file in JavaScript.
 ================================
 
 jDataView provides convenient way to read and/or modify binary data in all the browsers. It follows the [DataView Specification](http://www.khronos.org/registry/typedarray/specs/latest/#8) and even extends it for a more practical use.
@@ -55,20 +56,30 @@ library that works on top of **jDataView** and allows to operate with binary dat
 Demos
 =====
 
-* [HTTP Live Streaming realtime converter and player demo](http://rreverser.github.io/mpegts/) implemented using [jBinary](https://github.com/jDataView/jBinary) data structures.
+[HTTP Live Streaming realtime converter and player demo](http://rreverser.github.io/mpegts/) implemented using [jBinary](https://github.com/jDataView/jBinary) data structures.
 [![Screenshot](http://rreverser.github.io/mpegts/screenshot.png?)](http://rreverser.github.io/mpegts/)
 
-* A [World of Warcraft Model Viewer](http://jdataview.github.io/jsWoWModelViewer/). It uses [jDataView](https://github.com/jDataView/jDataView)+[jBinary](https://github.com/jDataView/jBinary) to read the binary file and then WebGL to display it.
+---
+
+A [World of Warcraft Model Viewer](http://jdataview.github.io/jsWoWModelViewer/). It uses [jDataView](https://github.com/jDataView/jDataView)+[jBinary](https://github.com/jDataView/jBinary) to read the binary file and then WebGL to display it.
 [![Screenshot](http://jdataview.github.io/jsWoWModelViewer/images/modelviewer.png)](http://jdataview.github.io/jsWoWModelViewer/)
 
-* A [PhotoSynth WebGL Viewer](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/) by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
+---
+
+A [PhotoSynth WebGL Viewer](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/) by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
 [![Screenshot](http://i.imgur.com/HRHXo.jpg)](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/)
 
-* A [simple tar viewer](http://jdataview.github.io/jDataView/untar/). It is a "Hello World" demo of how easy it is to use the library.
+---
 
-* JavaScript [TrueTypeFont library demo](http://ynakajima.github.io/ttf.js/demo/glyflist/) which uses jDataView to read and display glyphs from TrueType file.
+A [simple tar viewer](http://jdataview.github.io/jDataView/untar/). It is a "Hello World" demo of how easy it is to use the library.
 
-* [jBinary.Repo](https://jdataview.github.io/jBinary.Repo) ready-to-use typesets and corresponding demos of using
+---
+
+JavaScript [TrueTypeFont library demo](http://ynakajima.github.io/ttf.js/demo/glyflist/) which uses jDataView to read and display glyphs from TrueType file.
+
+--
+
+[jBinary.Repo](https://jdataview.github.io/jBinary.Repo) ready-to-use typesets and corresponding demos of using
 [jDataView](https://github.com/jDataView/jDataView)+[jBinary](https://github.com/jDataView/jBinary)
 for reading popular file formats like
 [GZIP archives](https://jdataview.github.io/jBinary.Repo/demo/#gzip),
@@ -78,10 +89,14 @@ for reading popular file formats like
 [MP3 tags](https://jdataview.github.io/jBinary.Repo/demo/#mp3)
 etc.
 
-* [Talking image](http://hacksparrow.github.io/talking-image/) - animation and audio in one package powered by
+---
+
+[Talking image](http://hacksparrow.github.io/talking-image/) - animation and audio in one package powered by
 HTML5 Audio, [jDataView](https://github.com/jDataView/jDataView) and [jBinary](https://github.com/jDataView/jBinary).
 
-Please tell us if you made something with jDataView :)
+---
+
+*Please tell us if you made something with jDataView :)*
 
 License
 =======
