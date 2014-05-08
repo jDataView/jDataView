@@ -1,44 +1,42 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>jDataView by jDataView</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/respond.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="stylesheets/ie.css">
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!-- Yandex.Metrika counter --><script type="text/javascript">(function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter23393200 = new Ya.Metrika({id:23393200, webvisor:true, clickmap:true, trackLinks:true, accurateTrackBounce:true, trackHash:true}); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks");</script><noscript><div><img src="//mc.yandex.ru/watch/23393200" style="position:absolute; left:-9999px;" alt="" /></div></noscript><!-- /Yandex.Metrika counter -->
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="jDataView : DataView. Extended. Anywhere." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>jDataView</title>
   </head>
+
   <body>
-      <div id="header">
-        <nav>
-          <li class="fork"><a href="https://github.com/jDataView/jDataView">View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/jDataView/jDataView/zipball/master">ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/jDataView/jDataView/tarball/master">TAR</a></li>
-          <li class="title">DOWNLOADS</li>
-        </nav>
-      </div><!-- end header -->
 
-    <div class="wrapper">
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/jDataView/jDataView">View on GitHub</a>
 
-      <section>
-        <div id="title">
-          <h1>jDataView</h1>
-          <p>DataView. Extended. Anywhere.</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/jDataView">jDataView</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
-        </div>
+          <h1 id="project_title">jDataView</h1>
+          <h2 id="project_tagline">DataView. Extended. Anywhere.</h2>
 
-        <p>jDataView provides convenient way to read and/or modify binary data in all the browsers. It follows the <a href="http://www.khronos.org/registry/webgl/doc/spec/TypedArray-spec.html#8">DataView Specification</a> and even extends it for a more practical use.</p>
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/jDataView/jDataView/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/jDataView/jDataView/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p><a href="https://travis-ci.org/jDataView/jBinary"><img src="https://travis-ci.org/jDataView/jDataView.png?branch=master" alt="Build Status"></a> <a href="https://npmjs.org/package/jdataview"><img src="https://badge.fury.io/js/jdataview.png" alt="NPM version"></a></p>
+
+<h1>
+<a name="jdataview---a-unique-way-to-work-with-a-binary-file-in-javascript" class="anchor" href="#jdataview---a-unique-way-to-work-with-a-binary-file-in-javascript"><span class="octicon octicon-link"></span></a><a href="http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html">jDataView</a> - A unique way to work with a binary file in JavaScript.</h1>
+
+<p>jDataView provides convenient way to read and/or modify binary data in all the browsers. It follows the <a href="http://www.khronos.org/registry/typedarray/specs/latest/#8">DataView Specification</a> and even extends it for a more practical use.</p>
 
 <h1>
 <a name="explanation" class="anchor" href="#explanation"><span class="octicon octicon-link"></span></a>Explanation</h1>
@@ -98,12 +96,22 @@ library that works on top of <strong>jDataView</strong> and allows to operate wi
 <h1>
 <a name="demos" class="anchor" href="#demos"><span class="octicon octicon-link"></span></a>Demos</h1>
 
-<ul>
-<li><p>A <a href="http://jdataview.github.io/jsWoWModelViewer/">World of Warcraft Model Viewer</a>. It uses <a href="https://github.com/jDataView/jDataView">jDataView</a>+<a href="https://github.com/jDataView/jBinary">jBinary</a> to read the binary file and then WebGL to display it.
-<a href="http://jdataview.github.io/jsWoWModelViewer/"><img src="http://jdataview.github.io/jsWoWModelViewer/images/modelviewer.png" alt="Screenshot"></a></p></li>
-<li><p>A <a href="http://jdataview.github.io/jDataView/untar/">simple tar viewer</a>. It is a "Hello World" demo of how easy it is to use the library.</p></li>
-<li><p>JavaScript <a href="http://ynakajima.github.io/ttf.js/demo/glyflist/">TrueTypeFont library demo</a> which uses jDataView to read and display glyphs from TrueType file.</p></li>
-<li><p><a href="https://jdataview.github.io/jBinary.Repo">jBinary.Repo</a> ready-to-use typesets and corresponding demos of using
+<p><a href="http://rreverser.github.io/mpegts/">HTTP Live Streaming realtime converter and player demo</a> implemented using <a href="https://github.com/jDataView/jBinary">jBinary</a> data structures.
+<a href="http://rreverser.github.io/mpegts/"><img src="http://rreverser.github.io/mpegts/screenshot.png?" alt="Screenshot"></a></p>
+
+<hr><p>A <a href="http://jdataview.github.io/jsWoWModelViewer/">World of Warcraft Model Viewer</a>. It uses <a href="https://github.com/jDataView/jDataView">jDataView</a>+<a href="https://github.com/jDataView/jBinary">jBinary</a> to read the binary file and then WebGL to display it.
+<a href="http://jdataview.github.io/jsWoWModelViewer/"><img src="http://jdataview.github.io/jsWoWModelViewer/images/modelviewer.png" alt="Screenshot"></a></p>
+
+<hr><p>A <a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/">PhotoSynth WebGL Viewer</a> by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
+<a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/"><img src="http://i.imgur.com/HRHXo.jpg" alt="Screenshot"></a></p>
+
+<hr><p>A <a href="http://jdataview.github.io/jDataView/untar/">simple tar viewer</a>. It is a "Hello World" demo of how easy it is to use the library.</p>
+
+<hr><p>JavaScript <a href="http://ynakajima.github.io/ttf.js/demo/glyflist/">TrueTypeFont library demo</a> which uses jDataView to read and display glyphs from TrueType file.</p>
+
+<h2></h2>
+
+<p><a href="https://jdataview.github.io/jBinary.Repo">jBinary.Repo</a> ready-to-use typesets and corresponding demos of using
 <a href="https://github.com/jDataView/jDataView">jDataView</a>+<a href="https://github.com/jDataView/jBinary">jBinary</a>
 for reading popular file formats like
 <a href="https://jdataview.github.io/jBinary.Repo/demo/#gzip">GZIP archives</a>,
@@ -111,21 +119,29 @@ for reading popular file formats like
 <a href="https://jdataview.github.io/jBinary.Repo/demo/#ico">ICO images</a>,
 <a href="https://jdataview.github.io/jBinary.Repo/demo/#bmp">BMP images</a>,
 <a href="https://jdataview.github.io/jBinary.Repo/demo/#mp3">MP3 tags</a>
-etc.</p></li>
-<li><p><a href="http://hacksparrow.github.io/talking-image/">Talking image</a> - animation and audio in one package powered by
-HTML5 Audio, <a href="https://github.com/jDataView/jDataView">jDataView</a> and <a href="https://github.com/jDataView/jBinary">jBinary</a>.</p></li>
-<li><p>A <a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/">PhotoSynth WebGL Viewer</a> by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
-<a href="http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/"><img src="http://i.imgur.com/HRHXo.jpg" alt="Screenshot"></a></p></li>
-</ul><p>Please tell us if you made something with jDataView :)</p>
+etc.</p>
+
+<hr><p><a href="http://hacksparrow.github.io/talking-image/">Talking image</a> - animation and audio in one package powered by
+HTML5 Audio, <a href="https://github.com/jDataView/jDataView">jDataView</a> and <a href="https://github.com/jDataView/jBinary">jBinary</a>.</p>
+
+<hr><p><em>Please tell us if you made something with jDataView :)</em></p>
 
 <h1>
 <a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h1>
 
 <p>jDataView is issued under <a href="http://sam.zoy.org/wtfpl/">Do What The Fuck You Want To Public License</a> :)</p>
       </section>
-
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">jDataView maintained by <a href="https://github.com/jDataView">jDataView</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
     
+
   </body>
 </html>
