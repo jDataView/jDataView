@@ -44,7 +44,7 @@
         DataView: "DataView" in global,
         ArrayBuffer: "ArrayBuffer" in global,
         PixelData: !1
-    };
+    }, TextEncoder = global.TextEncoder, TextDecoder = global.TextDecoder;
     compatibility.NodeBuffer && !function(buffer) {
         try {
             buffer.writeFloatLE(1/0, 0);
@@ -154,15 +154,20 @@
             if (this._isNodeBuffer) return byteOffset = defined(byteOffset, this._offset), byteLength = defined(byteLength, this.byteLength - byteOffset), 
             this._checkBounds(byteOffset, byteLength), this._offset = byteOffset + byteLength, 
             this.buffer.toString(encoding || "binary", this.byteOffset + byteOffset, this.byteOffset + this._offset);
-            var bytes = this._getBytes(byteLength, byteOffset, !0), string = "";
+            var bytes = this._getBytes(byteLength, byteOffset, !0);
+            if (encoding = "utf8" === encoding ? "utf-8" : encoding || "binary", TextDecoder && "binary" !== encoding) return new TextDecoder(encoding).decode(this._isArrayBuffer ? bytes : new Uint8Array(bytes));
+            var string = "";
             byteLength = bytes.length;
             for (var i = 0; byteLength > i; i++) string += String.fromCharCode(bytes[i]);
-            return "utf8" === encoding && (string = decodeURIComponent(escape(string))), string;
+            return "utf-8" === encoding && (string = decodeURIComponent(escape(string))), string;
         },
         setString: function(byteOffset, subString, encoding) {
-            return this._isNodeBuffer ? (byteOffset = defined(byteOffset, this._offset), this._checkBounds(byteOffset, subString.length), 
-            void (this._offset = byteOffset + this.buffer.write(subString, this.byteOffset + byteOffset, encoding || "binary"))) : ("utf8" === encoding && (subString = unescape(encodeURIComponent(subString))), 
-            void this._setBytes(byteOffset, getCharCodes(subString), !0));
+            if (this._isNodeBuffer) return byteOffset = defined(byteOffset, this._offset), this._checkBounds(byteOffset, subString.length), 
+            void (this._offset = byteOffset + this.buffer.write(subString, this.byteOffset + byteOffset, encoding || "binary"));
+            encoding = "utf8" === encoding ? "utf-8" : encoding || "binary";
+            var bytes;
+            TextEncoder && "binary" !== encoding ? bytes = new TextEncoder(encoding).encode(subString) : ("utf-8" === encoding && (subString = unescape(encodeURIComponent(subString))), 
+            bytes = getCharCodes(subString)), this._setBytes(byteOffset, bytes, !0);
         },
         getChar: function(byteOffset) {
             return this.getString(1, byteOffset);

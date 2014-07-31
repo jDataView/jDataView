@@ -26,6 +26,9 @@ var compatibility = {
 	PixelData: BROWSER && 'CanvasPixelArray' in global && 'ImageData' in global && 'document' in global
 };
 
+var TextEncoder = global.TextEncoder;
+var TextDecoder = global.TextDecoder;
+
 // we don't want to bother with old Buffer implementation
 if (NODE && compatibility.NodeBuffer) {
 	(function (buffer) {
@@ -386,12 +389,18 @@ var proto = jDataView.prototype = {
 			this._offset = byteOffset + byteLength;
 			return this.buffer.toString(encoding || 'binary', this.byteOffset + byteOffset, this.byteOffset + this._offset);
 		}
-		var bytes = this._getBytes(byteLength, byteOffset, true), string = '';
+		var bytes = this._getBytes(byteLength, byteOffset, true);
+		// backward-compatibility
+		encoding = encoding === 'utf8' ? 'utf-8' : (encoding || 'binary');
+		if (TextDecoder && encoding !== 'binary') {
+			return new TextDecoder(encoding).decode(this._isArrayBuffer ? bytes : new Uint8Array(bytes));
+		}
+		var string = '';
 		byteLength = bytes.length;
 		for (var i = 0; i < byteLength; i++) {
 			string += String.fromCharCode(bytes[i]);
 		}
-		if (encoding === 'utf8') {
+		if (encoding === 'utf-8') {
 			string = decodeURIComponent(escape(string));
 		}
 		return string;
@@ -404,10 +413,18 @@ var proto = jDataView.prototype = {
 			this._offset = byteOffset + this.buffer.write(subString, this.byteOffset + byteOffset, encoding || 'binary');
 			return;
 		}
-		if (encoding === 'utf8') {
-			subString = unescape(encodeURIComponent(subString));
+		// backward-compatibility
+		encoding = encoding === 'utf8' ? 'utf-8' : (encoding || 'binary');
+		var bytes;
+		if (TextEncoder && encoding !== 'binary') {
+			bytes = new TextEncoder(encoding).encode(subString);
+		} else {
+			if (encoding === 'utf-8') {
+				subString = unescape(encodeURIComponent(subString));
+			}
+			bytes = getCharCodes(subString);
 		}
-		this._setBytes(byteOffset, getCharCodes(subString), true);
+		this._setBytes(byteOffset, bytes, true);
 	},
 
 	getChar: function (byteOffset) {
