@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/jDataView/jDataView.png?branch=master)](https://travis-ci.org/jDataView/jDataView) [![NPM version](https://badge.fury.io/js/jdataview.png)](https://npmjs.org/package/jdataview)
 <a href="http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html">jDataView</a> - A unique way to work with a binary file in JavaScript.
 ================================
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/jDataView/jDataView?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 jDataView provides convenient way to read and/or modify binary data in all the browsers. It follows the [DataView Specification](http://www.khronos.org/registry/typedarray/specs/latest/#8) and even extends it for a more practical use.
 Explanation
 ===========
