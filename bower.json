@@ -1,7 +1,7 @@
 {
   "name": "jdataview",
   "description": "A unique way to work with a binary file in the browser and the server.",
-  "version": "2.4.7",
+  "version": "2.5.0",
   "keywords": [
     "buffer",
     "binary",
