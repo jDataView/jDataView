@@ -3,22 +3,24 @@
     module.exports = factory(global);
 }(function(global) {
     "use strict";
+    function is(obj, Ctor) {
+        return "object" != typeof obj || null === obj ? !1 : obj.constructor === Ctor || Object.prototype.toString.call(obj) === "[object " + Ctor.name + "]";
+    }
     function arrayFrom(arrayLike, forceCopy) {
-        return !forceCopy && arrayLike instanceof Array ? arrayLike : Array.prototype.slice.call(arrayLike);
+        return !forceCopy && is(arrayLike, Array) ? arrayLike : Array.prototype.slice.call(arrayLike);
     }
     function defined(value, defaultValue) {
         return void 0 !== value ? value : defaultValue;
     }
     function jDataView(buffer, byteOffset, byteLength, littleEndian) {
-        if (buffer instanceof jDataView) {
+        if (jDataView.is(buffer)) {
             var result = buffer.slice(byteOffset, byteOffset + byteLength);
             return result._littleEndian = defined(littleEndian, result._littleEndian), result;
         }
-        if (!(this instanceof jDataView)) return new jDataView(buffer, byteOffset, byteLength, littleEndian);
-        if (this.buffer = buffer = jDataView.wrapBuffer(buffer), this._isArrayBuffer = compatibility.ArrayBuffer && buffer instanceof ArrayBuffer, 
+        if (!jDataView.is(this)) return new jDataView(buffer, byteOffset, byteLength, littleEndian);
+        if (this.buffer = buffer = jDataView.wrapBuffer(buffer), this._isArrayBuffer = compatibility.ArrayBuffer && is(buffer, ArrayBuffer), 
         this._isPixelData = !1, this._isDataView = compatibility.DataView && this._isArrayBuffer, 
-        this._isNodeBuffer = !0 && compatibility.NodeBuffer && buffer instanceof Buffer, 
-        !(this._isNodeBuffer || this._isArrayBuffer || buffer instanceof Array)) throw new TypeError("jDataView buffer has an incompatible type");
+        this._isNodeBuffer = !0 && compatibility.NodeBuffer && is(buffer, Buffer), !this._isNodeBuffer && !this._isArrayBuffer && !is(buffer, Array)) throw new TypeError("jDataView buffer has an incompatible type");
         this._littleEndian = !!littleEndian;
         var bufferLength = "byteLength" in buffer ? buffer.byteLength : buffer.length;
         this.byteOffset = byteOffset = defined(byteOffset, 0), this.byteLength = byteLength = defined(byteLength, bufferLength - byteOffset), 
@@ -75,12 +77,14 @@
             buffer = getCharCodes(buffer);
 
           default:
-            return "length" in buffer && !(compatibility.NodeBuffer && buffer instanceof Buffer || compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) && (compatibility.NodeBuffer ? buffer = new Buffer(buffer) : compatibility.ArrayBuffer ? buffer instanceof ArrayBuffer || (buffer = new Uint8Array(buffer).buffer, 
-            buffer instanceof ArrayBuffer || (buffer = new Uint8Array(arrayFrom(buffer, !0)).buffer)) : buffer = arrayFrom(buffer)), 
+            return "length" in buffer && !(compatibility.NodeBuffer && is(buffer, Buffer) || compatibility.ArrayBuffer && is(buffer, ArrayBuffer)) && (compatibility.NodeBuffer ? buffer = new Buffer(buffer) : compatibility.ArrayBuffer ? is(buffer, ArrayBuffer) || (buffer = new Uint8Array(buffer).buffer, 
+            is(buffer, ArrayBuffer) || (buffer = new Uint8Array(arrayFrom(buffer, !0)).buffer)) : buffer = arrayFrom(buffer)), 
             buffer;
         }
-    }, jDataView.createBuffer = function() {
-        return jDataView.wrapBuffer(arguments);
+    }, jDataView.is = function(view) {
+        return view && view.jDataView;
+    }, jDataView.from = function() {
+        return new jDataView(arguments);
     }, jDataView.Uint64 = Uint64, Uint64.prototype = {
         valueOf: function() {
             return this.lo + pow2(32) * this.hi;
@@ -104,6 +108,7 @@
     };
     var proto = jDataView.prototype = {
         compatibility: compatibility,
+        jDataView: !0,
         _checkBounds: function(byteOffset, byteLength, maxLength) {
             if ("number" != typeof byteOffset) throw new TypeError("Offset is not a number.");
             if ("number" != typeof byteLength) throw new TypeError("Size is not a number.");
@@ -270,7 +275,7 @@
             this._setBinaryFloat(byteOffset, value, 52, 11, littleEndian);
         },
         _set64: function(Type, byteOffset, value, littleEndian) {
-            value instanceof Type || (value = Type.fromNumber(value)), littleEndian = defined(littleEndian, this._littleEndian), 
+            "object" != typeof value && (value = Type.fromNumber(value)), littleEndian = defined(littleEndian, this._littleEndian), 
             byteOffset = defined(byteOffset, this._offset);
             var parts = littleEndian ? {
                 lo: 0,

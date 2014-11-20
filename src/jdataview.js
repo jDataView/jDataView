@@ -3,7 +3,7 @@ var compatibility = {
 	NodeBuffer: NODE && 'Buffer' in global,
 	DataView: 'DataView' in global,
 	ArrayBuffer: 'ArrayBuffer' in global,
-	PixelData: BROWSER && 'CanvasPixelArray' in global && 'ImageData' in global && 'document' in global
+	PixelData: BROWSER && 'CanvasPixelArray' in global && !('Uint8ClampedArray' in global) && 'document' in global
 };
 
 var TextEncoder = global.TextEncoder;
@@ -21,8 +21,9 @@ if (NODE && compatibility.NodeBuffer) {
 }
 
 if (BROWSER && compatibility.PixelData) {
+	var context2d = document.createElement('canvas').getContext('2d');
 	var createPixelData = function (byteLength, buffer) {
-		var data = createPixelData.context2d.createImageData((byteLength + 3) / 4, 1).data;
+		var data = context2d.createImageData((byteLength + 3) / 4, 1).data;
 		data.byteLength = byteLength;
 		if (buffer !== undefined) {
 			for (var i = 0; i < byteLength; i++) {
@@ -31,7 +32,6 @@ if (BROWSER && compatibility.PixelData) {
 		}
 		return data;
 	};
-	createPixelData.context2d = document.createElement('canvas').getContext('2d');
 }
 
 var dataTypes = {
@@ -45,8 +45,15 @@ var dataTypes = {
 	'Float64': 8
 };
 
+function is(obj, Ctor) {
+	if (typeof obj !== 'object' || obj === null) {
+		return false;
+	}
+	return obj.constructor === Ctor || Object.prototype.toString.call(obj) === '[object ' + Ctor.name + ']';
+}
+
 function arrayFrom(arrayLike, forceCopy) {
-	return (!forceCopy && (arrayLike instanceof Array)) ? arrayLike : Array.prototype.slice.call(arrayLike);
+	return (!forceCopy && is(arrayLike, Array)) ? arrayLike : Array.prototype.slice.call(arrayLike);
 }
 
 function defined(value, defaultValue) {
@@ -56,26 +63,26 @@ function defined(value, defaultValue) {
 function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 	/* jshint validthis:true */
 
-	if (buffer instanceof jDataView) {
+	if (jDataView.is(buffer)) {
 		var result = buffer.slice(byteOffset, byteOffset + byteLength);
 		result._littleEndian = defined(littleEndian, result._littleEndian);
 		return result;
 	}
 
-	if (!(this instanceof jDataView)) {
+	if (!jDataView.is(this)) {
 		return new jDataView(buffer, byteOffset, byteLength, littleEndian);
 	}
 
 	this.buffer = buffer = jDataView.wrapBuffer(buffer);
 
 	// Check parameters and existing functionnalities
-	this._isArrayBuffer = compatibility.ArrayBuffer && buffer instanceof ArrayBuffer;
-	this._isPixelData = BROWSER && compatibility.PixelData && buffer instanceof CanvasPixelArray;
+	this._isArrayBuffer = compatibility.ArrayBuffer && is(buffer, ArrayBuffer);
+	this._isPixelData = BROWSER && compatibility.PixelData && is(buffer, CanvasPixelArray);
 	this._isDataView = compatibility.DataView && this._isArrayBuffer;
-	this._isNodeBuffer = NODE && compatibility.NodeBuffer && buffer instanceof Buffer;
+	this._isNodeBuffer = NODE && compatibility.NodeBuffer && is(buffer, Buffer);
 
 	// Handle Type Errors
-	if (!(NODE && this._isNodeBuffer) && !this._isArrayBuffer && !(BROWSER && this._isPixelData) && !(buffer instanceof Array)) {
+	if (!(NODE && this._isNodeBuffer) && !this._isArrayBuffer && !(BROWSER && this._isPixelData) && !is(buffer, Array)) {
 		throw new TypeError('jDataView buffer has an incompatible type');
 	}
 
@@ -145,15 +152,19 @@ jDataView.wrapBuffer = function (buffer) {
 			buffer = getCharCodes(buffer);
 			/* falls through */
 		default:
-			if ('length' in buffer && !((NODE && compatibility.NodeBuffer && buffer instanceof Buffer) || (compatibility.ArrayBuffer && buffer instanceof ArrayBuffer) || (BROWSER && compatibility.PixelData && buffer instanceof CanvasPixelArray))) {
+			if ('length' in buffer && !(
+				(NODE && compatibility.NodeBuffer && is(buffer, Buffer)) ||
+				(compatibility.ArrayBuffer && is(buffer, ArrayBuffer)) ||
+				(BROWSER && compatibility.PixelData && is(buffer, CanvasPixelArray))
+			)) {
 				if (NODE && compatibility.NodeBuffer) {
 					buffer = new Buffer(buffer);
 				} else
 				if (compatibility.ArrayBuffer) {
-					if (!(buffer instanceof ArrayBuffer)) {
+					if (!is(buffer, ArrayBuffer)) {
 						buffer = new Uint8Array(buffer).buffer;
 						// bug in Node.js <= 0.8:
-						if (!(buffer instanceof ArrayBuffer)) {
+						if (!is(buffer, ArrayBuffer)) {
 							buffer = new Uint8Array(arrayFrom(buffer, true)).buffer;
 						}
 					}
@@ -172,9 +183,12 @@ function pow2(n) {
 	return (n >= 0 && n < 31) ? (1 << n) : (pow2[n] || (pow2[n] = Math.pow(2, n)));
 }
 
-// left for backward compatibility
-jDataView.createBuffer = function () {
-	return jDataView.wrapBuffer(arguments);
+jDataView.is = function (view) {
+	return view && view.jDataView;
+};
+
+jDataView.from = function () {
+	return new jDataView(arguments);
 };
 
 function Uint64(lo, hi) {
@@ -232,6 +246,7 @@ Int64.fromNumber = function (number) {
 
 var proto = jDataView.prototype = {
 	compatibility: compatibility,
+	jDataView: true,
 
 	_checkBounds: function (byteOffset, byteLength, maxLength) {
 		// Do additional checks to simulate DataView
@@ -643,7 +658,7 @@ var proto = jDataView.prototype = {
 	},
 
 	_set64: function (Type, byteOffset, value, littleEndian) {
-		if (!(value instanceof Type)) {
+		if (typeof value !== 'object') {
 			value = Type.fromNumber(value);
 		}
 

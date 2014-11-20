@@ -5,7 +5,8 @@ if (hasNodeRequire) {
 	chai = require('chai');
 }
 
-var assert = chai.assert,
+var b = jDataView.from,
+	assert = chai.assert,
 	chr = String.fromCharCode,
 	// workaround for http://code.google.com/p/v8/issues/detail?id=2578
 	_isNaN = Number.isNaN || (function () { return this })().isNaN,
@@ -27,10 +28,6 @@ for (var engineName in compatibility) {
 	if (compatibility[engineName]) {
 		engines.push(engineName);
 	}
-}
-
-function b() {
-	return new jDataView(arguments);
 }
 
 function compareInt64(value, expected, message) {
