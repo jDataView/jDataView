@@ -20,7 +20,8 @@
         if (!jDataView.is(this)) return new jDataView(buffer, byteOffset, byteLength, littleEndian);
         if (this.buffer = buffer = jDataView.wrapBuffer(buffer), this._isArrayBuffer = compatibility.ArrayBuffer && is(buffer, ArrayBuffer), 
         this._isPixelData = !1, this._isDataView = compatibility.DataView && this._isArrayBuffer, 
-        this._isNodeBuffer = !0 && compatibility.NodeBuffer && is(buffer, Buffer), !this._isNodeBuffer && !this._isArrayBuffer && !is(buffer, Array)) throw new TypeError("jDataView buffer has an incompatible type");
+        this._isNodeBuffer = !0 && compatibility.NodeBuffer && Buffer.isBuffer(buffer), 
+        !this._isNodeBuffer && !this._isArrayBuffer && !is(buffer, Array)) throw new TypeError("jDataView buffer has an incompatible type");
         this._littleEndian = !!littleEndian;
         var bufferLength = "byteLength" in buffer ? buffer.byteLength : buffer.length;
         this.byteOffset = byteOffset = defined(byteOffset, 0), this.byteLength = byteLength = defined(byteLength, bufferLength - byteOffset), 
@@ -77,7 +78,7 @@
             buffer = getCharCodes(buffer);
 
           default:
-            return "length" in buffer && !(compatibility.NodeBuffer && is(buffer, Buffer) || compatibility.ArrayBuffer && is(buffer, ArrayBuffer)) && (compatibility.NodeBuffer ? buffer = new Buffer(buffer) : compatibility.ArrayBuffer ? is(buffer, ArrayBuffer) || (buffer = new Uint8Array(buffer).buffer, 
+            return "length" in buffer && !(compatibility.NodeBuffer && Buffer.isBuffer(buffer) || compatibility.ArrayBuffer && is(buffer, ArrayBuffer)) && (compatibility.NodeBuffer ? buffer = new Buffer(buffer) : compatibility.ArrayBuffer ? is(buffer, ArrayBuffer) || (buffer = new Uint8Array(buffer).buffer, 
             is(buffer, ArrayBuffer) || (buffer = new Uint8Array(arrayFrom(buffer, !0)).buffer)) : buffer = arrayFrom(buffer)), 
             buffer;
         }

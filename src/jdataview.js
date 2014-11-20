@@ -79,7 +79,7 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 	this._isArrayBuffer = compatibility.ArrayBuffer && is(buffer, ArrayBuffer);
 	this._isPixelData = BROWSER && compatibility.PixelData && is(buffer, CanvasPixelArray);
 	this._isDataView = compatibility.DataView && this._isArrayBuffer;
-	this._isNodeBuffer = NODE && compatibility.NodeBuffer && is(buffer, Buffer);
+	this._isNodeBuffer = NODE && compatibility.NodeBuffer && Buffer.isBuffer(buffer);
 
 	// Handle Type Errors
 	if (!(NODE && this._isNodeBuffer) && !this._isArrayBuffer && !(BROWSER && this._isPixelData) && !is(buffer, Array)) {
@@ -153,7 +153,7 @@ jDataView.wrapBuffer = function (buffer) {
 			/* falls through */
 		default:
 			if ('length' in buffer && !(
-				(NODE && compatibility.NodeBuffer && is(buffer, Buffer)) ||
+				(NODE && compatibility.NodeBuffer && Buffer.isBuffer(buffer)) ||
 				(compatibility.ArrayBuffer && is(buffer, ArrayBuffer)) ||
 				(BROWSER && compatibility.PixelData && is(buffer, CanvasPixelArray))
 			)) {
