@@ -198,14 +198,8 @@ function Uint64(lo, hi) {
 
 jDataView.Uint64 = Uint64;
 
-Uint64.prototype = {
-	valueOf: function () {
-		return this.lo + pow2(32) * this.hi;
-	},
-
-	toString: function () {
-		return Number.prototype.toString.apply(this.valueOf(), arguments);
-	}
+Uint64.prototype.valueOf = function () {
+	return this.lo + pow2(32) * this.hi;
 };
 
 Uint64.fromNumber = function (number) {
@@ -243,6 +237,73 @@ Int64.fromNumber = function (number) {
 	}
 	return new Int64(lo, hi);
 };
+
+// Helper functions for Uint64.prototype.toString
+
+// e.g. 1234 -> [4, 3, 2, 1]
+function numToDigits(num) {
+	var digits = num.toString().split('');
+	for (var i = 0; i < digits.length; i++) {
+		digits[i] = +digits[i];
+	}
+	digits.reverse();
+	return digits;
+}
+
+// Adds two digit arrays, returning the result.
+function add(x, y) {
+	var z = [];
+	var n = Math.max(x.length, y.length);
+	var carry = 0;
+	var i = 0;
+	while (i < n || carry) {
+		var xi = i < x.length ? x[i] : 0;
+		var yi = i < y.length ? y[i] : 0;
+		var zi = carry + xi + yi;
+		z.push(zi % 10);
+		carry = Math.floor(zi / 10);
+		i++;
+	}
+	return z;
+}
+
+// Precise versions of toString() for Int64/Uint64
+
+Uint64.prototype.toString = function() {
+	// Faster toString() for numbers which can be represented precisely as floats.
+	if (this.hi < pow2(19)) {
+		return Number.prototype.toString.apply(this.valueOf(), arguments);
+	}
+
+	// This converts the numbers to base 10 digit arrays for arbitrary precision toString().
+	// See http://www.danvk.org/hex2dec.html
+
+
+	// Compute result = 2^32 * hi + lo
+	var hiArray = numToDigits(this.hi);
+	var loArray = numToDigits(this.lo);
+	for (var i = 0; i < 32; i++) {
+		hiArray = add(hiArray, hiArray, 10);
+	}
+	var result = add(hiArray, loArray, 10);
+
+	var str = '';
+	for (i = result.length - 1; i >= 0; i--) {
+		str += result[i];
+	}
+	return str;
+};
+
+Int64.prototype.toString = function() {
+	if (this.hi < pow2(31)) {
+		return Uint64.prototype.toString.apply(this, arguments);
+	}
+	if (this.hi > pow2(32) - 1 - pow2(19)) {
+		return Number.prototype.toString.apply(this.valueOf(), arguments);
+	}
+	return '-' + new Uint64((pow2(32) - this.lo), (pow2(32) - 1 - this.hi)).toString();
+};
+
 
 var proto = jDataView.prototype = {
 	compatibility: compatibility,

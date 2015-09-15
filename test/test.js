@@ -486,6 +486,36 @@ engines.forEach(function (engineName) {
 			checkAlignBy(3, 6);
 		});
 
+		test('Uint64 should have precise toString', function() {
+			assert.equal(jDataView.Uint64.fromNumber(123456).toString(), '123456');
+			// this is larger than 2^32
+			assert.equal(jDataView.Uint64.fromNumber(12345678901).toString(), '12345678901');
+			// Number.MAX_SAFE_INTEGER
+			assert.equal(jDataView.Uint64.fromNumber(9007199254740992).toString(), '9007199254740992');
+			// this is larger than 2^53
+			assert.equal(new jDataView.Uint64(12345678, 12345678).toString(), '53024283269292366');
+			// 2^64 - 1
+			assert.equal(new jDataView.Uint64(Math.pow(2, 32) - 1, Math.pow(2, 32) - 1).toString(), '18446744073709551615');
+		});
+
+		test('Int64 should have precise toString', function() {
+			assert.equal(jDataView.Int64.fromNumber(-12345).toString(), '-12345');
+			// -Number.MAX_SAFE_INTEGER
+			assert.equal(jDataView.Int64.fromNumber(-9007199254740992).toString(), '-9007199254740992');
+
+			// Expected values come from Python's bignums:
+			// def toString(lo, hi):
+			//     return '-' + str(2 ** 32 - lo + 2**32*(2**32 - 1 - hi))
+
+			var pow = function(x) { return Math.pow(2, x); };
+			var toStr = function(lo, hi) { return new jDataView.Int64(lo, hi).toString(); };
+			assert.equal(toStr(0, pow(32) - 1 - pow(19)), '-2251804108652544');
+			assert.equal(toStr(0, pow(32) - pow(19)), '-2251799813685248');
+
+			// -2^63
+			assert.equal(toStr(0, pow(31)), '-9223372036854775808');
+		});
+
 		if (engineName === 'ArrayBuffer') {
 			test('can be used in jDataView from Uint8Array::subarray', function () {
 				var bytes = [1, 2, 3],
