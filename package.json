@@ -19,15 +19,19 @@
     "RReverser <me@rreverser.com> (http://rreverser.com)"
   ],
   "files": [
-    "dist/node/jdataview.js"
+    "dist/node/jdataview.js",
+    "dist/node/jdataview.js.map",
+    "dist/browser/jdataview.js",
+    "dist/browser/jdataview.js.map"
   ],
   "main": "dist/node/jdataview.js",
+  "browser": "dist/browser/jdataview.js",
   "scripts": {
     "precommit": "lint-staged",
     "test": "grunt"
   },
   "lint-staged": {
-    "+(src|test|grunt)/**/*.js": [
+    "*.js": [
       "eslint --fix",
       "prettier --write --single-quote --use-tabs",
       "git add"

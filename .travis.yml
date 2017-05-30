@@ -27,21 +27,7 @@ after_success:
           export $(cat .to_export_back)
           if [ "$BUILD_LEADER" = "YES" ]; then
             if [ "$BUILD_AGGREGATE_STATUS" = "others_succeeded" ]; then
-              git config --global user.name "Travis-CI"
-              git config --global user.email $EMAIL
-              echo "Cloning dist..."
-              git clone https://$GH_TOKEN@github.com/jDataView/dist.git ~/dist &>-
-              echo "Copying generated files into dist..."
-              cp dist/browser/{*.js,*.js.map} ~/dist/
-              echo "Committing..."
-              pushd ~/dist > /dev/null
-              git add .
-              git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
-              echo "Publishing..."
-              git push origin gh-pages &>-
-              popd
-              echo "Published browser dist."
-              grunt npm_publish
+              node_modules/.bin/grunt npm_publish
             else
               echo "Some of builds were failed."
             fi
