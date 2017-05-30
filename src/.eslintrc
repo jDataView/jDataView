@@ -8,7 +8,6 @@
     "sourceType": "module"
   },
   "globals": {
-    "CanvasPixelArray": false,
     "BROWSER": false,
     "NODE": false
   },

@@ -4,11 +4,7 @@ var compatibility = {
 	// NodeJS Buffer in v0.5.5 and newer
 	NodeBuffer: NODE && 'Buffer' in ctx,
 	DataView: 'DataView' in ctx,
-	ArrayBuffer: 'ArrayBuffer' in ctx,
-	PixelData: BROWSER &&
-		'CanvasPixelArray' in ctx &&
-		!('Uint8ClampedArray' in ctx) &&
-		'document' in ctx
+	ArrayBuffer: 'ArrayBuffer' in ctx
 };
 
 var TextEncoder = ctx.TextEncoder;
@@ -23,20 +19,6 @@ if (NODE && compatibility.NodeBuffer) {
 			compatibility.NodeBuffer = false;
 		}
 	})(new Buffer(4));
-}
-
-if (BROWSER && compatibility.PixelData) {
-	var context2d = document.createElement('canvas').getContext('2d');
-	var createPixelData = function(byteLength, buffer) {
-		var data = context2d.createImageData((byteLength + 3) / 4, 1).data;
-		data.byteLength = byteLength;
-		if (buffer !== undefined) {
-			for (var i = 0; i < byteLength; i++) {
-				data[i] = buffer[i];
-			}
-		}
-		return data;
-	};
 }
 
 var dataTypes = {
@@ -90,8 +72,6 @@ export default function jDataView(
 
 	// Check parameters and existing functionnalities
 	this._isArrayBuffer = compatibility.ArrayBuffer && is(buffer, ArrayBuffer);
-	this._isPixelData =
-		BROWSER && compatibility.PixelData && is(buffer, CanvasPixelArray);
 	this._isDataView = compatibility.DataView && this._isArrayBuffer;
 	this._isNodeBuffer =
 		NODE && compatibility.NodeBuffer && Buffer.isBuffer(buffer);
@@ -100,7 +80,6 @@ export default function jDataView(
 	if (
 		!(NODE && this._isNodeBuffer) &&
 		!this._isArrayBuffer &&
-		!(BROWSER && this._isPixelData) &&
 		!is(buffer, Array)
 	) {
 		throw new TypeError('jDataView buffer has an incompatible type');
@@ -153,8 +132,6 @@ jDataView.wrapBuffer = function(buffer) {
 				buffer.fill(0);
 			} else if (compatibility.ArrayBuffer) {
 				buffer = new Uint8Array(buffer).buffer;
-			} else if (BROWSER && compatibility.PixelData) {
-				buffer = createPixelData(buffer);
 			} else {
 				buffer = new Array(buffer);
 				for (var i = 0; i < buffer.length; i++) {
@@ -170,8 +147,7 @@ jDataView.wrapBuffer = function(buffer) {
 			if (
 				'length' in buffer &&
 				!((NODE && compatibility.NodeBuffer && Buffer.isBuffer(buffer)) ||
-					(compatibility.ArrayBuffer && is(buffer, ArrayBuffer)) ||
-					(BROWSER && compatibility.PixelData && is(buffer, CanvasPixelArray)))
+					(compatibility.ArrayBuffer && is(buffer, ArrayBuffer)))
 			) {
 				if (NODE && compatibility.NodeBuffer) {
 					buffer = new Buffer(buffer);
@@ -183,8 +159,6 @@ jDataView.wrapBuffer = function(buffer) {
 							buffer = new Uint8Array(arrayFrom(buffer, true)).buffer;
 						}
 					}
-				} else if (BROWSER && compatibility.PixelData) {
-					buffer = createPixelData(buffer.length, buffer);
 				} else {
 					buffer = arrayFrom(buffer);
 				}
