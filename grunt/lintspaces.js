@@ -3,7 +3,7 @@ module.exports = {
 		editorconfig: '.editorconfig'
 	},
 	all: {
-		src: ['+(src|test|grunt|umd)/**', '*'],
+		src: ['+(src|test|grunt)/**', '*'],
 		dot: true
 	}
 };

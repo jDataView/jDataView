@@ -12,7 +12,7 @@
   "camelcase": true,
   "curly": true,
   "eqeqeq": true,
-  "es3": true,
+  "esversion": 6,
   "expr": true,
   "immed": true,
   "indent": 4,

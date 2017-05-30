@@ -3,8 +3,6 @@ build_common:
   - 'lintspaces'
   - 'jshint:grunt'
   - 'jshint:before_concat'
-  - 'concat_sourcemap'
-  - 'jshint:after_concat'
 
 default:
   - 'build'

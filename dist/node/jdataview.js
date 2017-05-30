@@ -1,7 +1,6 @@
-!function(factory) {
-    var global = this;
-    module.exports = factory(global);
-}(function(global) {
+!function(global, factory) {
+    "object" == typeof exports && "undefined" != typeof module ? module.exports = factory() : "function" == typeof define && define.amd ? define(factory) : global.jDataView = factory();
+}(this, function() {
     "use strict";
     function is(obj, Ctor) {
         return "object" == typeof obj && null !== obj && (obj.constructor === Ctor || Object.prototype.toString.call(obj) === "[object " + Ctor.name + "]");
@@ -20,7 +19,7 @@
         if (!jDataView.is(this)) return new jDataView(buffer, byteOffset, byteLength, littleEndian);
         if (this.buffer = buffer = jDataView.wrapBuffer(buffer), this._isArrayBuffer = compatibility.ArrayBuffer && is(buffer, ArrayBuffer), 
         this._isPixelData = !1, this._isDataView = compatibility.DataView && this._isArrayBuffer, 
-        this._isNodeBuffer = compatibility.NodeBuffer && Buffer.isBuffer(buffer), !this._isNodeBuffer && !this._isArrayBuffer && !is(buffer, Array)) throw new TypeError("jDataView buffer has an incompatible type");
+        !(this._isNodeBuffer = compatibility.NodeBuffer && Buffer.isBuffer(buffer)) && !this._isArrayBuffer && !is(buffer, Array)) throw new TypeError("jDataView buffer has an incompatible type");
         this._littleEndian = !!littleEndian;
         var bufferLength = "byteLength" in buffer ? buffer.byteLength : buffer.length;
         this.byteOffset = byteOffset = defined(byteOffset, 0), this.byteLength = byteLength = defined(byteLength, bufferLength - byteOffset), 
@@ -52,12 +51,12 @@
         }
         return z;
     }
-    var compatibility = {
-        NodeBuffer: "Buffer" in global,
-        DataView: "DataView" in global,
-        ArrayBuffer: "ArrayBuffer" in global,
+    var ctx = global, compatibility = {
+        NodeBuffer: "Buffer" in ctx,
+        DataView: "DataView" in ctx,
+        ArrayBuffer: "ArrayBuffer" in ctx,
         PixelData: !1
-    }, TextEncoder = global.TextEncoder, TextDecoder = global.TextDecoder;
+    }, TextEncoder = ctx.TextEncoder, TextDecoder = ctx.TextDecoder;
     compatibility.NodeBuffer && function(buffer) {
         try {
             buffer.writeFloatLE(1 / 0, 0);
@@ -100,8 +99,7 @@
     }, Uint64.fromNumber = function(number) {
         var hi = Math.floor(number / pow2(32));
         return new Uint64(number - hi * pow2(32), hi);
-    }, jDataView.Int64 = Int64, Int64.prototype = "create" in Object ? Object.create(Uint64.prototype) : new Uint64(), 
-    Int64.prototype.valueOf = function() {
+    }, jDataView.Int64 = Int64, (Int64.prototype = "create" in Object ? Object.create(Uint64.prototype) : new Uint64()).valueOf = function() {
         return this.hi < pow2(31) ? Uint64.prototype.valueOf.apply(this, arguments) : -(pow2(32) - this.lo + pow2(32) * (pow2(32) - 1 - this.hi));
     }, Int64.fromNumber = function(number) {
         var lo, hi;
@@ -135,7 +133,7 @@
             return this._offset = byteOffset + dataTypes[type], isReadAction ? this._view["get" + type](byteOffset, littleEndian) : this._view["set" + type](byteOffset, value, littleEndian);
         },
         _arrayBufferAction: function(type, isReadAction, byteOffset, littleEndian, value) {
-            var typedArray, size = dataTypes[type], TypedArray = global[type + "Array"];
+            var typedArray, size = dataTypes[type], TypedArray = ctx[type + "Array"];
             if (littleEndian = defined(littleEndian, this._littleEndian), 1 === size || (this.byteOffset + byteOffset) % size == 0 && littleEndian) return typedArray = new TypedArray(this.buffer, this.byteOffset + byteOffset, 1), 
             this._offset = byteOffset + size, isReadAction ? typedArray[0] : typedArray[0] = value;
             var bytes = new Uint8Array(isReadAction ? this.getBytes(size, byteOffset, littleEndian, !0) : size);
@@ -351,3 +349,5 @@
     }(method.slice(3));
     return jDataView;
 });
+
+//# sourceMappingURL=jdataview.js.map

@@ -18,13 +18,6 @@ module.exports = function (grunt) {
 				'-W020': true // ...and ignore writing to read-only "global" vars
 			},
 			src: ['+(src|test)/**/*.js', '*.js']
-		},
-		after_concat: {
-			options: {
-				indent: false, // ignore broken indentation
-				'-W034': true // ignore duplicate "use strict" since it would be compressed
-			},
-			src: 'dist/<%= pkgName %>.js'
 		}
 	};
 };

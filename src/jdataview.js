@@ -1,13 +1,15 @@
+var ctx = BROWSER ? self : global;
+
 var compatibility = {
 	// NodeJS Buffer in v0.5.5 and newer
-	NodeBuffer: NODE && 'Buffer' in global,
-	DataView: 'DataView' in global,
-	ArrayBuffer: 'ArrayBuffer' in global,
-	PixelData: BROWSER && 'CanvasPixelArray' in global && !('Uint8ClampedArray' in global) && 'document' in global
+	NodeBuffer: NODE && 'Buffer' in ctx,
+	DataView: 'DataView' in ctx,
+	ArrayBuffer: 'ArrayBuffer' in ctx,
+	PixelData: BROWSER && 'CanvasPixelArray' in ctx && !('Uint8ClampedArray' in ctx) && 'document' in ctx
 };
 
-var TextEncoder = global.TextEncoder;
-var TextDecoder = global.TextDecoder;
+var TextEncoder = ctx.TextEncoder;
+var TextDecoder = ctx.TextDecoder;
 
 // we don't want to bother with old Buffer implementation
 if (NODE && compatibility.NodeBuffer) {
@@ -60,7 +62,7 @@ function defined(value, defaultValue) {
 	return value !== undefined ? value : defaultValue;
 }
 
-function jDataView(buffer, byteOffset, byteLength, littleEndian) {
+export default function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 	/* jshint validthis:true */
 
 	if (jDataView.is(buffer)) {
@@ -342,7 +344,7 @@ var proto = jDataView.prototype = {
 	},
 
 	_arrayBufferAction: function (type, isReadAction, byteOffset, littleEndian, value) {
-		var size = dataTypes[type], TypedArray = global[type + 'Array'], typedArray;
+		var size = dataTypes[type], TypedArray = ctx[type + 'Array'], typedArray;
 
 		littleEndian = defined(littleEndian, this._littleEndian);
 
