@@ -1,2 +1,2 @@
 /* eslint-env browser */
-window.mocha.setup({ui: 'tdd'});
+window.mocha.setup({ ui: 'tdd' });

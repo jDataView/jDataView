@@ -16,20 +16,18 @@ function uglifyOpts(isBrowser) {
 	});
 }
 
-module.exports = function () {
+module.exports = function() {
 	return {
 		options: {
 			format: 'umd',
 			legacy: true,
 			moduleName: 'jDataView',
-			sourceMap: true,
+			sourceMap: true
 			// sourceRoot: process.env.CI ? 'https://raw.github.com/' + process.env.TRAVIS_REPO_SLUG + '/' + process.env.TRAVIS_COMMIT : '../..'
 		},
 		browser: {
 			options: {
-				plugins: [
-					uglifyOpts(true)
-				]
+				plugins: [uglifyOpts(true)]
 			},
 			files: {
 				'dist/browser/<%= pkgName %>.js': 'src/<%= pkgName %>.js'
@@ -37,9 +35,7 @@ module.exports = function () {
 		},
 		node: {
 			options: {
-				plugins: [
-					uglifyOpts(false)
-				]
+				plugins: [uglifyOpts(false)]
 			},
 			files: {
 				'dist/node/<%= pkgName %>.js': 'src/<%= pkgName %>.js'

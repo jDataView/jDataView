@@ -1,4 +1,4 @@
-module.exports = function (config) {
+module.exports = function(config) {
 	var CI = process.env.CI;
 
 	var browsers = ['PhantomJS'];

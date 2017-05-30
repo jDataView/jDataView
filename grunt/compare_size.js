@@ -4,7 +4,7 @@ module.exports = {
 	options: {
 		cache: 'dist/.sizecache.json',
 		compress: {
-			gz: function (content) {
+			gz: function(content) {
 				return gzip.zip(content, {}).length;
 			}
 		}
