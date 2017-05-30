@@ -54,10 +54,5 @@
     "grunt-lintspaces": "^0.6.0",
     "grunt-contrib-clean": "^0.6.0"
   },
-  "licenses": [
-    {
-      "type": "WTFPL",
-      "url": "http://sam.zoy.org/wtfpl/"
-    }
-  ]
+  "license": "WTFPL"
 }
