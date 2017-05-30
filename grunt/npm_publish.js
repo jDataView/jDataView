@@ -2,7 +2,7 @@ module.exports = function (grunt) {
 	grunt.registerTask('npm_publish', function () {
 		var npm = require('npm'), done = this.async(), options = this.options();
 
-		npm.load({}, function(err) {
+		npm.load({}, function() {
 			npm.registry.adduser(options.username, options.password, options.email, function (err) {
 				if (err) {
 					console.log(err);

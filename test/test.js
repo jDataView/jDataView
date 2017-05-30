@@ -1,3 +1,6 @@
+/* eslint-env mocha */
+/* global jDataView: true, chai: true */
+
 var hasNodeRequire = typeof require === 'function' && typeof window === 'undefined';
 
 if (hasNodeRequire) {

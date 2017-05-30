@@ -38,7 +38,7 @@
         this.lo = lo, this.hi = hi;
     }
     function Int64(lo, hi) {
-        Uint64.apply(this, arguments);
+        Uint64.call(this, lo, hi);
     }
     function numToDigits(num) {
         for (var digits = num.toString().split(""), i = 0; i < digits.length; i++) digits[i] = +digits[i];

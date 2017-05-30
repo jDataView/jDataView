@@ -63,8 +63,6 @@ function defined(value, defaultValue) {
 }
 
 export default function jDataView(buffer, byteOffset, byteLength, littleEndian) {
-	/* jshint validthis:true */
-
 	if (jDataView.is(buffer)) {
 		var result = buffer.slice(byteOffset, byteOffset + byteLength);
 		result._littleEndian = defined(littleEndian, result._littleEndian);
@@ -212,7 +210,7 @@ Uint64.fromNumber = function (number) {
 };
 
 function Int64(lo, hi) {
-	Uint64.apply(this, arguments);
+	Uint64.call(this, lo, hi);
 }
 
 jDataView.Int64 = Int64;
@@ -499,7 +497,6 @@ var proto = jDataView.prototype = {
 
 	seek: function (byteOffset) {
 		this._checkBounds(byteOffset, 0);
-		/* jshint boss: true */
 		return this._offset = byteOffset;
 	},
 
@@ -637,8 +634,7 @@ var proto = jDataView.prototype = {
 			b = this._getBytes(end - start, start, true),
 			wideValue = 0;
 
-		/* jshint boss: true */
-		if (this._bitOffset = endBit & 7) {
+		if ((this._bitOffset = endBit & 7)) {
 			this._bitOffset -= 8;
 		}
 
@@ -804,7 +800,6 @@ if (NODE) {
 }
 
 for (var type in dataTypes) {
-	/* jshint loopfunc: true */
 	(function (type) {
 		proto['get' + type] = function (byteOffset, littleEndian) {
 			return this._action(type, true, byteOffset, littleEndian);
@@ -813,7 +808,6 @@ for (var type in dataTypes) {
 			this._action(type, false, byteOffset, littleEndian, value);
 		};
 	})(type);
-	/* jshint loopfunc: false */
 }
 
 proto._setInt32 = proto._setUint32;
@@ -822,7 +816,6 @@ proto._setInt8 = proto._setUint8;
 proto.setSigned = proto.setUnsigned;
 
 for (var method in proto) {
-	/* jshint loopfunc: true */
 	if (method.slice(0, 3) === 'set') {
 		(function (type) {
 			proto['write' + type] = function () {
@@ -831,5 +824,4 @@ for (var method in proto) {
 			};
 		})(method.slice(3));
 	}
-	/* jshint loopfunc: false */
 }

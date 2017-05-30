@@ -16,7 +16,7 @@ function uglifyOpts(isBrowser) {
 	});
 }
 
-module.exports = function (grunt) {
+module.exports = function () {
 	return {
 		options: {
 			format: 'umd',

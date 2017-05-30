@@ -1,8 +1,7 @@
 build_common:
   - 'clean'
   - 'lintspaces'
-  - 'jshint:grunt'
-  - 'jshint:before_concat'
+  - 'eslint'
 
 default:
   - 'build'
