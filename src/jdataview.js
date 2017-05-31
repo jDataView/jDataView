@@ -1,25 +1,12 @@
 var ctx = BROWSER ? self : global;
 
 var compatibility = {
-	// NodeJS Buffer in v0.5.5 and newer
-	NodeBuffer: NODE && 'Buffer' in ctx,
 	DataView: 'DataView' in ctx,
 	ArrayBuffer: 'ArrayBuffer' in ctx
 };
 
 var TextEncoder = ctx.TextEncoder;
 var TextDecoder = ctx.TextDecoder;
-
-// we don't want to bother with old Buffer implementation
-if (NODE && compatibility.NodeBuffer) {
-	(function(buffer) {
-		try {
-			buffer.writeFloatLE(Infinity, 0);
-		} catch (e) {
-			compatibility.NodeBuffer = false;
-		}
-	})(new Buffer(4));
-}
 
 var dataTypes = {
 	Int8: 1,
@@ -73,8 +60,7 @@ export default function jDataView(
 	// Check parameters and existing functionnalities
 	this._isArrayBuffer = compatibility.ArrayBuffer && is(buffer, ArrayBuffer);
 	this._isDataView = compatibility.DataView && this._isArrayBuffer;
-	this._isNodeBuffer =
-		NODE && compatibility.NodeBuffer && Buffer.isBuffer(buffer);
+	this._isNodeBuffer = NODE && Buffer.isBuffer(buffer);
 
 	// Handle Type Errors
 	if (
@@ -110,7 +96,7 @@ export default function jDataView(
 }
 
 function getCharCodes(string) {
-	if (NODE && compatibility.NodeBuffer) {
+	if (NODE) {
 		return new Buffer(string, 'binary');
 	}
 
@@ -127,7 +113,7 @@ function getCharCodes(string) {
 jDataView.wrapBuffer = function(buffer) {
 	switch (typeof buffer) {
 		case 'number':
-			if (NODE && compatibility.NodeBuffer) {
+			if (NODE) {
 				buffer = new Buffer(buffer);
 				buffer.fill(0);
 			} else if (compatibility.ArrayBuffer) {
@@ -138,33 +124,25 @@ jDataView.wrapBuffer = function(buffer) {
 					buffer[i] = 0;
 				}
 			}
-			return buffer;
+			break;
 
 		case 'string':
 			buffer = getCharCodes(buffer);
 		/* falls through */
 		default:
-			if (
-				'length' in buffer &&
-				!((NODE && compatibility.NodeBuffer && Buffer.isBuffer(buffer)) ||
-					(compatibility.ArrayBuffer && is(buffer, ArrayBuffer)))
-			) {
-				if (NODE && compatibility.NodeBuffer) {
+			if (NODE) {
+				if (!Buffer.isBuffer(buffer)) {
 					buffer = new Buffer(buffer);
-				} else if (compatibility.ArrayBuffer) {
-					if (!is(buffer, ArrayBuffer)) {
-						buffer = new Uint8Array(buffer).buffer;
-						// bug in Node.js <= 0.8:
-						if (!is(buffer, ArrayBuffer)) {
-							buffer = new Uint8Array(arrayFrom(buffer, true)).buffer;
-						}
-					}
-				} else {
-					buffer = arrayFrom(buffer);
 				}
+			} else if (compatibility.ArrayBuffer) {
+				if (!is(buffer, ArrayBuffer)) {
+					buffer = new Uint8Array(buffer).buffer;
+				}
+			} else {
+				buffer = arrayFrom(buffer);
 			}
-			return buffer;
 	}
+	return buffer;
 };
 
 function pow2(n) {
