@@ -532,3 +532,11 @@ engines.forEach(function (engineName) {
 		});
 	});
 });
+
+test('replacing global.DataView', function () {
+	var orig = global.DataView;
+	global.DataView = jDataView;
+	new DataView(new ArrayBuffer(3));
+	global.DataView = orig;
+});
+

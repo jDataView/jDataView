@@ -78,7 +78,7 @@ function jDataView(buffer, byteOffset, byteLength, littleEndian) {
 	// Check parameters and existing functionnalities
 	this._isArrayBuffer = compatibility.ArrayBuffer && is(buffer, ArrayBuffer);
 	this._isPixelData = BROWSER && compatibility.PixelData && is(buffer, CanvasPixelArray);
-	this._isDataView = compatibility.DataView && this._isArrayBuffer;
+	this._isDataView = compatibility.DataView && this._isArrayBuffer && global.DataView !== jDataView;
 	this._isNodeBuffer = NODE && compatibility.NodeBuffer && Buffer.isBuffer(buffer);
 
 	// Handle Type Errors
