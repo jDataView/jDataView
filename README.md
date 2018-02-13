@@ -99,8 +99,3 @@ HTML5 Audio, [jDataView](https://github.com/jDataView/jDataView) and [jBinary](h
 ---
 
 *Please tell us if you made something with jDataView :)*
-
-License
-=======
-
-jDataView is issued under [Do What The Fuck You Want To Public License](http://sam.zoy.org/wtfpl/) :)
