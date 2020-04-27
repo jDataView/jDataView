@@ -56,8 +56,8 @@
   },
   "licenses": [
     {
-      "type": "WTFPL",
-      "url": "http://sam.zoy.org/wtfpl/"
+      "type": "MIT",
+      "url": "https://raw.githubusercontent.com/jDataView/jDataView/master/LICENSE"
     }
   ]
 }
