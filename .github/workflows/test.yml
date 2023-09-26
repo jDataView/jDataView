@@ -15,7 +15,6 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - 18.x
           - latest
 
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
