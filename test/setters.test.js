@@ -22,6 +22,8 @@ describe('Setters', function () {
 				);
 				const getterArgs = setter.getterArgs || [offset];
 				const check = setter.check || assert.equal;
+
+				assert.ok(('write' + type) in view, 'jDataView does not have `write' + type + '` method.');
 				view["set" + type].apply(view, args);
 
 				const realValue = view["get" + type].apply(
@@ -146,7 +148,7 @@ describe('Setters', function () {
 			}
 
 			eachValue(function (value, bitLength) {
-				view["set" + type](0, value, bitLength);
+				view["write" + type](0, value, bitLength);
 			});
 
 			eachValue(function (value, bitLength) {
@@ -154,7 +156,7 @@ describe('Setters', function () {
 				assert.equal(
 					realValue,
 					value,
-					"set" +
+					"write" +
 					type +
 					"(" +
 					value +
