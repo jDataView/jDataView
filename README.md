@@ -3,7 +3,7 @@
 [jDataView](http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html) - A unique way to work with a binary file in JavaScript.
 ================================
 
-jDataView provides extensions to `DataView` to make modifying binary data a pleasure.
+jDataView provides a layer on top of `DataView` to make modifying binary data a pleasure.
 
 jDataView is a drop-in replacement for the native `DataView`, adding methods for setting string, arbitrary-sized integers, and more.
 
@@ -41,9 +41,9 @@ And one way to read a binary file from the server.
 
 * **NodeJS Buffers**. They appeared in [Node 0.4.0](http://nodejs.org/docs/v0.4.0/api/buffers.html). [Node 0.5.0](http://nodejs.org/docs/v0.5.0/api/buffers.html) added a DataView-like API. And [Node 0.6.0](http://nodejs.org/docs/v0.6.0/api/buffers.html) changed the API naming convention.
 
-**jDataView** provided the **DataView API** with own convenient extensions using the best available option between Arrays, TypedArrays, NodeJS Buffers and DataViews.
+**jDataView** provided a polyfill for the **DataView API** with own convenient extensions using the best available option between Arrays, TypedArrays, NodeJS Buffers and DataViews.
 
-Now that `DataView` is natively available in all engines, **jDataView 3** simply extends it with powerful methods for dealing with non-standard binary data types, such as strings and arbitrary-sized integers.
+Now that `DataView` is natively available in all engines, **jDataView 3** acts as a layer on top of it with powerful methods for dealing with non-standard binary data types, such as strings and arbitrary-sized integers.
 
 Also check out ([jBinary](https://github.com/jDataView/jBinary))
 ========================
