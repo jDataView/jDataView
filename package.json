@@ -1,6 +1,35 @@
 {
   "name": "jdataview",
-  "version": "2.5.1",
+  "version": "3.0.0",
+  "type": "module",
+  "scripts": {
+    "precommit": "lint-staged",
+    "build": "vite build",
+    "test": "vitest run",
+    "watch": "vitest"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write --single-quote --use-tabs",
+      "git add"
+    ]
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/jdataview.umd.cjs",
+  "module": "./dist/jdataview.js",
+  "exports": {
+    ".": {
+      "import": "./dist/jdataview.js",
+      "require": "./distjdataview.cjs"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jDataView/jDataView.git"
+  },
   "description": "A unique way to work with a binary file in the browser and the server.",
   "keywords": [
     "buffer",
@@ -12,65 +41,16 @@
     "write",
     "manipulation"
   ],
+  "license": "WTFPL",
   "homepage": "http://jDataView.github.io/",
   "author": "Vjeux <vjeuxx@gmail.com> (http://blog.vjeux.com/)",
   "contributors": [
     "Vjeux <vjeuxx@gmail.com> (http://blog.vjeux.com/)",
     "RReverser <me@rreverser.com> (http://rreverser.com)"
   ],
-  "files": [
-    "dist/node/jdataview.js",
-    "dist/node/jdataview.js.map",
-    "dist/browser/jdataview.js",
-    "dist/browser/jdataview.js.map"
-  ],
-  "main": "dist/node/jdataview.js",
-  "browser": "dist/browser/jdataview.js",
-  "scripts": {
-    "precommit": "lint-staged",
-    "test": "grunt"
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "prettier --write --single-quote --use-tabs",
-      "git add"
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/jDataView/jDataView.git"
-  },
   "devDependencies": {
-    "chai": "^4.0.0",
-    "eslint": "^3.19.0",
-    "grunt": "^1.0.1",
-    "grunt-cli": "^1.2.0",
-    "grunt-compare-size": "^0.4.0",
-    "grunt-contrib-clean": "^1.1.0",
-    "grunt-contrib-uglify": "^3.0.1",
-    "grunt-contrib-watch": "^1.0.0",
-    "grunt-eslint": "^19.0.0",
-    "grunt-karma": "^2.0.0",
-    "grunt-mocha-test": "^0.13.2",
-    "grunt-rollup": "^1.0.1",
-    "gzip-js": "^0.3.2",
-    "husky": "^0.13.4",
-    "karma": "^1.7.0",
-    "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "^2.1.1",
-    "karma-edge-launcher": "^0.4.1",
-    "karma-firefox-launcher": "^1.0.1",
-    "karma-ie-launcher": "^1.0.0",
-    "karma-mocha": "^1.3.0",
-    "karma-phantomjs-launcher": "^1.0.4",
-    "karma-safari-launcher": "^1.0.0",
-    "lint-staged": "^3.5.1",
-    "load-grunt-config": "*",
-    "mocha": "^3.4.2",
-    "npm": "^4.6.1",
-    "rollup": "^0.41.6",
-    "rollup-plugin-uglify": "^2.0.1"
-  },
-  "license": "WTFPL"
+    "eslint": "^8.50.0",
+    "vite": "^4.4.9",
+    "vitest": "^0.34.5"
+  }
 }
