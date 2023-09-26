@@ -1,0 +1,18 @@
+on:
+  - workflow_call
+
+jobs:
+   setup-for-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Install Node.JS
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+      - name: Install NPM modules
+        run: "pnpm i"
