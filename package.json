@@ -50,8 +50,10 @@
     "RReverser <me@rreverser.com> (http://rreverser.com)"
   ],
   "devDependencies": {
+    "@vitest/browser": "^0.34.5",
     "eslint": "^8.50.0",
     "vite": "^4.4.9",
-    "vitest": "^0.34.5"
+    "vitest": "^0.34.5",
+    "webdriverio": "^8.16.12"
   }
 }
