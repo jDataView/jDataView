@@ -11,13 +11,13 @@ on:
 jobs:
   test-in-node:
     runs-on: ubuntu-latest
+    uses: ./.github/workflows/setups-for-tests.yml
     steps:
-      - uses: octo-org/example-repo/.github/workflows/reusable-workflow.yml@main
       - name: "Run tests in Node.JS"
         run: "pnpm run test"
   test-in-browsers:
     runs-on: ubuntu-latest
-    needs: setup-for-tests
+    uses: ./.github/workflows/setups-for-tests.yml
     strategy:
       matrix:
         browser:
@@ -25,7 +25,6 @@ jobs:
           - firefox
           - safari
     steps:
-      - uses: ${{github.repository}}/.github/workflows/setups-for-tests.yml@${{github.ref_name}}
       - name: "Run tests in ${{matrix.browser}}"
         run: "BROWSER_TO_TEST=${{matrix.browser}} pnpm run test-in-browser"
     
