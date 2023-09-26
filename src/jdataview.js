@@ -1,4 +1,4 @@
-import { getCharCodes, is, arrayFrom, defined } from "./helpers";
+import { getCharCodes, wrapBuffer, arrayFrom, defined } from "./helpers";
 
 
 /**
@@ -7,8 +7,7 @@ import { getCharCodes, is, arrayFrom, defined } from "./helpers";
  * @typedef {string|number|ArrayBuffer|TypedArray} BufferIsh
 */
 
-
-export class jDataView extends DataView {
+export class jDataView {
 	/**
 	 * jDataView
 	 * TODO: Write docstring
@@ -23,9 +22,7 @@ export class jDataView extends DataView {
 		byteLength,
 		littleEndian
 	) {
-		buffer = jDataView.wrapBuffer(buffer);
-
-		super(buffer, byteOffset, byteLength);
+		this.jDataView = this;
 
 		if (jDataView.is(buffer)) {
 			const result = buffer.slice(byteOffset, byteOffset + byteLength);
@@ -33,32 +30,26 @@ export class jDataView extends DataView {
 			return result;
 		}
 
+		if (!jDataView.is(this)) {
+			return new jDataView(buffer, byteOffset, byteLength, littleEndian);
+		}
+
+		this.buffer = wrapBuffer(buffer);
+
+
+		this.byteOffset = defined(byteOffset, 0);
+		this.byteLength = defined(byteLength, this.buffer.byteLength - this.byteOffset);
+
+		this.dataView = new DataView(this.buffer, this.byteOffset, this.byteLength);
+
+
 		this._littleEndian = !!littleEndian;
 
 		this._offset = this._bitOffset = 0;
-
-		this._checkBounds(this.byteOffset, this.byteLength, buffer.byteLength);
 	}
 
 
-	// mostly internal function for wrapping any supported input (String or Array-like) to best suitable buffer format
-	static wrapBuffer(buffer) {
-		switch (typeof buffer) {
-			case 'number':
-				buffer = new Uint8Array(buffer).buffer;
 
-				break;
-
-			case 'string':
-				buffer = getCharCodes(buffer);
-			/* falls through */
-			default:
-				if (!is(buffer, ArrayBuffer)) {
-					buffer = new Uint8Array(buffer).buffer;
-				}
-		}
-		return buffer;
-	};
 
 	static is(view) {
 		return view && view.jDataView;
@@ -68,7 +59,7 @@ export class jDataView extends DataView {
 	 * @param {BufferIsh} data
 	 */
 	static from(...data) {
-		return new jDataView(data,);
+		return new jDataView(data);
 	}
 
 
@@ -241,7 +232,6 @@ export class jDataView extends DataView {
 		const endBit = startBit + bitLength;
 		const start = startBit >>> 3;
 		const end = (endBit + 7) >>> 3;
-		console.log(start, end, end - start)
 
 		const bytes = this._getBytes(end - start, start, true);
 		let wideValue = 0;
@@ -295,6 +285,40 @@ export class jDataView extends DataView {
 		return this.setUnsigned(...args);
 	}
 
+}
+
+const builtInTypes = [
+	"Float64", "Float32",
+	"BigInt64", "BigUint64",
+	"Int32", "Uint32",
+	"Int16", "Uint16",
+	"Int8", "Uint8"
+];
+// Encapsulate all the built-in methods
+for (const type of builtInTypes) {
+	// Getters
+	jDataView.prototype["get" + type] = function (byteOffset, littleEndian) {
+		littleEndian = defined(littleEndian, this._littleEndian);
+		return this.dataView["get" + type](byteOffset, littleEndian);
+	}
+
+	// Setters
+	jDataView.prototype["set" + type] = function (byteOffset, value, littleEndian) {
+		littleEndian = defined(littleEndian, this._littleEndian);
+		return this.dataView["set" + type](byteOffset, value, littleEndian);
+	}
+}
+const supportedTypes = [
+	...builtInTypes,
+	"Signed", "Unsigned",
+	"String", "Char",
+	"Bytes"
+]
+// Add the the writeXXX shorthand methods
+for (const type of supportedTypes) {
+	jDataView.prototype["write" + type] = function (value, littleEndian) {
+		return this["set" + type].call(this, undefined, value, littleEndian);
+	}
 }
 
 export default jDataView;

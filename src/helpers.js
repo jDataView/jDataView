@@ -7,6 +7,25 @@ export function getCharCodes(string) {
     return codes;
 }
 
+// mostly internal function for wrapping any supported input (String or Array-like) to best suitable buffer format
+export function wrapBuffer(buffer) {
+    switch (typeof buffer) {
+        case 'number':
+            buffer = new Uint8Array(buffer).buffer;
+
+            break;
+
+        case 'string':
+            buffer = getCharCodes(buffer);
+        /* falls through */
+        default:
+            if (!is(buffer, ArrayBuffer)) {
+                buffer = new Uint8Array(buffer).buffer;
+            }
+    }
+    return buffer;
+};
+
 
 export function is(obj, Ctor) {
     if (typeof obj !== 'object' || obj === null) {
