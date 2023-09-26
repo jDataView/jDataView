@@ -1,3 +1,7 @@
+* **September 26 2023**
+  * Version 3.0.0
+  * jDataView no longer polyfills DataView, it uses the native implementation. This should make it faster for some operations.
+  * Build system is now run by Vite, with testing using Vitest and Github Actions
 * **April 14 2014**
   * Build process completely reworked and automated via Grunt + Travis CI.
 * **August 23 2013**
