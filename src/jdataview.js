@@ -59,7 +59,7 @@ export class jDataView {
 	 * @param {BufferIsh} data
 	 */
 	static from(...data) {
-		return new jDataView(data);
+		return new jDataView(...data);
 	}
 
 
@@ -281,8 +281,8 @@ export class jDataView {
 		this._setBytes(data.start, b, true);
 	}
 
-	setSigned(...args) {
-		return this.setUnsigned(...args);
+	setSigned(byteOffset, value, bitLength) {
+		return this.setUnsigned(byteOffset, value, bitLength);
 	}
 
 }
