@@ -86,12 +86,11 @@ describe('Getters', function () {
 	]);
 
 	test("Big String", function () {
-		this.timeout(5000);
 		const view = new jDataView(2000000);
 		assert.doesNotThrow(function () {
 			view.getString();
 		});
-	});
+	}, { timeout: 5000 });
 
 	testGetters("Int8", [-1, -2, -3, -4, -6, 0, -70, 1]);
 
