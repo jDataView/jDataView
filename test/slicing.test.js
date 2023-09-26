@@ -13,7 +13,7 @@ describe('Slicing', function () {
 	});
 
 	test("as pointer to original data", function () {
-		var pointerCopy = view.slice(1, 4);
+		const pointerCopy = view.slice(1, 4);
 		compareBytes(pointerCopy.getBytes(), [0xfe, 0xfd, 0xfc]);
 		pointerCopy.setChar(0, chr(1));
 		assert.equal(view.getChar(1), chr(1));
@@ -21,14 +21,14 @@ describe('Slicing', function () {
 	});
 
 	test("as copy of original data", function () {
-		var copy = view.slice(1, 4, true);
+		const copy = view.slice(1, 4, true);
 		compareBytes(copy.getBytes(), [0xfe, 0xfd, 0xfc]);
 		copy.setChar(0, chr(1));
 		assert.notEqual(view.getChar(1), chr(1));
 	});
 
 	test("with only start offset argument given", function () {
-		var pointerCopy = view.slice(1);
+		const pointerCopy = view.slice(1);
 		compareBytes(
 			pointerCopy.getBytes(),
 			[0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]
@@ -36,12 +36,12 @@ describe('Slicing', function () {
 	});
 
 	test("with negative start offset given", function () {
-		var pointerCopy = view.slice(-2);
+		const pointerCopy = view.slice(-2);
 		compareBytes(pointerCopy.getBytes(), [0xba, 0x01]);
 	});
 
 	test("with negative end offset given", function () {
-		var pointerCopy = view.slice(1, -2);
+		const pointerCopy = view.slice(1, -2);
 		compareBytes(
 			pointerCopy.getBytes(),
 			[0xfe, 0xfd, 0xfc, 0xfa, 0x00]

@@ -24,7 +24,7 @@ describe('Setters', function () {
 				const check = setter.check || assert.equal;
 				view["set" + type].apply(view, args);
 
-				var realValue = view["get" + type].apply(
+				const realValue = view["get" + type].apply(
 					view,
 					getterArgs
 				);
@@ -135,7 +135,7 @@ describe('Setters', function () {
 	// setter = {value, bitLength}
 	function testBitfieldSetters(type, setters) {
 		test(type, function () {
-			var view = new jDataView(13);
+			const view = new jDataView(13);
 
 			function eachValue(callback) {
 				view.seek(0);
