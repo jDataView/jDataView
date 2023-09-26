@@ -16,5 +16,8 @@ export default defineConfig({
 	},
 	test: {
 		include: ["test/**\/*.{test,spec}.?(c|m)[jt]s?(x)"],
+		browser: {
+			headless: true,
+		}
 	},
 });

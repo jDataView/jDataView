@@ -6,6 +6,7 @@
     "precommit": "lint-staged",
     "build": "vite build",
     "test": "vitest run",
+    "test-in-browser": "vitest run --browser=$BROWSER_TO_TEST",
     "dev": "vitest dev"
   },
   "lint-staged": {
