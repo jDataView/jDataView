@@ -19,12 +19,11 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/jdataview.umd.cjs",
+  "main": "./dist/jdataview.js",
   "module": "./dist/jdataview.js",
   "exports": {
     ".": {
-      "import": "./dist/jdataview.js",
-      "require": "./distjdataview.cjs"
+      "import": "./dist/jdataview.js"
     }
   },
   "repository": {

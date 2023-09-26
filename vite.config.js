@@ -11,7 +11,7 @@ export default defineConfig({
 			name: "jDataView",
 			// the proper extensions will be added
 			fileName: "jdataview",
-			formats: ["es", "cjs", "umd"]
+			formats: ["es"]
 		},
 	},
 	test: {
