@@ -1,7 +1,15 @@
 # This is a 'reusable workflow' called by test.yml
 
 on:
-  - workflow_call
+  workflow_call:
+    inputs:
+      test-command:
+        required: true
+        type: string
+      env-name:
+        required: true
+        type: string
+  
 
 jobs:
    setup-for-tests:
@@ -18,3 +26,5 @@ jobs:
           cache: "pnpm"
       - name: Install NPM modules
         run: "pnpm i"
+      - name: Run tests in ${{inputs.env-name}}
+        run: ${{inputs.test-command}}
