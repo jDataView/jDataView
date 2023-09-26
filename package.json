@@ -6,7 +6,7 @@
     "precommit": "lint-staged",
     "build": "vite build",
     "test": "vitest run",
-    "watch": "vitest"
+    "dev": "vitest dev"
   },
   "lint-staged": {
     "*.js": [
