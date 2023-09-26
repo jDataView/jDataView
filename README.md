@@ -1,12 +1,30 @@
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/jDataView/jDataView?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/jDataView/jDataView.png?branch=master)](https://travis-ci.org/jDataView/jDataView)
 [![NPM version](https://badge.fury.io/js/jdataview.png)](https://npmjs.org/package/jdataview)
 [jDataView](http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html) - A unique way to work with a binary file in JavaScript.
 ================================
 
-jDataView provides convenient way to read and/or modify binary data in all the browsers. It follows the [DataView Specification](http://www.khronos.org/registry/typedarray/specs/latest/#8) and even extends it for a more practical use.
+jDataView provides extensions to `DataView` to make modifying binary data a pleasure.
 
-Explanation
+jDataView is a drop-in replacement for the native `DataView`, adding methods for setting string, arbitrary-sized integers, and more.
+
+
+Documentation
+=============
+
+  * API
+    * [jDataView constructor](https://github.com/jDataView/jDataView/wiki/jDataView-constructor)
+    * [DataView documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView)
+    * Extensions
+      * [Operation control](https://github.com/jDataView/jDataView/wiki/Operation-control)
+      * [writeXXX methods](https://github.com/jDataView/jDataView/wiki/writeXXX-methods)
+      * [Strings and Blobs](https://github.com/jDataView/jDataView/wiki/Strings-and-Blobs)
+      * [Bitfields](https://github.com/jDataView/jDataView/wiki/Bitfields)
+      * [Internal utilities](https://github.com/jDataView/jDataView/wiki/Internal-utilities)
+  * [Example](https://github.com/jDataView/jDataView/wiki/Example)
+  * [Changelog](https://github.com/jDataView/jDataView/blob/master/CHANGELOG.md)
+
+
+History
 ===========
 
 There are three ways to read a binary file from the browser.
@@ -23,25 +41,11 @@ And one way to read a binary file from the server.
 
 * **NodeJS Buffers**. They appeared in [Node 0.4.0](http://nodejs.org/docs/v0.4.0/api/buffers.html). [Node 0.5.0](http://nodejs.org/docs/v0.5.0/api/buffers.html) added a DataView-like API. And [Node 0.6.0](http://nodejs.org/docs/v0.6.0/api/buffers.html) changed the API naming convention.
 
-**jDataView** provides the **DataView API** with own convenient extensions using the best available option between Arrays, TypedArrays, NodeJS Buffers and DataViews.
+**jDataView** provided the **DataView API** with own convenient extensions using the best available option between Arrays, TypedArrays, NodeJS Buffers and DataViews.
 
-Documentation
-=============
+Now that `DataView` is natively available in all engines, **jDataView 3** simply extends it with powerful methods for dealing with non-standard binary data types, such as strings and arbitrary-sized integers.
 
-  * API
-    * [jDataView constructor](https://github.com/jDataView/jDataView/wiki/jDataView-constructor)
-    * [DataView Specification](http://www.khronos.org/registry/typedarray/specs/latest/#8)
-    * Extended Specification
-      * [Operation control](https://github.com/jDataView/jDataView/wiki/Operation-control)
-      * [writeXXX methods](https://github.com/jDataView/jDataView/wiki/writeXXX-methods)
-      * [Strings and Blobs](https://github.com/jDataView/jDataView/wiki/Strings-and-Blobs)
-      * [64-bit integers](https://github.com/jDataView/jDataView/wiki/64-bit-integers)
-      * [Bitfields](https://github.com/jDataView/jDataView/wiki/Bitfields)
-      * [Internal utilities](https://github.com/jDataView/jDataView/wiki/Internal-utilities)
-  * [Example](https://github.com/jDataView/jDataView/wiki/Example)
-  * [Changelog](https://github.com/jDataView/jDataView/blob/master/CHANGELOG.md)
-
-Advanced usage ([jBinary](https://github.com/jDataView/jBinary))
+Also check out ([jBinary](https://github.com/jDataView/jBinary))
 ========================
 
 For complicated binary structures, it may be hard enough to use only low-level get/set operations for parsing,
