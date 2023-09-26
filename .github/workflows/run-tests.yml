@@ -10,13 +10,11 @@ on:
 
 jobs:
   test-in-node:
-    runs-on: ubuntu-latest
     uses: ./.github/workflows/tests-core.yml
     with:
       env-name: Node.JS
       test-command: pnpm run test
   test-in-browsers:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         browser:
