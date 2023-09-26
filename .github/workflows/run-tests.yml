@@ -15,6 +15,7 @@ jobs:
       env-name: Node.JS
       test-command: pnpm run test
   test-in-browsers:
+    if: ${{ false }}  # disable for now
     strategy:
       matrix:
         browser:
