@@ -1,4 +1,4 @@
-import { getCharCodes, wrapBuffer, arrayFrom, defined } from "./helpers";
+import { getCharCodes, wrapBuffer, arrayFrom } from "./helpers";
 
 
 /**
@@ -9,8 +9,9 @@ import { getCharCodes, wrapBuffer, arrayFrom, defined } from "./helpers";
 
 export class jDataView {
 	/**
-	 * jDataView
-	 * TODO: Write docstring
+	 * jDataView provides a layer on top of the built-in `DataView` with a plethora of utilities to make working with binary data a pleasure.
+	 * 
+	 * [Read the docs](https://github.com/jDataView/jDataView/wiki)
 	 * @param {BufferIsh} buffer 
 	 * @param {number} byteOffset 
 	 * @param {number} byteLength 
@@ -66,8 +67,9 @@ export class jDataView {
 	}
 
 	/**
-	 * Constructs a new jDataView from the provided data
+	 * Constructs a new jDataView filled with the provided data
 	 * @param {BufferIsh} data
+	 * @returns {jDataView}
 	 */
 	static from(...data) {
 		return new jDataView(data.flat(Infinity));
