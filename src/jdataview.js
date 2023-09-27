@@ -26,7 +26,7 @@ export class jDataView {
 
 		if (jDataView.is(buffer)) {
 			const result = buffer.slice(byteOffset, byteOffset + byteLength);
-			result.littleEndian = defined(littleEndian, result.littleEndian);
+			result.littleEndian = littleEndian ?? result.littleEndian;
 			return result;
 		}
 
@@ -47,8 +47,8 @@ export class jDataView {
 		* @type {number}
 		* @public
 		*/
-		this.byteOffset = defined(byteOffset, 0);
-		this.byteLength = defined(byteLength, this.buffer.byteLength - this.byteOffset);
+		this.byteOffset = byteOffset ?? 0;
+		this.byteLength = byteLength ?? this.buffer.byteLength - this.byteOffset;
 
 		/**
 		* The internal `DataView` that powers all the default operations like `getUint8()`
@@ -98,7 +98,7 @@ export class jDataView {
 		}
 		if (
 			byteOffset < 0 ||
-			byteOffset + byteLength > defined(maxLength, this.byteLength)
+			byteOffset + byteLength > (maxLength ?? this.byteLength)
 		) {
 			throw new RangeError('Offsets are out of bounds.');
 		}
@@ -109,9 +109,9 @@ export class jDataView {
 	// Helpers
 
 	#getBytes(length, byteOffset, littleEndian) {
-		littleEndian = defined(littleEndian, this.littleEndian);
-		byteOffset = defined(byteOffset, this._offset);
-		length = defined(length, this.byteLength - byteOffset);
+		littleEndian ??= this.littleEndian;
+		byteOffset ??= this._offset;
+		length ??= this.byteLength - byteOffset;
 
 		this.#checkBounds(byteOffset, length);
 
@@ -136,7 +136,7 @@ export class jDataView {
 		const result = this.#getBytes(
 			length,
 			byteOffset,
-			defined(littleEndian, true)
+			littleEndian ?? true
 		);
 		return toArray ? arrayFrom(result) : result;
 	}
@@ -149,8 +149,8 @@ export class jDataView {
 			return;
 		}
 
-		littleEndian = defined(littleEndian, this.littleEndian);
-		byteOffset = defined(byteOffset, this._offset);
+		littleEndian ??= this.littleEndian;
+		byteOffset ??= this._offset;
 
 		this.#checkBounds(byteOffset, length);
 
@@ -167,7 +167,7 @@ export class jDataView {
 	}
 
 	setBytes(byteOffset, bytes, littleEndian) {
-		this.#setBytes(byteOffset, bytes, defined(littleEndian, true));
+		this.#setBytes(byteOffset, bytes, littleEndian ?? true);
 	}
 
 	/**
@@ -277,7 +277,7 @@ export class jDataView {
 		}
 
 		start = normalizeOffset(start, this.byteLength);
-		end = normalizeOffset(defined(end, this.byteLength), this.byteLength);
+		end = normalizeOffset(end ?? this.byteLength, this.byteLength);
 
 		return forceCopy
 			? new jDataView(
@@ -296,7 +296,7 @@ export class jDataView {
 
 	alignBy(byteCount) {
 		this._bitOffset = 0;
-		if (defined(byteCount, 1) !== 1) {
+		if ((byteCount ?? 1) !== 1) {
 			return this.skip(byteCount - (this._offset % byteCount || byteCount));
 		} else {
 			return this._offset;
@@ -304,7 +304,7 @@ export class jDataView {
 	}
 
 	#getBitRangeData(bitLength, byteOffset) {
-		const startBit = (defined(byteOffset, this._offset) << 3) + this._bitOffset;
+		const startBit = ((byteOffset ?? this._offset) << 3) + this._bitOffset;
 		const endBit = startBit + bitLength;
 		const start = startBit >>> 3;
 		const end = (endBit + 7) >>> 3;
@@ -375,8 +375,8 @@ for (const type in builtInTypeBytes) {
 	const typeByteLength = builtInTypeBytes[type];
 	// Getters
 	jDataView.prototype["get" + type] = function (byteOffset, littleEndian) {
-		littleEndian = defined(littleEndian, this.littleEndian);
-		byteOffset = defined(byteOffset, this._offset);
+		littleEndian ??= this.littleEndian;
+		byteOffset ??= this._offset;
 
 		// Move pointer forwards
 		this._offset = byteOffset + typeByteLength;
@@ -386,8 +386,8 @@ for (const type in builtInTypeBytes) {
 
 	// Setters
 	jDataView.prototype["set" + type] = function (byteOffset, value, littleEndian) {
-		littleEndian = defined(littleEndian, this.littleEndian);
-		byteOffset = defined(byteOffset, this._offset);
+		littleEndian ??= this.littleEndian;
+		byteOffset ??= this._offset;
 
 		// Move pointer forwards
 		this._offset = byteOffset + typeByteLength;

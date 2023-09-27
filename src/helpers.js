@@ -43,6 +43,3 @@ export function arrayFrom(arrayLike, forceCopy) {
         : Array.prototype.slice.call(arrayLike);
 }
 
-export function defined(value, defaultValue) {
-    return value !== undefined ? value : defaultValue;
-}
