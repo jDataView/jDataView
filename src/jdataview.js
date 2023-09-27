@@ -16,6 +16,8 @@ export class jDataView {
 	 * @param {number} byteLength 
 	 * @param {boolean} littleEndian 
 	 */
+
+
 	constructor(
 		buffer,
 		byteOffset,
@@ -34,16 +36,15 @@ export class jDataView {
 			return new jDataView(buffer, byteOffset, byteLength, littleEndian);
 		}
 
+		// Convert strings, arrays, etc to `ArrayBuffer`s
 		this.buffer = wrapBuffer(buffer);
-
 
 		this.byteOffset = defined(byteOffset, 0);
 		this.byteLength = defined(byteLength, this.buffer.byteLength - this.byteOffset);
 
 		this.dataView = new DataView(this.buffer, this.byteOffset, this.byteLength);
 
-
-		this._littleEndian = !!littleEndian;
+		this.littleEndian = !!littleEndian;
 
 		this._offset = this._bitOffset = 0;
 	}
@@ -56,14 +57,15 @@ export class jDataView {
 	}
 
 	/**
+	 * Constructs a new 
 	 * @param {BufferIsh} data
 	 */
 	static from(...data) {
-		return new jDataView(...data);
+		return new jDataView(data.flat(Infinity));
 	}
 
 
-	_checkBounds(byteOffset, byteLength, maxLength) {
+	#checkBounds(byteOffset, byteLength, maxLength) {
 		// Do additional checks to simulate DataView
 		if (typeof byteOffset !== 'number') {
 			throw new TypeError('Offset is not a number.');
@@ -86,12 +88,12 @@ export class jDataView {
 
 	// Helpers
 
-	_getBytes(length, byteOffset, littleEndian) {
-		littleEndian = defined(littleEndian, this._littleEndian);
+	#getBytes(length, byteOffset, littleEndian) {
+		littleEndian = defined(littleEndian, this.littleEndian);
 		byteOffset = defined(byteOffset, this._offset);
 		length = defined(length, this.byteLength - byteOffset);
 
-		this._checkBounds(byteOffset, length);
+		this.#checkBounds(byteOffset, length);
 
 		byteOffset += this.byteOffset;
 
@@ -104,7 +106,7 @@ export class jDataView {
 
 	// wrapper for external calls (do not return inner buffer directly to prevent it's modifying)
 	getBytes(length, byteOffset, littleEndian, toArray) {
-		const result = this._getBytes(
+		const result = this.#getBytes(
 			length,
 			byteOffset,
 			defined(littleEndian, true)
@@ -112,7 +114,7 @@ export class jDataView {
 		return toArray ? arrayFrom(result) : result;
 	}
 
-	_setBytes(byteOffset, bytes, littleEndian) {
+	#setBytes(byteOffset, bytes, littleEndian) {
 		const length = bytes.length;
 
 		// needed for Opera
@@ -120,10 +122,10 @@ export class jDataView {
 			return;
 		}
 
-		littleEndian = defined(littleEndian, this._littleEndian);
+		littleEndian = defined(littleEndian, this.littleEndian);
 		byteOffset = defined(byteOffset, this._offset);
 
-		this._checkBounds(byteOffset, length);
+		this.#checkBounds(byteOffset, length);
 
 		if (!littleEndian && length > 1) {
 			bytes = arrayFrom(bytes, true).reverse();
@@ -138,11 +140,11 @@ export class jDataView {
 	}
 
 	setBytes(byteOffset, bytes, littleEndian) {
-		this._setBytes(byteOffset, bytes, defined(littleEndian, true));
+		this.#setBytes(byteOffset, bytes, defined(littleEndian, true));
 	}
 
 	getString(byteLength, byteOffset, encoding) {
-		const bytes = this._getBytes(byteLength, byteOffset, true);
+		const bytes = this.#getBytes(byteLength, byteOffset, true);
 		// backward-compatibility
 		encoding = encoding === 'utf8' ? 'utf-8' : encoding || 'binary';
 		if (TextDecoder && encoding !== 'binary') {
@@ -171,7 +173,7 @@ export class jDataView {
 			}
 			bytes = getCharCodes(subString);
 		}
-		this._setBytes(byteOffset, bytes, true);
+		this.#setBytes(byteOffset, bytes, true);
 	}
 
 	getChar(byteOffset) {
@@ -187,7 +189,7 @@ export class jDataView {
 	}
 
 	seek(byteOffset) {
-		this._checkBounds(byteOffset, 0);
+		this.#checkBounds(byteOffset, 0);
 		return (this._offset = byteOffset);
 	}
 
@@ -208,13 +210,13 @@ export class jDataView {
 				this.getBytes(end - start, start, true, true),
 				undefined,
 				undefined,
-				this._littleEndian
+				this.littleEndian
 			)
 			: new jDataView(
 				this.buffer,
 				this.byteOffset + start,
 				end - start,
-				this._littleEndian
+				this.littleEndian
 			);
 	}
 
@@ -227,13 +229,13 @@ export class jDataView {
 		}
 	}
 
-	_getBitRangeData(bitLength, byteOffset) {
+	#getBitRangeData(bitLength, byteOffset) {
 		const startBit = (defined(byteOffset, this._offset) << 3) + this._bitOffset;
 		const endBit = startBit + bitLength;
 		const start = startBit >>> 3;
 		const end = (endBit + 7) >>> 3;
 
-		const bytes = this._getBytes(end - start, start, true);
+		const bytes = this.#getBytes(end - start, start, true);
 		let wideValue = 0;
 
 		if ((this._bitOffset = endBit & 7)) {
@@ -258,14 +260,14 @@ export class jDataView {
 
 	getUnsigned(bitLength, byteOffset) {
 		const value =
-			this._getBitRangeData(bitLength, byteOffset).wideValue >>>
+			this.#getBitRangeData(bitLength, byteOffset).wideValue >>>
 			-this._bitOffset;
 		return bitLength < 32 ? value & ~(-1 << bitLength) : value;
 	}
 
 
 	setUnsigned(byteOffset, value, bitLength) {
-		const data = this._getBitRangeData(bitLength, byteOffset);
+		const data = this.#getBitRangeData(bitLength, byteOffset);
 		const b = data.bytes;
 		let wideValue = data.wideValue;
 
@@ -278,7 +280,7 @@ export class jDataView {
 			wideValue >>>= 8;
 		}
 
-		this._setBytes(data.start, b, true);
+		this.#setBytes(data.start, b, true);
 	}
 
 	setSigned(byteOffset, value, bitLength) {
@@ -298,13 +300,13 @@ const builtInTypes = [
 for (const type of builtInTypes) {
 	// Getters
 	jDataView.prototype["get" + type] = function (byteOffset, littleEndian) {
-		littleEndian = defined(littleEndian, this._littleEndian);
+		littleEndian = defined(littleEndian, this.littleEndian);
 		return this.dataView["get" + type](byteOffset, littleEndian);
 	}
 
 	// Setters
 	jDataView.prototype["set" + type] = function (byteOffset, value, littleEndian) {
-		littleEndian = defined(littleEndian, this._littleEndian);
+		littleEndian = defined(littleEndian, this.littleEndian);
 		return this.dataView["set" + type](byteOffset, value, littleEndian);
 	}
 }
