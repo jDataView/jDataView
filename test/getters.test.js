@@ -282,7 +282,7 @@ describe('Getters', function () {
 		{ view: b(0xff, 0xff, 0xff, 0xff), args: [32], value: -1 },
 	]);
 
-	test("Debugging", () => {
+	test("Unicode character literals", () => {
 		const view = new jDataView(20);
 
 		view.writeChar("þ");
