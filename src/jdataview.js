@@ -24,14 +24,10 @@ export class jDataView {
 	) {
 		this.jDataView = this;
 
-		if (jDataView.is(buffer)) {
+		if (buffer instanceof jDataView) {
 			const result = buffer.slice(byteOffset, byteOffset + byteLength);
 			result.littleEndian = littleEndian ?? result.littleEndian;
 			return result;
-		}
-
-		if (!jDataView.is(this)) {
-			return new jDataView(buffer, byteOffset, byteLength, littleEndian);
 		}
 
 		/**
@@ -67,13 +63,6 @@ export class jDataView {
 		this.littleEndian = !!littleEndian;
 
 		this._offset = this._bitOffset = 0;
-	}
-
-
-
-
-	static is(view) {
-		return view && view.jDataView;
 	}
 
 	/**
