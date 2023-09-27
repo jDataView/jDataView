@@ -147,7 +147,7 @@ describe('Setters', function () {
 			}
 
 			eachValue(function (value, bitLength) {
-				this["write" + type](0, value, bitLength);
+				this["write" + type](value, bitLength);
 			});
 
 			eachValue(function (value, bitLength) {
