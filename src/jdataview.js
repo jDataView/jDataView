@@ -16,8 +16,6 @@ export class jDataView {
 	 * @param {number} byteLength 
 	 * @param {boolean} littleEndian 
 	 */
-
-
 	constructor(
 		buffer,
 		byteOffset,
@@ -28,7 +26,7 @@ export class jDataView {
 
 		if (jDataView.is(buffer)) {
 			const result = buffer.slice(byteOffset, byteOffset + byteLength);
-			result._littleEndian = defined(littleEndian, result._littleEndian);
+			result.littleEndian = defined(littleEndian, result.littleEndian);
 			return result;
 		}
 
@@ -36,14 +34,36 @@ export class jDataView {
 			return new jDataView(buffer, byteOffset, byteLength, littleEndian);
 		}
 
-		// Convert strings, arrays, etc to `ArrayBuffer`s
-		this.buffer = wrapBuffer(buffer);
+		/**
+		* buffer is the internal `ArrayBuffer` that jDataView is a 'view' on
+		* @type {ArrayBuffer}
+		* @public
+		*/
+		this.buffer = wrapBuffer(buffer); // Convert strings, arrays, etc to `ArrayBuffer`s
 
+		/**
+		* The offset in bytes from the start of the ArrayBuffer.
+		* Operations work relative to this number.
+		* @type {number}
+		* @public
+		*/
 		this.byteOffset = defined(byteOffset, 0);
 		this.byteLength = defined(byteLength, this.buffer.byteLength - this.byteOffset);
 
-		this.dataView = new DataView(this.buffer, this.byteOffset, this.byteLength);
+		/**
+		* The internal `DataView` that powers all the default operations like `getUint8()`
+		* @type {DataView}
+		* @private
+		* @readonly
+		*/
+		this._dataView = new DataView(this.buffer, this.byteOffset, this.byteLength);
 
+		/**
+		* Weather this jDataView should default to littleEndian for number operations
+		* @type {boolean}
+		* @public
+		* @readonly
+		*/
 		this.littleEndian = !!littleEndian;
 
 		this._offset = this._bitOffset = 0;
@@ -57,7 +77,7 @@ export class jDataView {
 	}
 
 	/**
-	 * Constructs a new 
+	 * Constructs a new jDataView from the provided data
 	 * @param {BufferIsh} data
 	 */
 	static from(...data) {
@@ -104,7 +124,14 @@ export class jDataView {
 		return littleEndian || length <= 1 ? result : arrayFrom(result).reverse();
 	}
 
-	// wrapper for external calls (do not return inner buffer directly to prevent it's modifying)
+	/**
+	 * Get raw bytes
+	 * @param {length} [length=]
+	 * @param {number} [byteOffset=]
+	 * @param {boolean} [littleEndian=true] 
+	 * @param {boolean} [toArray=false] @default
+	 * @returns {Uint8Array | number[]}
+	 */
 	getBytes(length, byteOffset, littleEndian, toArray) {
 		const result = this.#getBytes(
 			length,
@@ -143,6 +170,13 @@ export class jDataView {
 		this.#setBytes(byteOffset, bytes, defined(littleEndian, true));
 	}
 
+	/**
+	 * Read a string
+	 * @param {length} [length=]
+	 * @param {number} [byteOffset=]
+	 * @param {string} [encoding=binary] 
+	 * @returns {string}
+	 */
 	getString(byteLength, byteOffset, encoding) {
 		const bytes = this.#getBytes(byteLength, byteOffset, true);
 		// backward-compatibility
@@ -161,6 +195,12 @@ export class jDataView {
 		return string;
 	}
 
+	/**
+	 * Set a string. Uses big endian to store the bytes
+	 * @param {length} [length=]
+	 * @param {number} [byteOffset=]
+	 * @param {string} [encoding=binary] 
+	 */
 	setString(byteOffset, subString, encoding) {
 		// backward-compatibility
 		encoding = encoding === 'utf8' ? 'utf-8' : encoding || 'binary';
@@ -176,27 +216,61 @@ export class jDataView {
 		this.#setBytes(byteOffset, bytes, true);
 	}
 
+	/**
+	 * Get a single character.
+	 * This is the same as getting a 1-length string using binary encoding
+	 * @param {length} [length=]
+	 * @param {number} [byteOffset=]
+	 * @returns {string}
+	 */
 	getChar(byteOffset) {
 		return this.getString(1, byteOffset);
 	}
 
+	/**
+	 * Set a single character.
+	 * This is the same as setting a 1-length string using binary encoding
+	 * @param {number} [length=]
+	 * @param {number} [byteOffset=]
+	 */
 	setChar(byteOffset, character) {
 		this.setString(byteOffset, character);
 	}
 
+	/**
+	 * Get the current pointer position
+	 * @returns {number}
+	 */
 	tell() {
 		return this._offset;
 	}
 
+	/**
+	 * Move the current pointer position to `byteOffset`
+	 * @param {number} byteOffset
+	 * @returns {number}
+	 */
 	seek(byteOffset) {
 		this.#checkBounds(byteOffset, 0);
 		return (this._offset = byteOffset);
 	}
 
+	/**
+	 * Move the current pointer position forward by `byteOffset`
+	 * @param {number} byteOffset
+	 * @returns {number}
+	 */
 	skip(byteLength) {
 		return this.seek(this._offset + byteLength);
 	}
 
+	/**
+	 * Returns a new `jDataView` instance between `start` and `end`, optionally duplicating all the contained data in memory.  
+	 * @param {number} start 
+	 * @param {number} end 
+	 * @param {boolean} [forceCopy=false] 
+	 * @returns {jDataView}
+	 */
 	slice(start, end, forceCopy) {
 		function normalizeOffset(offset, byteLength) {
 			return offset < 0 ? offset + byteLength : offset;
@@ -289,15 +363,15 @@ export class jDataView {
 
 }
 
-const builtInTypes = [
-	"Float64", "Float32",
-	"BigInt64", "BigUint64",
-	"Int32", "Uint32",
-	"Int16", "Uint16",
-	"Int8", "Uint8"
-];
+const builtInTypeBytes = {
+	"Float64": 8, "Float32": 4,
+	"BigInt64": 8, "BigUint64": 8,
+	"Int32": 4, "Uint32": 4,
+	"Int16": 2, "Uint16": 2,
+	"Int8": 1, "Uint8": 1
+};
 // Encapsulate all the built-in methods
-for (const type of builtInTypes) {
+for (const type in builtInTypeBytes) {
 	// Getters
 	jDataView.prototype["get" + type] = function (byteOffset, littleEndian) {
 		littleEndian = defined(littleEndian, this.littleEndian);
@@ -311,7 +385,7 @@ for (const type of builtInTypes) {
 	}
 }
 const supportedTypes = [
-	...builtInTypes,
+	...Object.keys(builtInTypeBytes),
 	"Signed", "Unsigned",
 	"String", "Char",
 	"Bytes"
