@@ -22,7 +22,7 @@ jobs:
       - name: Install Node.JS
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: latest
           cache: "pnpm"
       - name: Install NPM modules
         run: "pnpm i"
