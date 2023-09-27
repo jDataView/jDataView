@@ -72,8 +72,6 @@ describe("Offset (pointer)", () => {
         // The demo assumes littleEndian, but that's not the default
         view.littleEndian = true;
 
-        console.log(view.buffer)
-
         assert.equal(view.getInt32(), 272)
         assert.equal(view.getFloat32(), 39887.5625)
 

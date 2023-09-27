@@ -1,10 +1,10 @@
-import { compareBytes, getJDataView, chr } from "./test-helpers";
+import { compareBytes, getPrefilledJDataView, chr } from "./test-helpers";
 import { describe, test, assert } from 'vitest'
 
 
 describe('Slicing', function () {
 
-	const view = getJDataView();
+	const view = getPrefilledJDataView();
 
 	test("with bound check", function () {
 		assert.Throw(function () {

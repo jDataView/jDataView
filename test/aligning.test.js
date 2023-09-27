@@ -1,9 +1,9 @@
-import { getJDataView, } from "./test-helpers";
+import { getPrefilledJDataView, } from "./test-helpers";
 import { describe, it, assert } from 'vitest'
 
 
 describe("Aligning", function () {
-    const view = getJDataView();
+    const view = getPrefilledJDataView();
 
     function checkAlignBy(byteCount, expectedOffset) {
         const offset = view.alignBy(byteCount);

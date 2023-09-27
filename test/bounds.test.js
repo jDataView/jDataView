@@ -1,9 +1,9 @@
-import { getJDataView, } from "./test-helpers";
+import { getPrefilledJDataView, } from "./test-helpers";
 import { describe, test, assert } from 'vitest'
 
 
 describe('Bounds', function () {
-	const view = getJDataView();
+	const view = getPrefilledJDataView();
 
 	function testBounds(type, ...args) {
 		test(type, function () {

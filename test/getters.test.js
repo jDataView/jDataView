@@ -1,5 +1,5 @@
 import { jDataView } from "../src/jdataview";
-import { compareInt64, compareBytes, compareWithNaN, getJDataView, b, chr } from "./test-helpers";
+import { compareInt64, compareBytes, compareWithNaN, getPrefilledJDataView, b, chr, bufferToHex } from "./test-helpers";
 import { describe, test, assert } from 'vitest'
 
 
@@ -7,15 +7,15 @@ describe('Getters', function () {
 
 	// getter = value || {value, check?, view?, args?}
 	function testGetters(type, getters) {
+		const view = getPrefilledJDataView();
 		test(type, function () {
 			getters.forEach(function (getter) {
 				if (typeof getter !== "object") {
 					getter = { value: getter };
 				}
 
-
 				const args = getter.args || [];
-				const contextView = getter.view || getJDataView();
+				const contextView = getter.view || view;
 				const check = getter.check || assert.equal;
 				const value = getter.value;
 				const offset = contextView.tell();
@@ -207,12 +207,12 @@ describe('Getters', function () {
 	testGetters("BigUint64", [
 		{
 			view: b(0x00, 0x67, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe),
-			value: 29273397577908224,
+			value: 29273397577908224n,
 			check: compareInt64,
 		},
 		{
 			view: b(0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77),
-			value: 4822678189205111,
+			value: 4822678189205111n,
 			check: compareInt64,
 		},
 	]);
@@ -220,17 +220,17 @@ describe('Getters', function () {
 	testGetters("BigInt64", [
 		{
 			args: [0, false],
-			value: -283686985483775,
+			value: -283686985483775n,
 			check: compareInt64,
 		},
 		{
 			view: b(0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe),
-			value: -2,
+			value: -2n,
 			check: compareInt64,
 		},
 		{
 			view: b(0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77),
-			value: 4822678189205111,
+			value: 4822678189205111n,
 			check: compareInt64,
 		},
 	]);
@@ -260,5 +260,12 @@ describe('Getters', function () {
 		// padded to byte here
 		{ view: b(0xff, 0xff, 0xff, 0xff), args: [32], value: -1 },
 	]);
+
+	test("Debugging", () => {
+		const view = new jDataView(20);
+
+		view.writeChar("þ");
+		assert.equal(view.getChar(0), "þ");
+	})
 
 });

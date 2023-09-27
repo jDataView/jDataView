@@ -5,14 +5,11 @@ import { assert } from "vitest"
 export const b = jDataView.from;
 export const chr = String.fromCharCode;
 // prettier-ignore
-const dataBytes = [
+const testDataBytes = [
     0x00,
     0xff, 0xfe, 0xfd, 0xfc,
     0xfa, 0x00, 0xba, 0x01
 ];
-const dataStart = 1;
-
-
 
 export function compareInt64(value, expected, message) {
     value = Number(value);
@@ -36,6 +33,6 @@ export function compareWithNaN(value, expected, message) {
     assert.ok(isNaN(value), message || value + " != NaN");
 }
 
-export function getJDataView() {
-    return new jDataView(dataBytes.slice(), dataStart, undefined, true);
+export function getPrefilledJDataView() {
+    return new jDataView(testDataBytes.slice(), 1, undefined, true);
 }

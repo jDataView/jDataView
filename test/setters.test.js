@@ -1,10 +1,10 @@
 import { jDataView } from "../src/jdataview";
-import { compareInt64, compareBytes, compareWithNaN, getJDataView, b, chr } from "./test-helpers";
+import { compareInt64, compareBytes, compareWithNaN, getPrefilledJDataView, b, chr } from "./test-helpers";
 import { describe, test, assert } from 'vitest'
 
 describe('Setters', function () {
 
-	const view = getJDataView();
+	const view = getPrefilledJDataView();
 
 	// setter = value || {value, args?, getterArgs?, check?}
 	function testSetters(type, setters) {
