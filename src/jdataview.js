@@ -144,11 +144,6 @@ export class jDataView {
 	#setBytes(byteOffset, bytes, littleEndian) {
 		const length = bytes.length;
 
-		// needed for Opera
-		if (length === 0) {
-			return;
-		}
-
 		littleEndian ??= this.littleEndian;
 		byteOffset ??= this._offset;
 
