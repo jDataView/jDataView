@@ -375,13 +375,13 @@ for (const type in builtInTypeBytes) {
 	// Getters
 	jDataView.prototype["get" + type] = function (byteOffset, littleEndian) {
 		littleEndian = defined(littleEndian, this.littleEndian);
-		return this.dataView["get" + type](byteOffset, littleEndian);
+		return this._dataView["get" + type](byteOffset, littleEndian);
 	}
 
 	// Setters
 	jDataView.prototype["set" + type] = function (byteOffset, value, littleEndian) {
 		littleEndian = defined(littleEndian, this.littleEndian);
-		return this.dataView["set" + type](byteOffset, value, littleEndian);
+		return this._dataView["set" + type](byteOffset, value, littleEndian);
 	}
 }
 const supportedTypes = [
