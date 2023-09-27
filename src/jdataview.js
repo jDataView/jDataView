@@ -378,7 +378,6 @@ for (const type in builtInTypeBytes) {
 		littleEndian = defined(littleEndian, this.littleEndian);
 		byteOffset = defined(byteOffset, this._offset);
 
-
 		// Move pointer forwards
 		this._offset = byteOffset + typeByteLength;
 

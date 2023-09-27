@@ -1,8 +1,6 @@
 import { describe, test, it, assert } from "vitest";
 import jDataView from "../src/jdataview";
 
-
-
 describe("Offset (pointer)", () => {
     it("starts at 0", () => {
         const view = new jDataView(10);
@@ -48,12 +46,10 @@ describe("Offset (pointer)", () => {
     test("Get moves the pointer forwards properly", () => {
         const view = new jDataView(15);
 
-
         view.writeUint8(25);
         view.writeInt16(26);
         view.writeUint32(27);
         view.writeBigInt64(28n);
-
 
         view.seek(0)
 
@@ -61,5 +57,29 @@ describe("Offset (pointer)", () => {
         assert.equal(view.getInt16(), 26)
         assert.equal(view.getUint32(), 27)
         assert.equal(view.getBigInt64(), 28n)
+    })
+    test("The demo works", () => {
+        // This demo: https://github.com/jDataView/jDataView/wiki/Example
+
+        const view = jDataView.from(
+            0x10, 0x01, 0x00, 0x00, // Int32 - 272
+            0x90, 0xcf, 0x1b, 0x47, // Float32 - 39887.5625
+            0, 0, 0, 0, 0, 0, 0, 0, // 8 blank bytes
+            0x4d, 0x44, 0x32, 0x30, // String - MD20
+            0x61                    // Char - a
+        );
+
+        // The demo assumes littleEndian, but that's not the default
+        view.littleEndian = true;
+
+        console.log(view.buffer)
+
+        assert.equal(view.getInt32(), 272)
+        assert.equal(view.getFloat32(), 39887.5625)
+
+        view.skip(8);
+
+        assert.equal(view.getString(4), "MD20")
+        assert.equal(view.getChar(), "a")
     })
 })
