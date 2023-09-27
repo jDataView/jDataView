@@ -1,7 +1,6 @@
 import { jDataView } from "../src/jdataview";
 import { compareInt64, compareBytes, compareWithNaN, getJDataView, b, chr } from "./test-helpers";
-import { describe, it, test, assert } from 'vitest'
-
+import { describe, test, assert } from 'vitest'
 
 describe('Setters', function () {
 
@@ -148,11 +147,11 @@ describe('Setters', function () {
 			}
 
 			eachValue(function (value, bitLength) {
-				view["write" + type](0, value, bitLength);
+				this["write" + type](0, value, bitLength);
 			});
 
 			eachValue(function (value, bitLength) {
-				const realValue = view["get" + type](bitLength);
+				const realValue = this["get" + type](bitLength);
 				assert.equal(
 					realValue,
 					value,
