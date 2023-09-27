@@ -7,7 +7,7 @@ describe("Aligning", function () {
 
     function checkAlignBy(byteCount, expectedOffset) {
         const offset = view.alignBy(byteCount);
-        assert.equal(view._bitOffset, 0);
+        assert.equal(view.tellBit(), 0);
         assert.equal(view.tell(), offset);
         assert.equal(offset, expectedOffset);
     }
