@@ -25,12 +25,9 @@ export function compareBytes(value, expected, message) {
     );
 }
 
-function isNaN(obj) {
-    return Number.isNaN(obj) || (typeof obj === 'number' && obj.toString() === 'NaN');
-}
 
 export function compareWithNaN(value, expected, message) {
-    assert.ok(isNaN(value), message || value + " != NaN");
+    assert.ok(Number.isNaN(value), message || value + " != NaN");
 }
 
 export function getPrefilledJDataView() {
