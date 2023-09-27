@@ -372,15 +372,27 @@ const builtInTypeBytes = {
 };
 // Encapsulate all the built-in methods
 for (const type in builtInTypeBytes) {
+	const typeByteLength = builtInTypeBytes[type];
 	// Getters
 	jDataView.prototype["get" + type] = function (byteOffset, littleEndian) {
 		littleEndian = defined(littleEndian, this.littleEndian);
+		byteOffset = defined(byteOffset, this._offset);
+
+
+		// Move pointer forwards
+		this._offset = byteOffset + typeByteLength;
+
 		return this._dataView["get" + type](byteOffset, littleEndian);
 	}
 
 	// Setters
 	jDataView.prototype["set" + type] = function (byteOffset, value, littleEndian) {
 		littleEndian = defined(littleEndian, this.littleEndian);
+		byteOffset = defined(byteOffset, this._offset);
+
+		// Move pointer forwards
+		this._offset = byteOffset + typeByteLength;
+
 		return this._dataView["set" + type](byteOffset, value, littleEndian);
 	}
 }
