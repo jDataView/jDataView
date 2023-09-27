@@ -1,5 +1,5 @@
 import { jDataView } from "../src/jdataview";
-import { compareInt64, compareBytes, compareWithNaN, getPrefilledJDataView, b, chr, bufferToHex } from "./test-helpers";
+import { compareBytes, compareWithNaN, getPrefilledJDataView, b, chr, bufferToHex } from "./test-helpers";
 import { describe, test, assert } from 'vitest'
 
 
@@ -208,12 +208,10 @@ describe('Getters', function () {
 		{
 			view: b(0x00, 0x67, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe),
 			value: 29273397577908224n,
-			check: compareInt64,
 		},
 		{
 			view: b(0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77),
 			value: 4822678189205111n,
-			check: compareInt64,
 		},
 	]);
 
@@ -221,17 +219,40 @@ describe('Getters', function () {
 		{
 			args: [0, false],
 			value: -283686985483775n,
-			check: compareInt64,
 		},
 		{
 			view: b(0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe),
 			value: -2n,
-			check: compareInt64,
 		},
 		{
 			view: b(0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77),
 			value: 4822678189205111n,
-			check: compareInt64,
+		},
+	]);
+
+	testGetters("Uint64", [
+		{
+			view: b(0x00, 0x67, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe),
+			value: 29273397577908224,
+		},
+		{
+			view: b(0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77),
+			value: 4822678189205111,
+		},
+	]);
+
+	testGetters("Int64", [
+		{
+			args: [0, false],
+			value: -283686985483775,
+		},
+		{
+			view: b(0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe),
+			value: -2,
+		},
+		{
+			view: b(0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77),
+			value: 4822678189205111,
 		},
 	]);
 

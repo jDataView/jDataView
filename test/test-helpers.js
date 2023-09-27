@@ -11,11 +11,6 @@ const testDataBytes = [
     0xfa, 0x00, 0xba, 0x01
 ];
 
-export function compareInt64(value, expected, message) {
-    value = Number(value);
-    assert.equal(value, expected, message || value + " != " + expected);
-}
-
 export function compareBytes(value, expected, message) {
     value = Array.prototype.slice.call(value);
     assert.deepEqual(

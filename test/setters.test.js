@@ -1,5 +1,5 @@
 import { jDataView } from "../src/jdataview";
-import { compareInt64, compareBytes, compareWithNaN, getPrefilledJDataView, b, chr } from "./test-helpers";
+import { compareBytes, compareWithNaN, getPrefilledJDataView, b, chr } from "./test-helpers";
 import { describe, test, assert } from 'vitest'
 
 describe('Setters', function () {
@@ -123,14 +123,25 @@ describe('Setters', function () {
 	]);
 
 	testSetters("BigUint64", [
-		{ value: 29273397577908224n, check: compareInt64 },
-		{ value: 4822678189205111n, check: compareInt64 },
+		{ value: 29273397577908224n },
+		{ value: 4822678189205111n },
 	]);
 
 	testSetters("BigInt64", [
-		{ value: -283686985483775n, check: compareInt64 },
-		{ value: -2n, check: compareInt64 },
-		{ value: 4822678189205111n, check: compareInt64 },
+		{ value: -283686985483775n },
+		{ value: -2n },
+		{ value: 4822678189205111n },
+	]);
+
+	testSetters("Uint64", [
+		{ value: 29273397577908224 },
+		{ value: 4822678189205111 },
+	]);
+
+	testSetters("Int64", [
+		{ value: -283686985483775 },
+		{ value: -2 },
+		{ value: 4822678189205111 },
 	]);
 
 	// setter = {value, bitLength}

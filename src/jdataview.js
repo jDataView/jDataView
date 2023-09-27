@@ -361,6 +361,57 @@ export class jDataView {
 		return this.setUnsigned(byteOffset, value, bitLength);
 	}
 
+	/**
+	 * Sets an unsigned 64 bit integer. Takes a regular Number, not a BigInt. 
+	 * 
+	 * For more precision, use `setBigUint64()`
+	 * @param {number} [byteOffset=] 
+	 * @param {number} value 
+	 * @param {boolean} [littleEndian=false] 
+	 */
+	setUint64(byteOffset, value, littleEndian) {
+		// Pointer will be handled for us by the bigInt method
+		this.setBigUint64(byteOffset, BigInt(value), littleEndian);
+	}
+
+	/**
+	 * Sets a 64 bit integer. Takes a regular Number, not a BigInt. 
+	 * 
+	 * For more precision, use `setBigInt64()`
+	 * @param {number} [byteOffset=] 
+	 * @param {number} value 
+	 * @param {boolean} [littleEndian=false] 
+	 */
+	setInt64(byteOffset, value, littleEndian) {
+		// Pointer will be handled for us by the bigInt method
+		this.setBigInt64(byteOffset, BigInt(value), littleEndian);
+	}
+
+	/**
+	 * Get an unsigned 64 bit integer. Returns a regular Number, not a BigInt. 
+	 * 
+	 * For more precision, use `getBigUint64()`
+	 * @param {number} [byteOffset=] 
+	 * @param {boolean} [littleEndian=false] 
+	 * @returns {number}
+	 */
+	getUint64(byteOffset, littleEndian) {
+		// Pointer will be handled for us by the bigInt method
+		return Number(this.getBigUint64(byteOffset, littleEndian));
+	}
+
+	/**
+	 * Get a 64 bit integer. Returns a regular Number, not a BigInt. 
+	 * 
+	 * For more precision, use `getBigInt64()`
+	 * @param {number} [byteOffset=] 
+	 * @param {boolean} [littleEndian=false] 
+	 * @returns {number}
+	 */
+	getInt64(byteOffset, littleEndian) {
+		// Pointer will be handled for us by the bigInt method
+		return Number(this.getBigInt64(byteOffset, littleEndian));
+	}
 }
 
 const builtInTypeBytes = {
@@ -397,6 +448,7 @@ for (const type in builtInTypeBytes) {
 }
 const supportedTypes = [
 	...Object.keys(builtInTypeBytes),
+	"Int64", "Uint64",
 	"Signed", "Unsigned",
 	"String", "Char",
 	"Bytes"
