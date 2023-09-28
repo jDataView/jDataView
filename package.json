@@ -17,10 +17,12 @@
     ]
   },
   "files": [
-    "dist"
+    "dist",
+    "src/**/*.d.ts"
   ],
   "main": "./dist/jdataview.js",
   "module": "./dist/jdataview.js",
+  "types": "./src/jdataview.d.ts",
   "exports": {
     ".": {
       "import": "./dist/jdataview.js"

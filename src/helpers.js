@@ -42,4 +42,3 @@ export function arrayFrom(arrayLike, forceCopy) {
         ? arrayLike
         : Array.prototype.slice.call(arrayLike);
 }
-

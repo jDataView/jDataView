@@ -1,21 +1,11 @@
 import { getCharCodes, wrapBuffer, arrayFrom } from "./helpers";
 
-
-/**
- * Type aliases
- * @typedef {Int8Array|Uint8Array|Uint8ClampedArray|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array|Float64Array|BigInt64Array|BigUint64Array} TypedArray
- * @typedef {string|number|ArrayBuffer|TypedArray} BufferIsh
-*/
-
 /**
  * jDataView provides a layer on top of the built-in `DataView` with a plethora of utilities to make working with binary data a pleasure.
  * 
  * Create a `jDataView` using either `new jDataView()` or `jDataView.from()`.
  *
- * [Read the docs](https://github.com/jDataView/jDataView/wiki)
- * 
- * @class
- * @implements {typeof DataView}
+ * [Read the docs](https://github.com/jDataView/jDataView/wiki) 
  */
 export class jDataView {
 
@@ -26,11 +16,6 @@ export class jDataView {
 	 * jDataView provides a layer on top of the built-in `DataView` with a plethora of utilities to make working with binary data a pleasure.
 	 * 
 	 * [Read the docs](https://github.com/jDataView/jDataView/wiki)
-	 * 
-	 * @param {BufferIsh} buffer 
-	 * @param {number} byteOffset 
-	 * @param {number} byteLength 
-	 * @param {boolean} littleEndian 
 	 */
 	constructor(
 		buffer,
@@ -40,9 +25,6 @@ export class jDataView {
 	) {
 		/**
 		 * The jDataView instance. Can be used to check if something really is a jDataView.
-		 * @type {jDataView}
-		 * @public
-		 * @readonly
 		 */
 		this.jDataView = this;
 
@@ -53,41 +35,28 @@ export class jDataView {
 		}
 
 		/**
-		* buffer is the internal `ArrayBuffer` that jDataView is a 'view' on
-		* @type {ArrayBuffer}
-		* @public
+		* The internal `ArrayBuffer` that jDataView is a view on
 		*/
 		this.buffer = wrapBuffer(buffer); // Convert strings, arrays, etc to `ArrayBuffer`s
 
 		/**
 		* The offset in bytes from the start of the ArrayBuffer.
-		* @type {number}
-		* @public
-		* @readonly
 		*/
 		this.byteOffset = byteOffset ?? 0;
 
 		/**
 		* 
 		* The number of elements in the byte array. If unspecified, jDataView's length will match the buffer's length.
-		* @type {number}
-		* @public
-		* @readonly
 		*/
 		this.byteLength = byteLength ?? (this.buffer.byteLength - this.byteOffset);
 
 		/**
 		* The internal `DataView` that powers all the default operations like `getUint8()`
-		* @type {DataView}
-		* @readonly
 		*/
 		this.dataView = new DataView(this.buffer, this.byteOffset, this.byteLength);
 
 		/**
 		* Weather this jDataView should default to littleEndian for number operations
-		* @type {boolean}
-		* @public
-		* @readonly
 		*/
 		this.littleEndian = !!littleEndian;
 
@@ -104,8 +73,6 @@ export class jDataView {
 
 	/**
 	 * Constructs a new jDataView filled with the provided data
-	 * @param {BufferIsh} data
-	 * @returns {jDataView}
 	 */
 	static from(...data) {
 		return new jDataView(data.flat(Infinity));
@@ -131,139 +98,8 @@ export class jDataView {
 		}
 	}
 
-	#getBytes(length, byteOffset, littleEndian) {
-		littleEndian ??= this.littleEndian;
-		byteOffset ??= this.#bytePointer;
-		length ??= this.byteLength - byteOffset;
-
-		this.#checkBounds(byteOffset, length);
-
-		byteOffset += this.byteOffset;
-
-		this.#bytePointer = byteOffset - this.byteOffset + length;
-
-		const result = new Uint8Array(this.buffer, byteOffset, length)
-
-		return littleEndian || length <= 1 ? result : arrayFrom(result).reverse();
-	}
-
-	/**
-	 * Get raw bytes. If length is undefined, it will go to the end of the buffer. 
-	 * @param {number} [length=]
-	 * @param {number} [byteOffset=]
-	 * @param {boolean} [littleEndian=true] 
-	 * @param {boolean} [toArray=false] @default
-	 * @returns {Uint8Array | number[]}
-	 */
-	getBytes(length, byteOffset, littleEndian, toArray) {
-		const result = this.#getBytes(
-			length,
-			byteOffset,
-			littleEndian ?? true
-		);
-		return toArray ? arrayFrom(result) : result;
-	}
-
-	#setBytes(byteOffset, bytes, littleEndian) {
-		const length = bytes.length;
-
-		littleEndian ??= this.littleEndian;
-		byteOffset ??= this.#bytePointer;
-
-		this.#checkBounds(byteOffset, length);
-
-		if (!littleEndian && length > 1) {
-			bytes = arrayFrom(bytes, true).reverse();
-		}
-
-		byteOffset += this.byteOffset;
-
-		new Uint8Array(this.buffer, byteOffset, length).set(bytes);
-
-
-		this.#bytePointer = byteOffset - this.byteOffset + length;
-	}
-
-	/**
-	 * Directly set raw bytes at `byteOffset` or the current pointer
-	 * @param {number} [byteOffset=]
-	 * @param {ArrayLike<number>} bytes 
-	 * @param {boolean} [littleEndian=true]
-	 */
-	setBytes(byteOffset, bytes, littleEndian) {
-		this.#setBytes(byteOffset, bytes, littleEndian ?? true);
-	}
-
-	/**
-	 * Read a string
-	 * @param {number} [length=]
-	 * @param {number} [byteOffset=]
-	 * @param {string} [encoding=binary] 
-	 * @returns {string}
-	 */
-	getString(byteLength, byteOffset, encoding) {
-		const bytes = this.#getBytes(byteLength, byteOffset, true);
-		// backward-compatibility
-		encoding = encoding === 'utf8' ? 'utf-8' : encoding || 'binary';
-		if (TextDecoder && encoding !== 'binary') {
-			return new TextDecoder(encoding).decode(bytes);
-		}
-		let string = '';
-		byteLength = bytes.length;
-		for (let i = 0; i < byteLength; i++) {
-			string += String.fromCharCode(bytes[i]);
-		}
-		if (encoding === 'utf-8') {
-			string = decodeURIComponent(escape(string));
-		}
-		return string;
-	}
-
-	/**
-	 * Set a string
-	 * @param {number} [byteOffset=]
-	 * @param {string} subString The string to set
-	 * @param {string} [encoding=binary] The encoding to use
-	 */
-	setString(byteOffset, subString, encoding) {
-		// backward-compatibility
-		encoding = encoding === 'utf8' ? 'utf-8' : encoding || 'binary';
-		let bytes;
-		if (TextEncoder && encoding !== 'binary') {
-			bytes = new TextEncoder(encoding).encode(subString);
-		} else {
-			if (encoding === 'utf-8') {
-				subString = unescape(encodeURIComponent(subString));
-			}
-			bytes = getCharCodes(subString);
-		}
-		this.#setBytes(byteOffset, bytes, true);
-	}
-
-	/**
-	 * Get a single character.
-	 * This is the same as getting a 1-length string using binary encoding
-	 * @param {number} [length=]
-	 * @param {number} [byteOffset=]
-	 * @returns {string}
-	 */
-	getChar(byteOffset) {
-		return this.getString(1, byteOffset);
-	}
-
-	/**
-	 * Set a single character.
-	 * This is the same as setting a 1-length string using binary encoding
-	 * @param {number} [length=]
-	 * @param {number} [byteOffset=]
-	 */
-	setChar(byteOffset, character) {
-		this.setString(byteOffset, character);
-	}
-
 	/**
 	 * Get the current byte pointer position
-	 * @returns {number}
 	 */
 	tell() {
 		return this.#bytePointer;
@@ -271,7 +107,6 @@ export class jDataView {
 
 	/**
 	 * Get the current bit offset
-	 * @returns {number}
 	 */
 	tellBit() {
 		return this.#bitOffset;
@@ -279,8 +114,6 @@ export class jDataView {
 
 	/**
 	 * Set the current byte pointer position
-	 * @param {number} byteOffset
-	 * @returns {number}
 	 */
 	seek(byteOffset) {
 		this.#checkBounds(byteOffset, 0);
@@ -290,8 +123,6 @@ export class jDataView {
 
 	/**
 	 * Move the current pointer position forward
-	 * @param {number} byteOffset
-	 * @returns {number}
 	 */
 	skip(byteLength) {
 		return this.seek(this.#bytePointer + byteLength);
@@ -299,10 +130,6 @@ export class jDataView {
 
 	/**
 	 * Returns a new `jDataView` instance between `start` and `end`, optionally duplicating all the contained data in memory.  
-	 * @param {number} start 
-	 * @param {number} end 
-	 * @param {boolean} [forceCopy=false] 
-	 * @returns {jDataView}
 	 */
 	slice(start, end, forceCopy) {
 		function normalizeOffset(offset, byteLength) {
@@ -329,8 +156,6 @@ export class jDataView {
 
 	/**
 	 * Aligns the pointer (clearing any bitOffset). Can also move the pointer
-	 * @param {number} [byteCount=1] 
-	 * @returns {number}
 	 */
 	alignBy(byteCount) {
 		this.#bitOffset = 0;
@@ -340,6 +165,121 @@ export class jDataView {
 			return this.#bytePointer;
 		}
 	}
+
+	// Setters and getters
+
+	#getBytes(length, byteOffset, littleEndian) {
+		littleEndian ??= this.littleEndian;
+		byteOffset ??= this.#bytePointer;
+		length ??= this.byteLength - byteOffset;
+
+		this.#checkBounds(byteOffset, length);
+
+		byteOffset += this.byteOffset;
+
+		this.#bytePointer = byteOffset - this.byteOffset + length;
+
+		const result = new Uint8Array(this.buffer, byteOffset, length)
+
+		return littleEndian || length <= 1 ? result : arrayFrom(result).reverse();
+	}
+
+	#setBytes(byteOffset, bytes, littleEndian) {
+		const length = bytes.length;
+
+		littleEndian ??= this.littleEndian;
+		byteOffset ??= this.#bytePointer;
+
+		this.#checkBounds(byteOffset, length);
+
+		if (!littleEndian && length > 1) {
+			bytes = arrayFrom(bytes, true).reverse();
+		}
+
+		byteOffset += this.byteOffset;
+
+		new Uint8Array(this.buffer, byteOffset, length).set(bytes);
+
+
+		this.#bytePointer = byteOffset - this.byteOffset + length;
+	}
+
+
+	/**
+	 * Get raw bytes. If length is undefined, it will go to the end of the buffer.
+	 */
+	getBytes(length, byteOffset, littleEndian, toArray) {
+		const result = this.#getBytes(
+			length,
+			byteOffset,
+			littleEndian ?? true
+		);
+		return toArray ? arrayFrom(result) : result;
+	}
+
+
+	/**
+	 * Directly set raw bytes at `byteOffset` or the current pointer.
+	 */
+	setBytes(byteOffset, bytes, littleEndian) {
+		this.#setBytes(byteOffset, bytes, littleEndian ?? true);
+	}
+
+	/**
+	 * Read a string using the specified encoding, or binary if unspecified
+	 */
+	getString(byteLength, byteOffset, encoding) {
+		const bytes = this.#getBytes(byteLength, byteOffset, true);
+		// backward-compatibility
+		encoding = encoding === 'utf8' ? 'utf-8' : encoding || 'binary';
+		if (TextDecoder && encoding !== 'binary') {
+			return new TextDecoder(encoding).decode(bytes);
+		}
+		let string = '';
+		byteLength = bytes.length;
+		for (let i = 0; i < byteLength; i++) {
+			string += String.fromCharCode(bytes[i]);
+		}
+		if (encoding === 'utf-8') {
+			string = decodeURIComponent(escape(string));
+		}
+		return string;
+	}
+
+	/**
+	 * Set a string using the specified encoding, or binary if unspecified
+	 */
+	setString(byteOffset, subString, encoding) {
+		// backward-compatibility
+		encoding = encoding === 'utf8' ? 'utf-8' : encoding || 'binary';
+		let bytes;
+		if (TextEncoder && encoding !== 'binary') {
+			bytes = new TextEncoder(encoding).encode(subString);
+		} else {
+			if (encoding === 'utf-8') {
+				subString = unescape(encodeURIComponent(subString));
+			}
+			bytes = getCharCodes(subString);
+		}
+		this.#setBytes(byteOffset, bytes, true);
+	}
+
+	/**
+	 * Get a single character.
+	 * This is the same as getting a 1-length string using binary encoding
+	 */
+	getChar(byteOffset) {
+		return this.getString(1, byteOffset);
+	}
+
+	/**
+	 * Set a single character.
+	 * This is the same as setting a 1-length string using binary encoding
+	 */
+	setChar(byteOffset, character) {
+		this.setString(byteOffset, character);
+	}
+
 
 	#getBitRangeData(bitLength, byteOffset) {
 		const startBit = ((byteOffset ?? this.#bytePointer) << 3) + this.#bitOffset;
@@ -367,9 +307,6 @@ export class jDataView {
 
 	/**
 	 * Get an integer of any bit length up to 32
-	 * @param {number} bitLength 
-	 * @param {number} [byteOffset=]
-	 * @returns {number}
 	 */
 	getSigned(bitLength, byteOffset) {
 		const shift = 32 - bitLength;
@@ -378,9 +315,6 @@ export class jDataView {
 
 	/**
 	 * Get an unsigned integer of any bit length up to 32
-	 * @param {number} bitLength 
-	 * @param {number} [byteOffset=]
-	 * @returns {number}
 	 */
 	getUnsigned(bitLength, byteOffset) {
 		const value =
@@ -392,10 +326,6 @@ export class jDataView {
 
 	/**
 	 * Set an unsigned integer of any bit length up to 32
-	 * @param {number} [byteOffset=] 
-	 * @param {number} value
-	 * @param {number} bitLength
-	 * @returns {number}
 	 */
 	setUnsigned(byteOffset, value, bitLength) {
 		const data = this.#getBitRangeData(bitLength, byteOffset);
@@ -415,10 +345,6 @@ export class jDataView {
 
 	/**
 	 * Set a signed integer of any bit length up to 32
-	 * @param {number} [byteOffset=] 
-	 * @param {number} value
-	 * @param {number} bitLength
-	 * @returns {number}
 	 */
 	setSigned(byteOffset, value, bitLength) {
 		return this.setUnsigned(byteOffset, value, bitLength);
@@ -428,9 +354,6 @@ export class jDataView {
 	 * Sets an unsigned 64 bit integer. Takes a regular Number, not a BigInt. 
 	 * 
 	 * For more precision, use `setBigUint64()`
-	 * @param {number} [byteOffset=] 
-	 * @param {number} value 
-	 * @param {boolean} [littleEndian=false] 
 	 */
 	setUint64(byteOffset, value, littleEndian) {
 		// Pointer will be handled for us by the bigInt method
@@ -441,9 +364,6 @@ export class jDataView {
 	 * Sets a 64 bit integer. Takes a regular Number, not a BigInt. 
 	 * 
 	 * For more precision, use `setBigInt64()`
-	 * @param {number} [byteOffset=] 
-	 * @param {number} value 
-	 * @param {boolean} [littleEndian=false] 
 	 */
 	setInt64(byteOffset, value, littleEndian) {
 		// Pointer will be handled for us by the bigInt method
@@ -454,9 +374,6 @@ export class jDataView {
 	 * Get an unsigned 64 bit integer. Returns a regular Number, not a BigInt. 
 	 * 
 	 * For more precision, use `getBigUint64()`
-	 * @param {number} [byteOffset=] 
-	 * @param {boolean} [littleEndian=false] 
-	 * @returns {number}
 	 */
 	getUint64(byteOffset, littleEndian) {
 		// Pointer will be handled for us by the bigInt method
@@ -467,9 +384,6 @@ export class jDataView {
 	 * Get a 64 bit integer. Returns a regular Number, not a BigInt. 
 	 * 
 	 * For more precision, use `getBigInt64()`
-	 * @param {number} [byteOffset=] 
-	 * @param {boolean} [littleEndian=false] 
-	 * @returns {number}
 	 */
 	getInt64(byteOffset, littleEndian) {
 		// Pointer will be handled for us by the bigInt method
@@ -485,6 +399,15 @@ const builtInTypeBytes = {
 	"Int16": 2, "Uint16": 2,
 	"Int8": 1, "Uint8": 1
 };
+
+const supportedTypes = [
+	...Object.keys(builtInTypeBytes),
+	"Int64", "Uint64",
+	"Signed", "Unsigned",
+	"String", "Char",
+	"Bytes"
+]
+
 // Encapsulate all the built-in methods
 for (const type in builtInTypeBytes) {
 	const typeByteLength = builtInTypeBytes[type];
@@ -510,13 +433,7 @@ for (const type in builtInTypeBytes) {
 		return this.dataView["set" + type](byteOffset, value, littleEndian);
 	}
 }
-const supportedTypes = [
-	...Object.keys(builtInTypeBytes),
-	"Int64", "Uint64",
-	"Signed", "Unsigned",
-	"String", "Char",
-	"Bytes"
-]
+
 // Add the the writeXXX shorthand methods
 for (const type of supportedTypes) {
 	// arg3 might be littleEndian or bitLength
