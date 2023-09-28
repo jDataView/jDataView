@@ -7,6 +7,16 @@ import { getCharCodes, wrapBuffer, arrayFrom } from "./helpers";
  * @typedef {string|number|ArrayBuffer|TypedArray} BufferIsh
 */
 
+/**
+ * jDataView provides a layer on top of the built-in `DataView` with a plethora of utilities to make working with binary data a pleasure.
+ * 
+ * Create a `jDataView` using either `new jDataView()` or `jDataView.from()`.
+ *
+ * [Read the docs](https://github.com/jDataView/jDataView/wiki)
+ * 
+ * @class
+ * @implements {typeof DataView}
+ */
 export class jDataView {
 
 	#bitOffset;
@@ -16,6 +26,7 @@ export class jDataView {
 	 * jDataView provides a layer on top of the built-in `DataView` with a plethora of utilities to make working with binary data a pleasure.
 	 * 
 	 * [Read the docs](https://github.com/jDataView/jDataView/wiki)
+	 * 
 	 * @param {BufferIsh} buffer 
 	 * @param {number} byteOffset 
 	 * @param {number} byteLength 
@@ -465,6 +476,7 @@ export class jDataView {
 		return Number(this.getBigInt64(byteOffset, littleEndian));
 	}
 }
+export default jDataView;
 
 const builtInTypeBytes = {
 	"Float64": 8, "Float32": 4,
@@ -507,9 +519,8 @@ const supportedTypes = [
 ]
 // Add the the writeXXX shorthand methods
 for (const type of supportedTypes) {
-	jDataView.prototype["write" + type] = function (value, littleEndian) {
-		return this["set" + type].call(this, undefined, value, littleEndian);
+	// arg3 might be littleEndian or bitLength
+	jDataView.prototype["write" + type] = function (value, arg3) {
+		return this["set" + type].call(this, undefined, value, arg3);
 	}
 }
-
-export default jDataView;
