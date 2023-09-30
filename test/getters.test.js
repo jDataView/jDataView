@@ -1,10 +1,15 @@
 import { jDataView } from "../src/jdataview";
-import { compareBytes, compareWithNaN, getPrefilledJDataView, b, chr, bufferToHex } from "./test-helpers";
-import { describe, test, assert } from 'vitest'
+import {
+	compareBytes,
+	compareWithNaN,
+	getPrefilledJDataView,
+	b,
+	chr,
+	bufferToHex,
+} from "./test-helpers";
+import { describe, test, assert } from "vitest";
 
-
-describe('Getters', function () {
-
+describe("Getters", function () {
 	// getter = value || {value, check?, view?, args?}
 	function testGetters(type, getters) {
 		const view = getPrefilledJDataView();
@@ -28,22 +33,22 @@ describe('Getters', function () {
 					realValue,
 					value,
 					"get" +
-					type +
-					"(" +
-					args.join(", ") +
-					") == " +
-					realValue +
-					" != " +
-					value +
-					" at offset " +
-					offset +
-					(getter.view
-						? " in view [" +
-						getter.view
-							.getBytes(undefined, 0, true, true)
-							.join(", ") +
-						"]"
-						: "")
+						type +
+						"(" +
+						args.join(", ") +
+						") == " +
+						realValue +
+						" != " +
+						value +
+						" at offset " +
+						offset +
+						(getter.view
+							? " in view [" +
+							  getter.view
+									.getBytes(undefined, 0, true, true)
+									.join(", ") +
+							  "]"
+							: "")
 				);
 			});
 		});
@@ -85,12 +90,16 @@ describe('Getters', function () {
 		},
 	]);
 
-	test("Big String", function () {
-		const view = new jDataView(2000000);
-		assert.doesNotThrow(function () {
-			view.getString();
-		});
-	}, { timeout: 5000 });
+	test(
+		"Big String",
+		function () {
+			const view = new jDataView(2000000);
+			assert.doesNotThrow(function () {
+				view.getString();
+			});
+		},
+		{ timeout: 5000 }
+	);
 
 	testGetters("Int8", [-1, -2, -3, -4, -6, 0, -70, 1]);
 
@@ -287,6 +296,5 @@ describe('Getters', function () {
 
 		view.writeChar("þ");
 		assert.equal(view.getChar(0), "þ");
-	})
-
+	});
 });

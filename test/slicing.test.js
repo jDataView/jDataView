@@ -1,9 +1,7 @@
 import { compareBytes, getPrefilledJDataView, chr } from "./test-helpers";
-import { describe, test, assert } from 'vitest'
+import { describe, test, assert } from "vitest";
 
-
-describe('Slicing', function () {
-
+describe("Slicing", function () {
 	const view = getPrefilledJDataView();
 
 	test("with bound check", function () {
@@ -42,9 +40,6 @@ describe('Slicing', function () {
 
 	test("with negative end offset given", function () {
 		const pointerCopy = view.slice(1, -2);
-		compareBytes(
-			pointerCopy.getBytes(),
-			[0xfe, 0xfd, 0xfc, 0xfa, 0x00]
-		);
+		compareBytes(pointerCopy.getBytes(), [0xfe, 0xfd, 0xfc, 0xfa, 0x00]);
 	});
 });

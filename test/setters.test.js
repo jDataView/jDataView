@@ -1,9 +1,14 @@
 import { jDataView } from "../src/jdataview";
-import { compareBytes, compareWithNaN, getPrefilledJDataView, b, chr } from "./test-helpers";
-import { describe, test, assert } from 'vitest'
+import {
+	compareBytes,
+	compareWithNaN,
+	getPrefilledJDataView,
+	b,
+	chr,
+} from "./test-helpers";
+import { describe, test, assert } from "vitest";
 
-describe('Setters', function () {
-
+describe("Setters", function () {
 	const view = getPrefilledJDataView();
 
 	// setter = value || {value, args?, getterArgs?, check?}
@@ -22,27 +27,27 @@ describe('Setters', function () {
 				const getterArgs = setter.getterArgs || [offset];
 				const check = setter.check || assert.equal;
 
-				assert.ok(('write' + type) in view, 'jDataView does not have `write' + type + '` method.');
+				assert.ok(
+					"write" + type in view,
+					"jDataView does not have `write" + type + "` method."
+				);
 				view["set" + type].apply(view, args);
 
-				const realValue = view["get" + type].apply(
-					view,
-					getterArgs
-				);
+				const realValue = view["get" + type].apply(view, getterArgs);
 
 				check(
 					realValue,
 					value,
 					"set" +
-					type +
-					"(" +
-					args.join(", ") +
-					") != get" +
-					type +
-					"(" +
-					getterArgs.join(", ") +
-					") == " +
-					realValue
+						type +
+						"(" +
+						args.join(", ") +
+						") != get" +
+						type +
+						"(" +
+						getterArgs.join(", ") +
+						") == " +
+						realValue
 				);
 			});
 		});
@@ -167,17 +172,17 @@ describe('Setters', function () {
 					realValue,
 					value,
 					"write" +
-					type +
-					"(" +
-					value +
-					", " +
-					bitLength +
-					") != get" +
-					type +
-					"(" +
-					bitLength +
-					") == " +
-					realValue
+						type +
+						"(" +
+						value +
+						", " +
+						bitLength +
+						") != get" +
+						type +
+						"(" +
+						bitLength +
+						") == " +
+						realValue
 				);
 			});
 		});
@@ -210,5 +215,4 @@ describe('Setters', function () {
 		{ value: -0x40000000, bitLength: 31 },
 		{ value: -1, bitLength: 1 },
 	]);
-
 });

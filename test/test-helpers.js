@@ -1,5 +1,5 @@
-import jDataView from "../src/jdataview"
-import { assert } from "vitest"
+import jDataView from "../src/jdataview";
+import { assert } from "vitest";
 
 // Aliases
 export const b = jDataView.from;
@@ -12,19 +12,18 @@ const testDataBytes = [
 ];
 
 export function compareBytes(value, expected, message) {
-    value = Array.prototype.slice.call(value);
-    assert.deepEqual(
-        value,
-        expected,
-        message || "[" + value + "] != [" + expected + "]"
-    );
+	value = Array.prototype.slice.call(value);
+	assert.deepEqual(
+		value,
+		expected,
+		message || "[" + value + "] != [" + expected + "]"
+	);
 }
 
-
 export function compareWithNaN(value, expected, message) {
-    assert.ok(Number.isNaN(value), message || value + " != NaN");
+	assert.ok(Number.isNaN(value), message || value + " != NaN");
 }
 
 export function getPrefilledJDataView() {
-    return new jDataView(testDataBytes.slice(), 1, undefined, true);
+	return new jDataView(testDataBytes.slice(), 1, undefined, true);
 }
