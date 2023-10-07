@@ -1,4 +1,4 @@
-import { getCharCodes, wrapBuffer, arrayFrom } from "./helpers";
+import { getCharCodes, wrapBuffer } from "./helpers";
 
 /**
  * jDataView provides a layer on top of the built-in `DataView` with a plethora of utilities to make working with binary data a pleasure.
@@ -183,7 +183,7 @@ export class jDataView {
 
 		return littleEndian || length <= 1
 			? result
-			: arrayFrom(result).reverse();
+			: Array.from(result).reverse();
 	}
 
 	#setBytes(byteOffset, bytes, littleEndian) {
@@ -195,7 +195,7 @@ export class jDataView {
 		this.#checkBounds(byteOffset, length);
 
 		if (!littleEndian && length > 1) {
-			bytes = arrayFrom(bytes, true).reverse();
+			bytes = Array.from(bytes).reverse();
 		}
 
 		byteOffset += this.byteOffset;

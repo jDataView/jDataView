@@ -19,25 +19,9 @@ export function wrapBuffer(buffer) {
 			buffer = getCharCodes(buffer);
 		/* falls through */
 		default:
-			if (!is(buffer, ArrayBuffer)) {
+			if (!(buffer instanceof ArrayBuffer)) {
 				buffer = new Uint8Array(buffer).buffer;
 			}
 	}
 	return buffer;
-}
-
-export function is(obj, Ctor) {
-	if (typeof obj !== "object" || obj === null) {
-		return false;
-	}
-	return (
-		obj.constructor === Ctor ||
-		Object.prototype.toString.call(obj) === "[object " + Ctor.name + "]"
-	);
-}
-
-export function arrayFrom(arrayLike, forceCopy) {
-	return !forceCopy && is(arrayLike, Array)
-		? arrayLike
-		: Array.prototype.slice.call(arrayLike);
 }
