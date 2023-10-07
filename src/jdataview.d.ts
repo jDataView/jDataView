@@ -80,17 +80,12 @@ declare class jDataView {
 		littleEndian?: boolean
 	);
 
-	// The `getBytes` method has an extra argument that changes the return type
-	// from a Uint8Array to a number[] if it's true
-	getBytes<
-		T extends boolean | undefined,
-		R extends T extends true ? number[] : Uint8Array
-	>(
+	// The `getBytes` method has an extra argument for specifying the byte length
+	getBytes(
 		length?: number,
 		byteOffset?: number,
-		littleEndian?: boolean,
-		toArray?: T
-	): R;
+		littleEndian?: boolean
+	): Uint8Array;
 
 	// The string and char methods have unique signatures
 	getString(

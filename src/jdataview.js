@@ -139,7 +139,7 @@ export class jDataView {
 
 		return forceCopy
 			? new jDataView(
-					this.getBytes(end - start, start, true, true),
+					this.getBytes(end - start, start, true),
 					undefined,
 					undefined,
 					this.littleEndian
@@ -208,9 +208,8 @@ export class jDataView {
 	/**
 	 * Get raw bytes. If length is undefined, it will go to the end of the buffer.
 	 */
-	getBytes(length, byteOffset, littleEndian, toArray) {
-		const result = this.#getBytes(length, byteOffset, littleEndian ?? true);
-		return toArray ? arrayFrom(result) : result;
+	getBytes(length, byteOffset, littleEndian) {
+		return this.#getBytes(length, byteOffset, littleEndian ?? true);
 	}
 
 	/**
