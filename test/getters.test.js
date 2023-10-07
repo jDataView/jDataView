@@ -45,7 +45,7 @@ describe("Getters", function () {
 						(getter.view
 							? " in view [" +
 							  getter.view
-									.getBytes(undefined, 0, true, true)
+									.getBytes(undefined, 0, true)
 									.join(", ") +
 							  "]"
 							: "")
