@@ -222,11 +222,10 @@ export class jDataView {
 	/**
 	 * Read a string using the specified encoding, or binary if unspecified
 	 */
-	getString(byteLength, byteOffset, encoding) {
+	getString(byteLength, byteOffset, encoding = "binary") {
 		const bytes = this.#getBytes(byteLength, byteOffset, true);
 		// backward-compatibility
-		encoding = encoding === "utf8" ? "utf-8" : encoding || "binary";
-		if (TextDecoder && encoding !== "binary") {
+		if (encoding !== "binary") {
 			return new TextDecoder(encoding).decode(bytes);
 		}
 		let string = "";
@@ -234,25 +233,18 @@ export class jDataView {
 		for (let i = 0; i < byteLength; i++) {
 			string += String.fromCharCode(bytes[i]);
 		}
-		if (encoding === "utf-8") {
-			string = decodeURIComponent(escape(string));
-		}
 		return string;
 	}
 
 	/**
 	 * Set a string using the specified encoding, or binary if unspecified
 	 */
-	setString(byteOffset, subString, encoding) {
+	setString(byteOffset, subString, encoding = "binary") {
 		// backward-compatibility
-		encoding = encoding === "utf8" ? "utf-8" : encoding || "binary";
 		let bytes;
-		if (TextEncoder && encoding !== "binary") {
+		if (encoding !== "binary") {
 			bytes = new TextEncoder(encoding).encode(subString);
 		} else {
-			if (encoding === "utf-8") {
-				subString = unescape(encodeURIComponent(subString));
-			}
 			bytes = getCharCodes(subString);
 		}
 		this.#setBytes(byteOffset, bytes, true);
