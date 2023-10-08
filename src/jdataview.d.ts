@@ -64,7 +64,7 @@ type TypedArray =
 	| BigInt64Array
 	| BigUint64Array;
 
-type Bufferish = string | number | ArrayBuffer | TypedArray | ArrayLike<number>;
+type Bufferish = string | number | ArrayBuffer | ArrayLike<number>;
 
 declare class jDataView {
 	readonly jDataView: jDataView;
