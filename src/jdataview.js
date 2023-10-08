@@ -16,43 +16,24 @@ export class jDataView {
 	 *
 	 * [Read the docs](https://github.com/jDataView/jDataView/wiki)
 	 */
-	constructor(buffer, byteOffset, byteLength, littleEndian) {
+	constructor(_buffer, byteOffset, byteLength, littleEndian) {
 		/**
 		 * The jDataView instance. Can be used to check if something really is a jDataView.
 		 */
 		this.jDataView = this;
 
-		if (buffer instanceof jDataView) {
-			const result = buffer.slice(byteOffset, byteOffset + byteLength);
+		if (_buffer instanceof jDataView) {
+			const result = _buffer.slice(byteOffset, byteOffset + byteLength);
 			result.littleEndian = littleEndian ?? result.littleEndian;
 			return result;
 		}
 
-		/**
-		 * The internal `ArrayBuffer` that jDataView is a view on
-		 */
-		this.buffer = wrapBuffer(buffer); // Convert strings, arrays, etc to `ArrayBuffer`s
-
-		/**
-		 * The offset in bytes from the start of the ArrayBuffer.
-		 */
-		this.byteOffset = byteOffset ?? 0;
-
-		/**
-		 *
-		 * The number of elements in the byte array. If unspecified, jDataView's length will match the buffer's length.
-		 */
-		this.byteLength =
-			byteLength ?? this.buffer.byteLength - this.byteOffset;
+		const buffer = wrapBuffer(_buffer);
 
 		/**
 		 * The internal `DataView` that powers all the default operations like `getUint8()`
 		 */
-		this.dataView = new DataView(
-			this.buffer,
-			this.byteOffset,
-			this.byteLength
-		);
+		this.dataView = new DataView(buffer, byteOffset, byteLength);
 
 		/**
 		 * Weather this jDataView should default to littleEndian for number operations
@@ -68,6 +49,19 @@ export class jDataView {
 		 * The current bit offset.
 		 */
 		this.#bitOffset = 0;
+	}
+
+	/** Getters for properties managed by the internal DataView */
+	get buffer() {
+		return this.dataView.buffer;
+	}
+
+	get byteLength() {
+		return this.dataView.byteLength;
+	}
+
+	get byteOffset() {
+		return this.dataView.byteOffset;
 	}
 
 	get [Symbol.toStringTag]() {
