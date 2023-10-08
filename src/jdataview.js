@@ -449,7 +449,10 @@ for (const type in builtInTypeBytes) {
 // Add the the writeXXX shorthand methods
 for (const type of supportedTypes) {
 	// arg3 might be littleEndian or bitLength
-	jDataView.prototype["write" + type] = function (value, arg3) {
+	jDataView.prototype["write" + type] = function (
+		value,
+		littleEndianOrBitLength
+	) {
 		if (typeof this === "undefined") {
 			throw new Error(
 				"'this' is undefined.\nMake sure you call `view.write" +
@@ -458,6 +461,11 @@ for (const type of supportedTypes) {
 			);
 		}
 
-		return this["set" + type].call(this, undefined, value, arg3);
+		return this["set" + type].call(
+			this,
+			undefined,
+			value,
+			littleEndianOrBitLength
+		);
 	};
 }
