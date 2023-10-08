@@ -172,9 +172,11 @@ export class jDataView {
 
 	// Setters and getters
 
-	#getBytes(length, byteOffset, littleEndian) {
-		littleEndian ??= this.littleEndian;
-		byteOffset ??= this.#bytePointer;
+	#getBytes(
+		length,
+		byteOffset = this.#bytePointer,
+		littleEndian = this.littleEndian
+	) {
 		length ??= this.byteLength - byteOffset;
 
 		this.#checkBounds(byteOffset, length);
@@ -190,11 +192,12 @@ export class jDataView {
 			: Array.from(result).reverse();
 	}
 
-	#setBytes(byteOffset, bytes, littleEndian) {
+	#setBytes(
+		byteOffset = this.#bytePointer,
+		bytes,
+		littleEndian = this.littleEndian
+	) {
 		const length = bytes.length;
-
-		littleEndian ??= this.littleEndian;
-		byteOffset ??= this.#bytePointer;
 
 		this.#checkBounds(byteOffset, length);
 
@@ -419,6 +422,7 @@ for (const type in builtInTypeBytes) {
 			);
 		}
 
+		// These two need to be set with ??= because of shenanigans with 'this'
 		littleEndian ??= this.littleEndian;
 		byteOffset ??= this.tell();
 
