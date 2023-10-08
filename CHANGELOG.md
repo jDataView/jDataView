@@ -1,8 +1,9 @@
-* **September 27 2023**
+* **October X 2023**
   * Version 3.0.0
-  * jDataView no longer polyfills DataView, it uses the native implementation. THe install and bundle sizes will be better now.
+  * jDataView no longer polyfills DataView, it uses the native implementation. The install and bundle sizes will be better now.
   * Build system is now run by Vite, with testing using Vitest and Github Actions.
-  * jDataView is now published as ES modules
+  * jDataView is now published as ES modules.
+  * TypeScript support.
 * **April 14 2014**
   * Build process completely reworked and automated via Grunt + Travis CI.
 * **August 23 2013**
