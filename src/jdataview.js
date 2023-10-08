@@ -413,7 +413,10 @@ const supportedTypes = [
 for (const type in builtInTypeBytes) {
 	const typeByteLength = builtInTypeBytes[type];
 	// Getters
-	jDataView.prototype["get" + type] = function (byteOffset, littleEndian) {
+	jDataView.prototype["get" + type] = function (
+		byteOffset = this.tell(),
+		littleEndian = this.littleEndian
+	) {
 		if (typeof this === "undefined") {
 			throw new Error(
 				"'this' is undefined.\nMake sure you call `view.get" +
@@ -421,10 +424,6 @@ for (const type in builtInTypeBytes) {
 					"()` directly, without assigning it to a temporary variable, as doing so causes issues."
 			);
 		}
-
-		// These two need to be set with ??= because of shenanigans with 'this'
-		littleEndian ??= this.littleEndian;
-		byteOffset ??= this.tell();
 
 		// Move pointer forwards
 		this.seek(byteOffset + typeByteLength);
@@ -434,9 +433,9 @@ for (const type in builtInTypeBytes) {
 
 	// Setters
 	jDataView.prototype["set" + type] = function (
-		byteOffset,
+		byteOffset = this.tell(),
 		value,
-		littleEndian
+		littleEndian = this.littleEndian
 	) {
 		if (typeof this === "undefined") {
 			throw new Error(
@@ -445,9 +444,6 @@ for (const type in builtInTypeBytes) {
 					"()` directly, without assigning it to a temporary variable, as doing so causes issues."
 			);
 		}
-
-		littleEndian ??= this.littleEndian;
-		byteOffset ??= this.tell();
 
 		// Move pointer forwards
 		this.seek(byteOffset + typeByteLength);
