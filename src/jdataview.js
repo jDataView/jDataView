@@ -70,6 +70,10 @@ export class jDataView {
 		this.#bitOffset = 0;
 	}
 
+	get [Symbol.toStringTag]() {
+		return "jDataView";
+	}
+
 	/**
 	 * Constructs a new jDataView filled with the provided data
 	 */

@@ -66,7 +66,7 @@ type TypedArray =
 
 type Bufferish = string | number | ArrayBuffer | TypedArray | ArrayLike<number>;
 
-declare class jDataView {
+declare class jDataView implements DataView {
 	readonly jDataView: jDataView;
 	readonly buffer: ArrayBuffer;
 	readonly byteOffset: number;
@@ -79,6 +79,9 @@ declare class jDataView {
 		byteLength?: number,
 		littleEndian?: boolean
 	);
+
+	//  Needed to fully implement DataView
+	get [Symbol.toStringTag](): string;
 
 	// The `getBytes` method has an extra argument for specifying the byte length
 	getBytes(
