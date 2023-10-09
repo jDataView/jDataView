@@ -2,7 +2,8 @@ export function getCharCodes(string) {
 	const codes = new Uint8Array(string.length);
 
 	for (let i = 0, length = string.length; i < length; i++) {
-		codes[i] = string.charCodeAt(i) & 0xff;
+		// Wraparound handled by typed array
+		codes[i] = string.charCodeAt(i);
 	}
 	return codes;
 }
