@@ -13,12 +13,12 @@ export function wrapBuffer(buffer) {
 	switch (typeof buffer) {
 		case "number":
 			buffer = new Uint8Array(buffer).buffer;
-
 			break;
 
 		case "string":
-			buffer = getCharCodes(buffer);
-		/* falls through */
+			buffer = getCharCodes(buffer).buffer;
+			break;
+
 		default:
 			if (!(buffer instanceof ArrayBuffer)) {
 				buffer = new Uint8Array(buffer).buffer;
