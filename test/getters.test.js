@@ -82,16 +82,12 @@ describe("Getters", function () {
 		},
 	]);
 
-	test(
-		"Big String",
-		function () {
-			const view = new jDataView(2000000);
-			assert.doesNotThrow(function () {
-				view.getString();
-			});
-		},
-		{ timeout: 5000 }
-	);
+	test("Big String", function () {
+		const view = new jDataView(2000000);
+		assert.doesNotThrow(function () {
+			view.getString();
+		});
+	});
 
 	testGetters("Int8", [-1, -2, -3, -4, -6, 0, -70, 1]);
 
