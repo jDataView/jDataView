@@ -411,14 +411,6 @@ for (const type in builtInTypeBytes) {
 		byteOffset = this.tell(),
 		littleEndian = this.littleEndian
 	) {
-		if (typeof this === "undefined") {
-			throw new Error(
-				"'this' is undefined.\nMake sure you call `view.get" +
-					type +
-					"()` directly, without assigning it to a temporary variable, as doing so causes issues."
-			);
-		}
-
 		// Move pointer forwards
 		this.seek(byteOffset + typeByteLength);
 
@@ -431,14 +423,6 @@ for (const type in builtInTypeBytes) {
 		value,
 		littleEndian = this.littleEndian
 	) {
-		if (typeof this === "undefined") {
-			throw new Error(
-				"'this' is undefined.\nMake sure you call `view.set" +
-					type +
-					"()` directly, without assigning it to a temporary variable, as doing so causes issues."
-			);
-		}
-
 		// Move pointer forwards
 		this.seek(byteOffset + typeByteLength);
 
@@ -453,14 +437,6 @@ for (const type of supportedTypes) {
 		value,
 		littleEndianOrBitLength
 	) {
-		if (typeof this === "undefined") {
-			throw new Error(
-				"'this' is undefined.\nMake sure you call `view.write" +
-					type +
-					"()` directly, without assigning it to a temporary variable, as doing so causes issues."
-			);
-		}
-
 		return this["set" + type].call(
 			this,
 			undefined,
