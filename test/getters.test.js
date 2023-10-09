@@ -32,23 +32,16 @@ describe("Getters", function () {
 				check(
 					realValue,
 					value,
-					"get" +
-						type +
-						"(" +
-						args.join(", ") +
-						") == " +
-						realValue +
-						" != " +
-						value +
-						" at offset " +
-						offset +
-						(getter.view
-							? " in view [" +
-							  getter.view
-									.getBytes(undefined, 0, true)
-									.join(", ") +
-							  "]"
-							: "")
+					`get${type}(${args.join(
+						", "
+					)}) == ${realValue} != ${value} at offset ${offset}
+						${
+							getter.view
+								? ` in view [${getter.view
+										.getBytes(undefined, 0, true)
+										.join(", ")}]`
+								: ""
+						}`
 				);
 			});
 		});

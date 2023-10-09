@@ -38,16 +38,9 @@ describe("Setters", function () {
 				check(
 					realValue,
 					value,
-					"set" +
-						type +
-						"(" +
-						args.join(", ") +
-						") != get" +
-						type +
-						"(" +
-						getterArgs.join(", ") +
-						") == " +
-						realValue
+					`set${type}(${args.join(
+						", "
+					)}) != get${type}(${getterArgs.join(", ")}) == ${realValue}`
 				);
 			});
 		});
