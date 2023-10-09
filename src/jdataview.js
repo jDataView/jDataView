@@ -199,7 +199,7 @@ export class jDataView {
 		this.#checkBounds(byteOffset, length);
 
 		if (!littleEndian && length > 1) {
-			bytes = Array.from(bytes).reverse();
+			bytes = new Uint8Array(bytes).reverse();
 		}
 
 		byteOffset += this.byteOffset;
