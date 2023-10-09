@@ -1,4 +1,4 @@
-import jDataView from "../src/jdataview";
+import jDataView from "../src/jdataview.js";
 import { assert } from "vitest";
 
 // Aliases
@@ -11,8 +11,15 @@ const testDataBytes = [
     0xfa, 0x00, 0xba, 0x01
 ];
 
+/**
+ *
+ * @param {Uint8Array} value
+ * @param {ArrayLike<number>} expected
+ * @param {string} [message=_]
+ */
 export function compareBytes(value, expected, message) {
-	value = Array.prototype.slice.call(value);
+	expected = Uint8Array.from(expected);
+
 	assert.deepEqual(
 		value,
 		expected,
