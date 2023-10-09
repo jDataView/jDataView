@@ -1,5 +1,5 @@
+import { getPrefilledJDataView } from "./test-helpers.js";
 import { describe, expect, it } from "vitest";
-import { getPrefilledJDataView } from "./test-helpers";
 
 describe("Method calling (this)", () => {
 	it("Throws when 'this' is undefined", () => {

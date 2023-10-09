@@ -1,4 +1,4 @@
-import { getPrefilledJDataView } from "./test-helpers";
+import { getPrefilledJDataView } from "./test-helpers.js";
 import { describe, test, assert } from "vitest";
 
 describe("Bounds", function () {

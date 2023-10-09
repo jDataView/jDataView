@@ -1,4 +1,7 @@
-import { getCharCodes, wrapBuffer } from "./helpers";
+import { getCharCodes, wrapBuffer } from "./helpers.js";
+
+// Create it here because creating TextEncoders is slow
+const jDataViewTextEncoder = new TextEncoder();
 
 /**
  * jDataView provides a layer on top of the built-in `DataView` with a plethora of utilities to make working with binary data a pleasure.
@@ -183,7 +186,7 @@ export class jDataView {
 
 		return littleEndian || length <= 1
 			? result
-			: Array.from(result).reverse();
+			: new Uint8Array(result).reverse();
 	}
 
 	#setBytes(
@@ -225,8 +228,8 @@ export class jDataView {
 	 */
 	getString(byteLength, byteOffset, encoding = "binary") {
 		const bytes = this.#getBytes(byteLength, byteOffset, true);
-		// backward-compatibility
 		if (encoding !== "binary") {
+			// TextDecoder, unlike TextEncoder, supports multiple encodings
 			return new TextDecoder(encoding).decode(bytes);
 		}
 		let string = "";
@@ -244,7 +247,8 @@ export class jDataView {
 		// backward-compatibility
 		let bytes;
 		if (encoding !== "binary") {
-			bytes = new TextEncoder(encoding).encode(subString);
+			// TextEncoder only supports UTF-8
+			bytes = jDataViewTextEncoder.encode(subString);
 		} else {
 			bytes = getCharCodes(subString);
 		}
@@ -344,6 +348,7 @@ export class jDataView {
 	 */
 	setUint64(byteOffset, value, littleEndian) {
 		// Pointer will be handled for us by the bigInt method
+		// @ts-expect-error These methods get added later via prototype extension
 		this.setBigUint64(byteOffset, BigInt(value), littleEndian);
 	}
 
@@ -354,6 +359,7 @@ export class jDataView {
 	 */
 	setInt64(byteOffset, value, littleEndian) {
 		// Pointer will be handled for us by the bigInt method
+		// @ts-expect-error These methods get added later via prototype extension
 		this.setBigInt64(byteOffset, BigInt(value), littleEndian);
 	}
 
@@ -364,6 +370,7 @@ export class jDataView {
 	 */
 	getUint64(byteOffset, littleEndian) {
 		// Pointer will be handled for us by the bigInt method
+		// @ts-expect-error These methods get added later via prototype extension
 		return Number(this.getBigUint64(byteOffset, littleEndian));
 	}
 
@@ -374,6 +381,7 @@ export class jDataView {
 	 */
 	getInt64(byteOffset, littleEndian) {
 		// Pointer will be handled for us by the bigInt method
+		// @ts-expect-error These methods get added later via prototype extension
 		return Number(this.getBigInt64(byteOffset, littleEndian));
 	}
 }

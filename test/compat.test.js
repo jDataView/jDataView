@@ -1,7 +1,6 @@
-import { jDataView } from "../src/jdataview";
-import { describe, it } from "vitest";
-import { compareBytes } from "./test-helpers";
-import { expect } from "vitest";
+import { jDataView } from "../src/jdataview.js";
+import { compareBytes } from "./test-helpers.js";
+import { expect, describe, it } from "vitest";
 
 describe("Compatibility", function () {
 	it("Can be used in jDataView from Uint8Array::subarray", () => {

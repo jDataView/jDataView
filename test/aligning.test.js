@@ -1,4 +1,4 @@
-import { getPrefilledJDataView } from "./test-helpers";
+import { getPrefilledJDataView } from "./test-helpers.js";
 import { describe, it, assert } from "vitest";
 
 describe("Aligning", function () {

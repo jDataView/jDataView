@@ -1,12 +1,11 @@
-import { jDataView } from "../src/jdataview";
+import { jDataView } from "../src/jdataview.js";
 import {
 	compareBytes,
 	compareWithNaN,
 	getPrefilledJDataView,
 	b,
 	chr,
-	bufferToHex,
-} from "./test-helpers";
+} from "./test-helpers.js";
 import { describe, test, assert } from "vitest";
 
 describe("Getters", function () {

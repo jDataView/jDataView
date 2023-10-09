@@ -1,6 +1,10 @@
 {
     "compilerOptions": {
-        "strict": true,
-        "lib": ["ESNext"]
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "checkJs": true,
+        "noEmit": true,
+        "moduleResolution":"NodeNext",
+        "module": "NodeNext"
     }
 }

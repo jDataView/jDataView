@@ -1,4 +1,4 @@
-import { compareBytes, getPrefilledJDataView, chr } from "./test-helpers";
+import { compareBytes, getPrefilledJDataView, chr } from "./test-helpers.js";
 import { describe, test, assert } from "vitest";
 
 describe("Slicing", function () {

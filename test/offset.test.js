@@ -1,5 +1,5 @@
+import jDataView from "../src/jdataview.js";
 import { describe, test, it, assert } from "vitest";
-import jDataView from "../src/jdataview";
 
 describe("Offset (pointer)", () => {
 	it("starts at 0", () => {

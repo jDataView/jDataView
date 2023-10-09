@@ -20,7 +20,7 @@ type RegularTypes = {
 
 // These are the actual getXXX, setXXX, and writeXXX function definitions
 type GetTypeFunction<T extends keyof RegularTypes> = (
-	byteOffset: number | undefined,
+	byteOffset?: number | undefined,
 	littleEndian?: boolean | undefined
 ) => RegularTypes[T];
 type SetTypeFunction<T extends keyof RegularTypes> = (
@@ -51,19 +51,6 @@ interface jDataView extends Omit<GetSetWrite, "getBytes"> {}
 
 // Regular, non-cursed typescript from here on
 
-type TypedArray =
-	| Int8Array
-	| Uint8Array
-	| Uint8ClampedArray
-	| Int16Array
-	| Uint16Array
-	| Int32Array
-	| Uint32Array
-	| Float32Array
-	| Float64Array
-	| BigInt64Array
-	| BigUint64Array;
-
 type Bufferish = string | number | ArrayBuffer | ArrayLike<number>;
 
 declare class jDataView implements DataView {
@@ -72,6 +59,7 @@ declare class jDataView implements DataView {
 	readonly byteOffset: number;
 	readonly byteLength: number;
 	readonly dataView: DataView;
+	littleEndian: boolean;
 
 	constructor(
 		buffer: Bufferish,
@@ -122,8 +110,9 @@ declare class jDataView implements DataView {
 	writeSigned(value: number, bitLength: number): void;
 	writeUnsigned(value: number, bitLength: number): void;
 
+	static from(...data: Bufferish[]): jDataView;
+
 	// Seek, skip, etc methods
-	from(...data: Bufferish[]): jDataView;
 	seek(byteOffset: number): number;
 	skip(byteLength: number): number;
 	slice(start: number, end?: number, forceCopy?: boolean): jDataView;
