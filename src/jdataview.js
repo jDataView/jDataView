@@ -1,833 +1,455 @@
-var compatibility = {
-	// NodeJS Buffer in v0.5.5 and newer
-	NodeBuffer: NODE && 'Buffer' in global,
-	DataView: 'DataView' in global,
-	ArrayBuffer: 'ArrayBuffer' in global,
-	PixelData: BROWSER && 'CanvasPixelArray' in global && !('Uint8ClampedArray' in global) && 'document' in global
-};
+import { getCharCodes, wrapBuffer } from "./helpers.js";
 
-var TextEncoder = global.TextEncoder;
-var TextDecoder = global.TextDecoder;
+// Create it here because creating TextEncoders is slow
+const jDataViewTextEncoder = new TextEncoder();
 
-// we don't want to bother with old Buffer implementation
-if (NODE && compatibility.NodeBuffer) {
-	(function (buffer) {
-		try {
-			buffer.writeFloatLE(Infinity, 0);
-		} catch (e) {
-			compatibility.NodeBuffer = false;
+/**
+ * jDataView provides a layer on top of the built-in `DataView` with a plethora of utilities to make working with binary data a pleasure.
+ *
+ * Create a `jDataView` using either `new jDataView()` or `jDataView.from()`.
+ *
+ * [Read the docs](https://github.com/jDataView/jDataView/wiki)
+ */
+export class jDataView {
+	#bitOffset;
+	#bytePointer;
+
+	/**
+	 * jDataView provides a layer on top of the built-in `DataView` with a plethora of utilities to make working with binary data a pleasure.
+	 *
+	 * [Read the docs](https://github.com/jDataView/jDataView/wiki)
+	 */
+	constructor(_buffer, byteOffset, byteLength, littleEndian) {
+		/**
+		 * The jDataView instance. Can be used to check if something really is a jDataView.
+		 */
+		this.jDataView = this;
+
+		if (_buffer instanceof jDataView) {
+			const result = _buffer.slice(byteOffset, byteOffset + byteLength);
+			result.littleEndian = littleEndian ?? result.littleEndian;
+			return result;
 		}
-	})(new Buffer(4));
-}
 
-if (BROWSER && compatibility.PixelData) {
-	var context2d = document.createElement('canvas').getContext('2d');
-	var createPixelData = function (byteLength, buffer) {
-		var data = context2d.createImageData((byteLength + 3) / 4, 1).data;
-		data.byteLength = byteLength;
-		if (buffer !== undefined) {
-			for (var i = 0; i < byteLength; i++) {
-				data[i] = buffer[i];
-			}
-		}
-		return data;
-	};
-}
+		const buffer = wrapBuffer(_buffer);
 
-var dataTypes = {
-	'Int8': 1,
-	'Int16': 2,
-	'Int32': 4,
-	'Uint8': 1,
-	'Uint16': 2,
-	'Uint32': 4,
-	'Float32': 4,
-	'Float64': 8
-};
+		/**
+		 * The internal `DataView` that powers all the default operations like `getUint8()`
+		 */
+		this.dataView = new DataView(buffer, byteOffset, byteLength);
 
-function is(obj, Ctor) {
-	if (typeof obj !== 'object' || obj === null) {
-		return false;
-	}
-	return obj.constructor === Ctor || Object.prototype.toString.call(obj) === '[object ' + Ctor.name + ']';
-}
+		/**
+		 * Weather this jDataView should default to littleEndian for number operations
+		 */
+		this.littleEndian = !!littleEndian;
 
-function arrayFrom(arrayLike, forceCopy) {
-	return (!forceCopy && is(arrayLike, Array)) ? arrayLike : Array.prototype.slice.call(arrayLike);
-}
+		/**
+		 * The current byte pointer.
+		 */
+		this.#bytePointer = 0;
 
-function defined(value, defaultValue) {
-	return value !== undefined ? value : defaultValue;
-}
-
-function jDataView(buffer, byteOffset, byteLength, littleEndian) {
-	/* jshint validthis:true */
-
-	if (jDataView.is(buffer)) {
-		var result = buffer.slice(byteOffset, byteOffset + byteLength);
-		result._littleEndian = defined(littleEndian, result._littleEndian);
-		return result;
+		/**
+		 * The current bit offset.
+		 */
+		this.#bitOffset = 0;
 	}
 
-	if (!jDataView.is(this)) {
-		return new jDataView(buffer, byteOffset, byteLength, littleEndian);
+	/** Getters for properties managed by the internal DataView */
+	get buffer() {
+		return this.dataView.buffer;
 	}
 
-	this.buffer = buffer = jDataView.wrapBuffer(buffer);
-
-	// Check parameters and existing functionnalities
-	this._isArrayBuffer = compatibility.ArrayBuffer && is(buffer, ArrayBuffer);
-	this._isPixelData = BROWSER && compatibility.PixelData && is(buffer, CanvasPixelArray);
-	this._isDataView = compatibility.DataView && this._isArrayBuffer;
-	this._isNodeBuffer = NODE && compatibility.NodeBuffer && Buffer.isBuffer(buffer);
-
-	// Handle Type Errors
-	if (!(NODE && this._isNodeBuffer) && !this._isArrayBuffer && !(BROWSER && this._isPixelData) && !is(buffer, Array)) {
-		throw new TypeError('jDataView buffer has an incompatible type');
+	get byteLength() {
+		return this.dataView.byteLength;
 	}
 
-	// Default Values
-	this._littleEndian = !!littleEndian;
-
-	var bufferLength = 'byteLength' in buffer ? buffer.byteLength : buffer.length;
-	this.byteOffset = byteOffset = defined(byteOffset, 0);
-	this.byteLength = byteLength = defined(byteLength, bufferLength - byteOffset);
-
-	this._offset = this._bitOffset = 0;
-
-	if (!this._isDataView) {
-		this._checkBounds(byteOffset, byteLength, bufferLength);
-	} else {
-		this._view = new DataView(buffer, byteOffset, byteLength);
+	get byteOffset() {
+		return this.dataView.byteOffset;
 	}
 
-	// Create uniform methods (action wrappers) for the following data types
-
-	this._engineAction =
-		this._isDataView
-			? this._dataViewAction
-		: (NODE && this._isNodeBuffer)
-			? this._nodeBufferAction
-		: this._isArrayBuffer
-			? this._arrayBufferAction
-		: this._arrayAction;
-}
-
-function getCharCodes(string) {
-	if (NODE && compatibility.NodeBuffer) {
-		return new Buffer(string, 'binary');
+	get [Symbol.toStringTag]() {
+		return "jDataView";
 	}
 
-	var Type = compatibility.ArrayBuffer ? Uint8Array : Array,
-		codes = new Type(string.length);
-
-	for (var i = 0, length = string.length; i < length; i++) {
-		codes[i] = string.charCodeAt(i) & 0xff;
-	}
-	return codes;
-}
-
-// mostly internal function for wrapping any supported input (String or Array-like) to best suitable buffer format
-jDataView.wrapBuffer = function (buffer) {
-	switch (typeof buffer) {
-		case 'number':
-			if (NODE && compatibility.NodeBuffer) {
-				buffer = new Buffer(buffer);
-				buffer.fill(0);
-			} else
-			if (compatibility.ArrayBuffer) {
-				buffer = new Uint8Array(buffer).buffer;
-			} else
-			if (BROWSER && compatibility.PixelData) {
-				buffer = createPixelData(buffer);
-			} else {
-				buffer = new Array(buffer);
-				for (var i = 0; i < buffer.length; i++) {
-					buffer[i] = 0;
-				}
-			}
-			return buffer;
-
-		case 'string':
-			buffer = getCharCodes(buffer);
-			/* falls through */
-		default:
-			if ('length' in buffer && !(
-				(NODE && compatibility.NodeBuffer && Buffer.isBuffer(buffer)) ||
-				(compatibility.ArrayBuffer && is(buffer, ArrayBuffer)) ||
-				(BROWSER && compatibility.PixelData && is(buffer, CanvasPixelArray))
-			)) {
-				if (NODE && compatibility.NodeBuffer) {
-					buffer = new Buffer(buffer);
-				} else
-				if (compatibility.ArrayBuffer) {
-					if (!is(buffer, ArrayBuffer)) {
-						buffer = new Uint8Array(buffer).buffer;
-						// bug in Node.js <= 0.8:
-						if (!is(buffer, ArrayBuffer)) {
-							buffer = new Uint8Array(arrayFrom(buffer, true)).buffer;
-						}
-					}
-				} else
-				if (BROWSER && compatibility.PixelData) {
-					buffer = createPixelData(buffer.length, buffer);
-				} else {
-					buffer = arrayFrom(buffer);
-				}
-			}
-			return buffer;
-	}
-};
-
-function pow2(n) {
-	return (n >= 0 && n < 31) ? (1 << n) : (pow2[n] || (pow2[n] = Math.pow(2, n)));
-}
-
-jDataView.is = function (view) {
-	return view && view.jDataView;
-};
-
-jDataView.from = function () {
-	return new jDataView(arguments);
-};
-
-function Uint64(lo, hi) {
-	this.lo = lo;
-	this.hi = hi;
-}
-
-jDataView.Uint64 = Uint64;
-
-Uint64.prototype.valueOf = function () {
-	return this.lo + pow2(32) * this.hi;
-};
-
-Uint64.fromNumber = function (number) {
-	var hi = Math.floor(number / pow2(32)),
-		lo = number - hi * pow2(32);
-
-	return new Uint64(lo, hi);
-};
-
-function Int64(lo, hi) {
-	Uint64.apply(this, arguments);
-}
-
-jDataView.Int64 = Int64;
-
-Int64.prototype = 'create' in Object ? Object.create(Uint64.prototype) : new Uint64();
-
-Int64.prototype.valueOf = function () {
-	if (this.hi < pow2(31)) {
-		return Uint64.prototype.valueOf.apply(this, arguments);
-	}
-	return -((pow2(32) - this.lo) + pow2(32) * (pow2(32) - 1 - this.hi));
-};
-
-Int64.fromNumber = function (number) {
-	var lo, hi;
-	if (number >= 0) {
-		var unsigned = Uint64.fromNumber(number);
-		lo = unsigned.lo;
-		hi = unsigned.hi;
-	} else {
-		hi = Math.floor(number / pow2(32));
-		lo = number - hi * pow2(32);
-		hi += pow2(32);
-	}
-	return new Int64(lo, hi);
-};
-
-// Helper functions for Uint64.prototype.toString
-
-// e.g. 1234 -> [4, 3, 2, 1]
-function numToDigits(num) {
-	var digits = num.toString().split('');
-	for (var i = 0; i < digits.length; i++) {
-		digits[i] = +digits[i];
-	}
-	digits.reverse();
-	return digits;
-}
-
-// Adds two digit arrays, returning the result.
-function add(x, y) {
-	var z = [];
-	var n = Math.max(x.length, y.length);
-	var carry = 0;
-	var i = 0;
-	while (i < n || carry) {
-		var xi = i < x.length ? x[i] : 0;
-		var yi = i < y.length ? y[i] : 0;
-		var zi = carry + xi + yi;
-		z.push(zi % 10);
-		carry = Math.floor(zi / 10);
-		i++;
-	}
-	return z;
-}
-
-// Precise versions of toString() for Int64/Uint64
-
-Uint64.prototype.toString = function() {
-	// Faster toString() for numbers which can be represented precisely as floats.
-	if (this.hi < pow2(19)) {
-		return Number.prototype.toString.apply(this.valueOf(), arguments);
+	/**
+	 * Constructs a new jDataView filled with the provided data
+	 */
+	static from(...data) {
+		return new jDataView(data.flat(Infinity));
 	}
 
-	// This converts the numbers to base 10 digit arrays for arbitrary precision toString().
-	// See http://www.danvk.org/hex2dec.html
-
-
-	// Compute result = 2^32 * hi + lo
-	var hiArray = numToDigits(this.hi);
-	var loArray = numToDigits(this.lo);
-	for (var i = 0; i < 32; i++) {
-		hiArray = add(hiArray, hiArray, 10);
-	}
-	var result = add(hiArray, loArray, 10);
-
-	var str = '';
-	for (i = result.length - 1; i >= 0; i--) {
-		str += result[i];
-	}
-	return str;
-};
-
-Int64.prototype.toString = function() {
-	if (this.hi < pow2(31)) {
-		return Uint64.prototype.toString.apply(this, arguments);
-	}
-	if (this.hi > pow2(32) - 1 - pow2(19)) {
-		return Number.prototype.toString.apply(this.valueOf(), arguments);
-	}
-	return '-' + new Uint64((pow2(32) - this.lo), (pow2(32) - 1 - this.hi)).toString();
-};
-
-
-var proto = jDataView.prototype = {
-	compatibility: compatibility,
-	jDataView: true,
-
-	_checkBounds: function (byteOffset, byteLength, maxLength) {
+	#checkBounds(byteOffset, byteLength, maxLength) {
 		// Do additional checks to simulate DataView
-		if (typeof byteOffset !== 'number') {
-			throw new TypeError('Offset is not a number.');
+		if (typeof byteOffset !== "number") {
+			throw new TypeError("Offset is not a number.");
 		}
-		if (typeof byteLength !== 'number') {
-			throw new TypeError('Size is not a number.');
+		if (typeof byteLength !== "number") {
+			throw new TypeError("Size is not a number.");
 		}
 		if (byteLength < 0) {
-			throw new RangeError('Length is negative.');
+			throw new RangeError("Length is negative.");
 		}
-		if (byteOffset < 0 || byteOffset + byteLength > defined(maxLength, this.byteLength)) {
-			throw new RangeError('Offsets are out of bounds.');
+		if (
+			byteOffset < 0 ||
+			byteOffset + byteLength > (maxLength ?? this.byteLength)
+		) {
+			throw new RangeError("Offsets are out of bounds.");
 		}
-	},
+	}
 
-	_action: function (type, isReadAction, byteOffset, littleEndian, value) {
-		return this._engineAction(
-			type,
-			isReadAction,
-			defined(byteOffset, this._offset),
-			defined(littleEndian, this._littleEndian),
-			value
-		);
-	},
+	/**
+	 * Get the current byte pointer position
+	 */
+	tell() {
+		return this.#bytePointer;
+	}
 
-	_dataViewAction: function (type, isReadAction, byteOffset, littleEndian, value) {
-		// Move the internal offset forward
-		this._offset = byteOffset + dataTypes[type];
-		return isReadAction ? this._view['get' + type](byteOffset, littleEndian) : this._view['set' + type](byteOffset, value, littleEndian);
-	},
+	/**
+	 * Get the current bit offset
+	 */
+	tellBit() {
+		return this.#bitOffset;
+	}
 
-	_arrayBufferAction: function (type, isReadAction, byteOffset, littleEndian, value) {
-		var size = dataTypes[type], TypedArray = global[type + 'Array'], typedArray;
+	/**
+	 * Set the current byte pointer position
+	 */
+	seek(byteOffset) {
+		this.#checkBounds(byteOffset, 0);
+		this.#bytePointer = byteOffset;
+		return this.#bytePointer;
+	}
 
-		littleEndian = defined(littleEndian, this._littleEndian);
+	/**
+	 * Move the current pointer position forward
+	 */
+	skip(byteLength) {
+		return this.seek(this.#bytePointer + byteLength);
+	}
 
-		// ArrayBuffer: we use a typed array of size 1 from original buffer if alignment is good and from slice when it's not
-		if (size === 1 || ((this.byteOffset + byteOffset) % size === 0 && littleEndian)) {
-			typedArray = new TypedArray(this.buffer, this.byteOffset + byteOffset, 1);
-			this._offset = byteOffset + size;
-			return isReadAction ? typedArray[0] : (typedArray[0] = value);
-		} else {
-			var bytes = new Uint8Array(isReadAction ? this.getBytes(size, byteOffset, littleEndian, true) : size);
-			typedArray = new TypedArray(bytes.buffer, 0, 1);
-
-			if (isReadAction) {
-				return typedArray[0];
-			} else {
-				typedArray[0] = value;
-				this._setBytes(byteOffset, bytes, littleEndian);
-			}
-		}
-	},
-
-	_arrayAction: function (type, isReadAction, byteOffset, littleEndian, value) {
-		return isReadAction ? this['_get' + type](byteOffset, littleEndian) : this['_set' + type](byteOffset, value, littleEndian);
-	},
-
-	// Helpers
-
-	_getBytes: function (length, byteOffset, littleEndian) {
-		littleEndian = defined(littleEndian, this._littleEndian);
-		byteOffset = defined(byteOffset, this._offset);
-		length = defined(length, this.byteLength - byteOffset);
-
-		this._checkBounds(byteOffset, length);
-
-		byteOffset += this.byteOffset;
-
-		this._offset = byteOffset - this.byteOffset + length;
-
-		var result = (
-			this._isArrayBuffer
-			? new Uint8Array(this.buffer, byteOffset, length)
-			: (this.buffer.slice || Array.prototype.slice).call(this.buffer, byteOffset, byteOffset + length)
-		);
-
-		return littleEndian || length <= 1 ? result : arrayFrom(result).reverse();
-	},
-
-	// wrapper for external calls (do not return inner buffer directly to prevent it's modifying)
-	getBytes: function (length, byteOffset, littleEndian, toArray) {
-		var result = this._getBytes(length, byteOffset, defined(littleEndian, true));
-		return toArray ? arrayFrom(result) : result;
-	},
-
-	_setBytes: function (byteOffset, bytes, littleEndian) {
-		var length = bytes.length;
-
-		// needed for Opera
-		if (length === 0) {
-			return;
-		}
-
-		littleEndian = defined(littleEndian, this._littleEndian);
-		byteOffset = defined(byteOffset, this._offset);
-
-		this._checkBounds(byteOffset, length);
-
-		if (!littleEndian && length > 1) {
-			bytes = arrayFrom(bytes, true).reverse();
-		}
-
-		byteOffset += this.byteOffset;
-
-		if (this._isArrayBuffer) {
-			new Uint8Array(this.buffer, byteOffset, length).set(bytes);
-		}
-		else {
-			if (NODE && this._isNodeBuffer) {
-				new Buffer(bytes).copy(this.buffer, byteOffset);
-			} else {
-				for (var i = 0; i < length; i++) {
-					this.buffer[byteOffset + i] = bytes[i];
-				}
-			}
-		}
-
-		this._offset = byteOffset - this.byteOffset + length;
-	},
-
-	setBytes: function (byteOffset, bytes, littleEndian) {
-		this._setBytes(byteOffset, bytes, defined(littleEndian, true));
-	},
-
-	getString: function (byteLength, byteOffset, encoding) {
-		if (NODE && this._isNodeBuffer) {
-			byteOffset = defined(byteOffset, this._offset);
-			byteLength = defined(byteLength, this.byteLength - byteOffset);
-
-			this._checkBounds(byteOffset, byteLength);
-
-			this._offset = byteOffset + byteLength;
-			return this.buffer.toString(encoding || 'binary', this.byteOffset + byteOffset, this.byteOffset + this._offset);
-		}
-		var bytes = this._getBytes(byteLength, byteOffset, true);
-		// backward-compatibility
-		encoding = encoding === 'utf8' ? 'utf-8' : (encoding || 'binary');
-		if (TextDecoder && encoding !== 'binary') {
-			return new TextDecoder(encoding).decode(this._isArrayBuffer ? bytes : new Uint8Array(bytes));
-		}
-		var string = '';
-		byteLength = bytes.length;
-		for (var i = 0; i < byteLength; i++) {
-			string += String.fromCharCode(bytes[i]);
-		}
-		if (encoding === 'utf-8') {
-			string = decodeURIComponent(escape(string));
-		}
-		return string;
-	},
-
-	setString: function (byteOffset, subString, encoding) {
-		if (NODE && this._isNodeBuffer) {
-			byteOffset = defined(byteOffset, this._offset);
-			this._checkBounds(byteOffset, subString.length);
-			this._offset = byteOffset + this.buffer.write(subString, this.byteOffset + byteOffset, encoding || 'binary');
-			return;
-		}
-		// backward-compatibility
-		encoding = encoding === 'utf8' ? 'utf-8' : (encoding || 'binary');
-		var bytes;
-		if (TextEncoder && encoding !== 'binary') {
-			bytes = new TextEncoder(encoding).encode(subString);
-		} else {
-			if (encoding === 'utf-8') {
-				subString = unescape(encodeURIComponent(subString));
-			}
-			bytes = getCharCodes(subString);
-		}
-		this._setBytes(byteOffset, bytes, true);
-	},
-
-	getChar: function (byteOffset) {
-		return this.getString(1, byteOffset);
-	},
-
-	setChar: function (byteOffset, character) {
-		this.setString(byteOffset, character);
-	},
-
-	tell: function () {
-		return this._offset;
-	},
-
-	seek: function (byteOffset) {
-		this._checkBounds(byteOffset, 0);
-		/* jshint boss: true */
-		return this._offset = byteOffset;
-	},
-
-	skip: function (byteLength) {
-		return this.seek(this._offset + byteLength);
-	},
-
-	slice: function (start, end, forceCopy) {
+	/**
+	 * Returns a new `jDataView` instance between `start` and `end`, optionally duplicating all the contained data in memory.
+	 */
+	slice(start, end, forceCopy) {
 		function normalizeOffset(offset, byteLength) {
 			return offset < 0 ? offset + byteLength : offset;
 		}
 
 		start = normalizeOffset(start, this.byteLength);
-		end = normalizeOffset(defined(end, this.byteLength), this.byteLength);
+		end = normalizeOffset(end ?? this.byteLength, this.byteLength);
 
-		return (
-			forceCopy
-			? new jDataView(this.getBytes(end - start, start, true, true), undefined, undefined, this._littleEndian)
-			: new jDataView(this.buffer, this.byteOffset + start, end - start, this._littleEndian)
-		);
-	},
+		return forceCopy
+			? new jDataView(
+					this.getBytes(end - start, start, true),
+					undefined,
+					undefined,
+					this.littleEndian
+			  )
+			: new jDataView(
+					this.buffer,
+					this.byteOffset + start,
+					end - start,
+					this.littleEndian
+			  );
+	}
 
-	alignBy: function (byteCount) {
-		this._bitOffset = 0;
-		if (defined(byteCount, 1) !== 1) {
-			return this.skip(byteCount - (this._offset % byteCount || byteCount));
+	/**
+	 * Aligns the pointer (clearing any bitOffset). Can also move the pointer
+	 */
+	alignBy(byteCount) {
+		this.#bitOffset = 0;
+		if ((byteCount ?? 1) !== 1) {
+			return this.skip(
+				byteCount - (this.#bytePointer % byteCount || byteCount)
+			);
 		} else {
-			return this._offset;
+			return this.#bytePointer;
 		}
-	},
+	}
 
-	// Compatibility functions
+	// Setters and getters
 
-	_getFloat64: function (byteOffset, littleEndian) {
-		var b = this._getBytes(8, byteOffset, littleEndian),
+	#getBytes(
+		length,
+		byteOffset = this.#bytePointer,
+		littleEndian = this.littleEndian
+	) {
+		length ??= this.byteLength - byteOffset;
 
-			sign = 1 - (2 * (b[7] >> 7)),
-			exponent = ((((b[7] << 1) & 0xff) << 3) | (b[6] >> 4)) - ((1 << 10) - 1),
+		this.#checkBounds(byteOffset, length);
 
-		// Binary operators such as | and << operate on 32 bit values, using + and Math.pow(2) instead
-			mantissa = ((b[6] & 0x0f) * pow2(48)) + (b[5] * pow2(40)) + (b[4] * pow2(32)) +
-						(b[3] * pow2(24)) + (b[2] * pow2(16)) + (b[1] * pow2(8)) + b[0];
+		byteOffset += this.byteOffset;
 
-		if (exponent === 1024) {
-			if (mantissa !== 0) {
-				return NaN;
-			} else {
-				return sign * Infinity;
-			}
-		}
+		this.#bytePointer = byteOffset - this.byteOffset + length;
 
-		if (exponent === -1023) { // Denormalized
-			return sign * mantissa * pow2(-1022 - 52);
-		}
+		const result = new Uint8Array(this.buffer, byteOffset, length);
 
-		return sign * (1 + mantissa * pow2(-52)) * pow2(exponent);
-	},
+		return littleEndian || length <= 1
+			? result
+			: new Uint8Array(result).reverse();
+	}
 
-	_getFloat32: function (byteOffset, littleEndian) {
-		var b = this._getBytes(4, byteOffset, littleEndian),
+	#setBytes(
+		byteOffset = this.#bytePointer,
+		bytes,
+		littleEndian = this.littleEndian
+	) {
+		const length = bytes.length;
 
-			sign = 1 - (2 * (b[3] >> 7)),
-			exponent = (((b[3] << 1) & 0xff) | (b[2] >> 7)) - 127,
-			mantissa = ((b[2] & 0x7f) << 16) | (b[1] << 8) | b[0];
+		this.#checkBounds(byteOffset, length);
 
-		if (exponent === 128) {
-			if (mantissa !== 0) {
-				return NaN;
-			} else {
-				return sign * Infinity;
-			}
+		if (!littleEndian && length > 1) {
+			bytes = new Uint8Array(bytes).reverse();
 		}
 
-		if (exponent === -127) { // Denormalized
-			return sign * mantissa * pow2(-126 - 23);
+		byteOffset += this.byteOffset;
+
+		new Uint8Array(this.buffer, byteOffset, length).set(bytes);
+
+		this.#bytePointer = byteOffset - this.byteOffset + length;
+	}
+
+	/**
+	 * Get raw bytes. If length is undefined, it will go to the end of the buffer.
+	 */
+	getBytes(length, byteOffset, littleEndian) {
+		return this.#getBytes(length, byteOffset, littleEndian ?? true);
+	}
+
+	/**
+	 * Directly set raw bytes at `byteOffset` or the current pointer.
+	 */
+	setBytes(byteOffset, bytes, littleEndian) {
+		this.#setBytes(byteOffset, bytes, littleEndian ?? true);
+	}
+
+	/**
+	 * Read a string using the specified encoding, or binary if unspecified
+	 */
+	getString(byteLength, byteOffset, encoding = "binary") {
+		const bytes = this.#getBytes(byteLength, byteOffset, true);
+		if (encoding !== "binary") {
+			// TextDecoder, unlike TextEncoder, supports multiple encodings
+			return new TextDecoder(encoding).decode(bytes);
+		}
+		let string = "";
+		byteLength = bytes.length;
+		for (let i = 0; i < byteLength; i++) {
+			string += String.fromCharCode(bytes[i]);
+		}
+		return string;
+	}
+
+	/**
+	 * Set a string using the specified encoding, or binary if unspecified
+	 */
+	setString(byteOffset, subString, encoding = "binary") {
+		// backward-compatibility
+		let bytes;
+		if (encoding !== "binary") {
+			// TextEncoder only supports UTF-8
+			bytes = jDataViewTextEncoder.encode(subString);
+		} else {
+			bytes = getCharCodes(subString);
+		}
+		this.#setBytes(byteOffset, bytes, true);
+	}
+
+	/**
+	 * Get a single character.
+	 * This is the same as getting a 1-length string using binary encoding
+	 */
+	getChar(byteOffset) {
+		return this.getString(1, byteOffset);
+	}
+
+	/**
+	 * Set a single character.
+	 * This is the same as setting a 1-length string using binary encoding
+	 */
+	setChar(byteOffset, character) {
+		this.setString(byteOffset, character);
+	}
+
+	#getBitRangeData(bitLength, byteOffset) {
+		const startBit =
+			((byteOffset ?? this.#bytePointer) << 3) + this.#bitOffset;
+		const endBit = startBit + bitLength;
+		const start = startBit >>> 3;
+		const end = (endBit + 7) >>> 3;
+
+		const bytes = this.#getBytes(end - start, start, true);
+		let wideValue = 0;
+
+		if ((this.#bitOffset = endBit & 7)) {
+			this.#bitOffset -= 8;
 		}
 
-		return sign * (1 + mantissa * pow2(-23)) * pow2(exponent);
-	},
-
-	_get64: function (Type, byteOffset, littleEndian) {
-		littleEndian = defined(littleEndian, this._littleEndian);
-		byteOffset = defined(byteOffset, this._offset);
-
-		var parts = littleEndian ? [0, 4] : [4, 0];
-
-		for (var i = 0; i < 2; i++) {
-			parts[i] = this.getUint32(byteOffset + parts[i], littleEndian);
-		}
-
-		this._offset = byteOffset + 8;
-
-		return new Type(parts[0], parts[1]);
-	},
-
-	getInt64: function (byteOffset, littleEndian) {
-		return this._get64(Int64, byteOffset, littleEndian);
-	},
-
-	getUint64: function (byteOffset, littleEndian) {
-		return this._get64(Uint64, byteOffset, littleEndian);
-	},
-
-	_getInt32: function (byteOffset, littleEndian) {
-		var b = this._getBytes(4, byteOffset, littleEndian);
-		return (b[3] << 24) | (b[2] << 16) | (b[1] << 8) | b[0];
-	},
-
-	_getUint32: function (byteOffset, littleEndian) {
-		return this._getInt32(byteOffset, littleEndian) >>> 0;
-	},
-
-	_getInt16: function (byteOffset, littleEndian) {
-		return (this._getUint16(byteOffset, littleEndian) << 16) >> 16;
-	},
-
-	_getUint16: function (byteOffset, littleEndian) {
-		var b = this._getBytes(2, byteOffset, littleEndian);
-		return (b[1] << 8) | b[0];
-	},
-
-	_getInt8: function (byteOffset) {
-		return (this._getUint8(byteOffset) << 24) >> 24;
-	},
-
-	_getUint8: function (byteOffset) {
-		return this._getBytes(1, byteOffset)[0];
-	},
-
-	_getBitRangeData: function (bitLength, byteOffset) {
-		var startBit = (defined(byteOffset, this._offset) << 3) + this._bitOffset,
-			endBit = startBit + bitLength,
-			start = startBit >>> 3,
-			end = (endBit + 7) >>> 3,
-			b = this._getBytes(end - start, start, true),
-			wideValue = 0;
-
-		/* jshint boss: true */
-		if (this._bitOffset = endBit & 7) {
-			this._bitOffset -= 8;
-		}
-
-		for (var i = 0, length = b.length; i < length; i++) {
-			wideValue = (wideValue << 8) | b[i];
+		for (let i = 0, length = bytes.length; i < length; i++) {
+			wideValue = (wideValue << 8) | bytes[i];
 		}
 
 		return {
-			start: start,
-			bytes: b,
-			wideValue: wideValue
+			start,
+			bytes,
+			wideValue,
 		};
-	},
+	}
 
-	getSigned: function (bitLength, byteOffset) {
-		var shift = 32 - bitLength;
+	/**
+	 * Get an integer of any bit length up to 32
+	 */
+	getSigned(bitLength, byteOffset) {
+		const shift = 32 - bitLength;
 		return (this.getUnsigned(bitLength, byteOffset) << shift) >> shift;
-	},
+	}
 
-	getUnsigned: function (bitLength, byteOffset) {
-		var value = this._getBitRangeData(bitLength, byteOffset).wideValue >>> -this._bitOffset;
-		return bitLength < 32 ? (value & ~(-1 << bitLength)) : value;
-	},
+	/**
+	 * Get an unsigned integer of any bit length up to 32
+	 */
+	getUnsigned(bitLength, byteOffset) {
+		const value =
+			this.#getBitRangeData(bitLength, byteOffset).wideValue >>>
+			-this.#bitOffset;
+		return bitLength < 32 ? value & ~(-1 << bitLength) : value;
+	}
 
-	_setBinaryFloat: function (byteOffset, value, mantSize, expSize, littleEndian) {
-		var signBit = value < 0 ? 1 : 0,
-			exponent,
-			mantissa,
-			eMax = ~(-1 << (expSize - 1)),
-			eMin = 1 - eMax;
+	/**
+	 * Set an unsigned integer of any bit length up to 32
+	 */
+	setUnsigned(byteOffset, value, bitLength) {
+		const data = this.#getBitRangeData(bitLength, byteOffset);
+		let wideValue = data.wideValue;
 
-		if (value < 0) {
-			value = -value;
-		}
+		wideValue &= ~(~(-1 << bitLength) << -this.#bitOffset); // clearing bit range before binary "or"
+		wideValue |=
+			(bitLength < 32 ? value & ~(-1 << bitLength) : value) <<
+			-this.#bitOffset; // setting bits
 
-		if (value === 0) {
-			exponent = 0;
-			mantissa = 0;
-		} else if (isNaN(value)) {
-			exponent = 2 * eMax + 1;
-			mantissa = 1;
-		} else if (value === Infinity) {
-			exponent = 2 * eMax + 1;
-			mantissa = 0;
-		} else {
-			exponent = Math.floor(Math.log(value) / Math.LN2);
-			if (exponent >= eMin && exponent <= eMax) {
-				mantissa = Math.floor((value * pow2(-exponent) - 1) * pow2(mantSize));
-				exponent += eMax;
-			} else {
-				mantissa = Math.floor(value / pow2(eMin - mantSize));
-				exponent = 0;
-			}
-		}
-
-		var b = [];
-		while (mantSize >= 8) {
-			b.push(mantissa % 256);
-			mantissa = Math.floor(mantissa / 256);
-			mantSize -= 8;
-		}
-		exponent = (exponent << mantSize) | mantissa;
-		expSize += mantSize;
-		while (expSize >= 8) {
-			b.push(exponent & 0xff);
-			exponent >>>= 8;
-			expSize -= 8;
-		}
-		b.push((signBit << expSize) | exponent);
-
-		this._setBytes(byteOffset, b, littleEndian);
-	},
-
-	_setFloat32: function (byteOffset, value, littleEndian) {
-		this._setBinaryFloat(byteOffset, value, 23, 8, littleEndian);
-	},
-
-	_setFloat64: function (byteOffset, value, littleEndian) {
-		this._setBinaryFloat(byteOffset, value, 52, 11, littleEndian);
-	},
-
-	_set64: function (Type, byteOffset, value, littleEndian) {
-		if (typeof value !== 'object') {
-			value = Type.fromNumber(value);
-		}
-
-		littleEndian = defined(littleEndian, this._littleEndian);
-		byteOffset = defined(byteOffset, this._offset);
-
-		var parts = littleEndian ? {lo: 0, hi: 4} : {lo: 4, hi: 0};
-
-		for (var partName in parts) {
-			this.setUint32(byteOffset + parts[partName], value[partName], littleEndian);
-		}
-
-		this._offset = byteOffset + 8;
-	},
-
-	setInt64: function (byteOffset, value, littleEndian) {
-		this._set64(Int64, byteOffset, value, littleEndian);
-	},
-
-	setUint64: function (byteOffset, value, littleEndian) {
-		this._set64(Uint64, byteOffset, value, littleEndian);
-	},
-
-	_setUint32: function (byteOffset, value, littleEndian) {
-		this._setBytes(byteOffset, [
-			value & 0xff,
-			(value >>> 8) & 0xff,
-			(value >>> 16) & 0xff,
-			value >>> 24
-		], littleEndian);
-	},
-
-	_setUint16: function (byteOffset, value, littleEndian) {
-		this._setBytes(byteOffset, [
-			value & 0xff,
-			(value >>> 8) & 0xff
-		], littleEndian);
-	},
-
-	_setUint8: function (byteOffset, value) {
-		this._setBytes(byteOffset, [value & 0xff]);
-	},
-
-	setUnsigned: function (byteOffset, value, bitLength) {
-		var data = this._getBitRangeData(bitLength, byteOffset),
-			wideValue = data.wideValue,
-			b = data.bytes;
-
-		wideValue &= ~(~(-1 << bitLength) << -this._bitOffset); // clearing bit range before binary "or"
-		wideValue |= (bitLength < 32 ? (value & ~(-1 << bitLength)) : value) << -this._bitOffset; // setting bits
-
-		for (var i = b.length - 1; i >= 0; i--) {
-			b[i] = wideValue & 0xff;
+		for (let i = data.bytes.length - 1; i >= 0; i--) {
+			data.bytes[i] = wideValue & 0xff;
 			wideValue >>>= 8;
 		}
 
-		this._setBytes(data.start, b, true);
+		this.#setBytes(data.start, data.bytes, true);
 	}
+
+	/**
+	 * Set a signed integer of any bit length up to 32
+	 */
+	setSigned(byteOffset, value, bitLength) {
+		return this.setUnsigned(byteOffset, value, bitLength);
+	}
+
+	/**
+	 * Sets an unsigned 64 bit integer. Takes a regular Number, not a BigInt.
+	 *
+	 * For more precision, use `setBigUint64()`
+	 */
+	setUint64(byteOffset, value, littleEndian) {
+		// Pointer will be handled for us by the bigInt method
+		// @ts-expect-error These methods get added later via prototype extension
+		this.setBigUint64(byteOffset, BigInt(value), littleEndian);
+	}
+
+	/**
+	 * Sets a 64 bit integer. Takes a regular Number, not a BigInt.
+	 *
+	 * For more precision, use `setBigInt64()`
+	 */
+	setInt64(byteOffset, value, littleEndian) {
+		// Pointer will be handled for us by the bigInt method
+		// @ts-expect-error These methods get added later via prototype extension
+		this.setBigInt64(byteOffset, BigInt(value), littleEndian);
+	}
+
+	/**
+	 * Get an unsigned 64 bit integer. Returns a regular Number, not a BigInt.
+	 *
+	 * For more precision, use `getBigUint64()`
+	 */
+	getUint64(byteOffset, littleEndian) {
+		// Pointer will be handled for us by the bigInt method
+		// @ts-expect-error These methods get added later via prototype extension
+		return Number(this.getBigUint64(byteOffset, littleEndian));
+	}
+
+	/**
+	 * Get a 64 bit integer. Returns a regular Number, not a BigInt.
+	 *
+	 * For more precision, use `getBigInt64()`
+	 */
+	getInt64(byteOffset, littleEndian) {
+		// Pointer will be handled for us by the bigInt method
+		// @ts-expect-error These methods get added later via prototype extension
+		return Number(this.getBigInt64(byteOffset, littleEndian));
+	}
+}
+export default jDataView;
+
+const builtInTypeBytes = {
+	Float64: 8,
+	Float32: 4,
+	BigInt64: 8,
+	BigUint64: 8,
+	Int32: 4,
+	Uint32: 4,
+	Int16: 2,
+	Uint16: 2,
+	Int8: 1,
+	Uint8: 1,
 };
 
-if (NODE) {
-	var nodeNaming = {
-		'Int8': 'Int8',
-		'Int16': 'Int16',
-		'Int32': 'Int32',
-		'Uint8': 'UInt8',
-		'Uint16': 'UInt16',
-		'Uint32': 'UInt32',
-		'Float32': 'Float',
-		'Float64': 'Double'
+const supportedTypes = [
+	...Object.keys(builtInTypeBytes),
+	"Int64",
+	"Uint64",
+	"Signed",
+	"Unsigned",
+	"String",
+	"Char",
+	"Bytes",
+];
+
+// Encapsulate all the built-in methods
+for (const type in builtInTypeBytes) {
+	const typeByteLength = builtInTypeBytes[type];
+	// Getters
+	jDataView.prototype["get" + type] = function (
+		byteOffset = this.tell(),
+		littleEndian = this.littleEndian
+	) {
+		// Move pointer forwards
+		this.seek(byteOffset + typeByteLength);
+
+		return this.dataView["get" + type](byteOffset, littleEndian);
 	};
 
-	proto._nodeBufferAction = function (type, isReadAction, byteOffset, littleEndian, value) {
-		// Move the internal offset forward
-		this._offset = byteOffset + dataTypes[type];
-		var nodeName = nodeNaming[type] + ((type === 'Int8' || type === 'Uint8') ? '' : littleEndian ? 'LE' : 'BE');
-		byteOffset += this.byteOffset;
-		return isReadAction ? this.buffer['read' + nodeName](byteOffset) : this.buffer['write' + nodeName](value, byteOffset);
+	// Setters
+	jDataView.prototype["set" + type] = function (
+		byteOffset = this.tell(),
+		value,
+		littleEndian = this.littleEndian
+	) {
+		// Move pointer forwards
+		this.seek(byteOffset + typeByteLength);
+
+		return this.dataView["set" + type](byteOffset, value, littleEndian);
 	};
 }
 
-for (var type in dataTypes) {
-	/* jshint loopfunc: true */
-	(function (type) {
-		proto['get' + type] = function (byteOffset, littleEndian) {
-			return this._action(type, true, byteOffset, littleEndian);
-		};
-		proto['set' + type] = function (byteOffset, value, littleEndian) {
-			this._action(type, false, byteOffset, littleEndian, value);
-		};
-	})(type);
-	/* jshint loopfunc: false */
-}
-
-proto._setInt32 = proto._setUint32;
-proto._setInt16 = proto._setUint16;
-proto._setInt8 = proto._setUint8;
-proto.setSigned = proto.setUnsigned;
-
-for (var method in proto) {
-	/* jshint loopfunc: true */
-	if (method.slice(0, 3) === 'set') {
-		(function (type) {
-			proto['write' + type] = function () {
-				Array.prototype.unshift.call(arguments, undefined);
-				this['set' + type].apply(this, arguments);
-			};
-		})(method.slice(3));
-	}
-	/* jshint loopfunc: false */
+// Add the the writeXXX shorthand methods
+for (const type of supportedTypes) {
+	// arg3 might be littleEndian or bitLength
+	jDataView.prototype["write" + type] = function (
+		value,
+		littleEndianOrBitLength
+	) {
+		return this["set" + type].call(
+			this,
+			undefined,
+			value,
+			littleEndianOrBitLength
+		);
+	};
 }

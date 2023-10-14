@@ -1,0 +1,5 @@
+{
+  "vitest.enable": true,
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "testing.automaticallyOpenPeekView": "never",
+}

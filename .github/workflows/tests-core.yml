@@ -1,0 +1,30 @@
+# This is a 'reusable workflow' called by test.yml
+
+on:
+  workflow_call:
+    inputs:
+      test-command:
+        required: true
+        type: string
+      env-name:
+        required: true
+        type: string
+  
+
+jobs:
+   test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Install Node.JS
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+          cache: "pnpm"
+      - name: Install NPM modules
+        run: "pnpm i"
+      - name: Run tests in ${{inputs.env-name}}
+        run: ${{inputs.test-command}}

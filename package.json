@@ -1,6 +1,37 @@
 {
   "name": "jdataview",
-  "version": "2.5.1",
+  "version": "3.0.0",
+  "type": "module",
+  "scripts": {
+    "precommit": "lint-staged",
+    "build": "vite build",
+    "test": "vitest run",
+    "test-in-browser": "vitest run --browser=$BROWSER_TO_TEST",
+    "dev": "vitest dev"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write --single-quote --use-tabs",
+      "git add"
+    ]
+  },
+  "files": [
+    "dist",
+    "src/**/*.d.ts"
+  ],
+  "main": "./dist/jdataview.js",
+  "module": "./dist/jdataview.js",
+  "types": "./src/jdataview.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/jdataview.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jDataView/jDataView.git"
+  },
   "description": "A unique way to work with a binary file in the browser and the server.",
   "keywords": [
     "buffer",
@@ -12,52 +43,18 @@
     "write",
     "manipulation"
   ],
+  "license": "MIT",
   "homepage": "http://jDataView.github.io/",
   "author": "Vjeux <vjeuxx@gmail.com> (http://blog.vjeux.com/)",
   "contributors": [
     "Vjeux <vjeuxx@gmail.com> (http://blog.vjeux.com/)",
     "RReverser <me@rreverser.com> (http://rreverser.com)"
   ],
-  "files": [
-    "dist/node/jdataview.js"
-  ],
-  "main": "dist/node/jdataview.js",
-  "scripts": {
-    "test": "grunt"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/jDataView/jDataView.git"
-  },
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-uglify": "^0.3.2",
-    "grunt-contrib-jshint": "^0.10.0",
-    "load-grunt-config": "*",
-    "grunt-mocha-test": "^0.11.0",
-    "karma": "^0.12.19",
-    "karma-firefox-launcher": "^0.1.3",
-    "karma-chrome-launcher": "^0.1.4",
-    "karma-phantomjs-launcher": "^0.1.4",
-    "karma-ie-launcher": "^0.1.5",
-    "karma-mocha": "^0.1.6",
-    "chai": "^1.9.1",
-    "karma-chai": "^0.1.0",
-    "grunt-karma": "^0.8.3",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-bump": "0.0.15",
-    "npm": "^1.4.21",
-    "grunt-concat-sourcemap": "^0.4.3",
-    "grunt-compare-size": "^0.4.0",
-    "gzip-js": "^0.3.2",
-    "jshint-stylish": "^0.4.0",
-    "grunt-lintspaces": "^0.6.0",
-    "grunt-contrib-clean": "^0.6.0"
-  },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://raw.githubusercontent.com/jDataView/jDataView/master/LICENSE"
-    }
-  ]
+    "@vitest/browser": "^0.34.5",
+    "eslint": "^8.50.0",
+    "vite": "^4.4.9",
+    "vitest": "^0.34.5",
+    "webdriverio": "^8.16.15"
+  }
 }
