@@ -15,6 +15,7 @@ npm i jdataview
 ```ts
 import { jDataView } from "jDataView";
 
+// jDataView maintains an internal byte-cursor, which lets you use the API in a much more ergonomic way
 const view = new jDataView(new ArrayBuffer(100));
 
 const msg = "Hello there";
@@ -27,13 +28,12 @@ view.writeBigInt64(2011n);
 // seek(pos) changes the byte-position of jDataView's internal 'cursor' 
 view.seek(0);
 
-// You need to specify the byte-length for strings
-// (which for ascii text is just the length)
-console.log(view.getString(msg.length)); // Hello there
+// You need to specify the byte-length for strings (which for ascii text is just the length)
+console.log(view.getString(msg.length)); // > Hello there
 
-// Passing an offset is optional -
-// if you don't, jDataView will use the byte-cursor position
-console.log(view.getBigInt64()); // 2011n (the year jDataView was created)
+// Passing an offset is optional - if you don't, jDataView uses the byte-cursor position
+// jDataView also has methods that let you use bigger Number's than JavaScript supports - you'll just lose precision
+console.log(view.getInt64()); // > 2011
 ```
 More examples are in [the docs](https://github.com/jDataView/jDataView/wiki). Here's a good [starting point](https://github.com/jDataView/jDataView/wiki/Example).
 
