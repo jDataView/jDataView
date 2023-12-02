@@ -19,14 +19,23 @@ const view = new jDataView(new ArrayBuffer(100));
 
 const msg = "Hello there";
 
+// jDataView's writeXXX methods are the same as the setXXX methods,
+// but the byte-cursor position is used instead of passing an offset
 view.writeString(msg);
 view.writeBigInt64(2011n);
 
+// seek(pos) changes the byte-position of jDataView's internal 'cursor' 
 view.seek(0);
+
+// You need to specify the byte-length for strings
+// (which for ascii text is just the length)
 console.log(view.getString(msg.length)); // Hello there
+
+// Passing an offset is optional -
+// if you don't, jDataView will use the byte-cursor position
 console.log(view.getBigInt64()); // 2011n (the year jDataView was created)
 ```
-More examples are in [the docs](). Here's a [starting point](https://github.com/jDataView/jDataView/wiki/Example).
+More examples are in [the docs](https://github.com/jDataView/jDataView/wiki). Here's a good [starting point](https://github.com/jDataView/jDataView/wiki/Example).
 
 ## [Documentation](https://github.com/jDataView/jDataView/wiki)
 jDataView extends the built-in JavaScript `DataView` class, so all of [it's documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView) is applicable here. 
