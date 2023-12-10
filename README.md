@@ -13,7 +13,7 @@ npm i jdataview
 ```
 > Note that TypeScript definitions are now included in the `jDataView` package automatically.
 ```ts
-import { jDataView } from "jDataView";
+import { jDataView } from "jdataview";
 
 // jDataView maintains an internal byte-cursor, which lets you use the API in a much more ergonomic way
 const view = new jDataView(new ArrayBuffer(100));
