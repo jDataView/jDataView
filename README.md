@@ -11,7 +11,7 @@ jDataView is a drop-in replacement for JavaScript's built-in `DataView` class,  
 ```bash
 npm i jdataview
 ```
-> Note that TypeScript definitions are now included in the `jDataView` package automatically.
+> Note that TypeScript definitions are now included in the `jdataview` package automatically.
 ```ts
 import { jDataView } from "jdataview";
 
