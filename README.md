@@ -50,29 +50,6 @@ jDataView extends the built-in JavaScript `DataView` class, so all of [it's docu
     * [Bitfields](https://github.com/jDataView/jDataView/wiki/Bitfields)
     * [Internal utilities](https://github.com/jDataView/jDataView/wiki/Internal-utilities)
 
-
-## History
-
-Check out the original [jDataView article](https://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html) by [Vjeux](https://github.com/vjeux), jDataView's original author.
-
-There are three ways to read a binary file from the browser.
-
-* The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a **String**, convert it to byte **Array** and you have to rewrite all the decoding and encoding functions (getUint16, getFloat32, ...). All the browsers support this.
-
-* Then browsers that implemented **Canvas** also added **CanvasPixelArray** as part of **ImageData**. It is fast byte array that is created and used internally by `<canvas />` element for manipulating low-level image data. We can create such host element and use it as factory for our own instances of this array.
-
-* Then browsers that implemented **WebGL** added **ArrayBuffer**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. It has big drawback, it can't read non-aligned data (but we can actually hack that). So they replaced **CanvasPixelArray** with **Uint8ClampedArray** (same as Uint8Array, but cuts off numbers outside 0..255 range).
-
-* A new revision of the specification added **DataViews**. It is a view around your buffer that can read/write arbitrary data types directly through functions: getUint32, getFloat64 ...
-
-And one way to read a binary file from the server.
-
-* **NodeJS Buffers**. They appeared in [Node 0.4.0](http://nodejs.org/docs/v0.4.0/api/buffers.html). [Node 0.5.0](http://nodejs.org/docs/v0.5.0/api/buffers.html) added a DataView-like API. And [Node 0.6.0](http://nodejs.org/docs/v0.6.0/api/buffers.html) changed the API naming convention.
-
-**jDataView** provided a polyfill for the **DataView API** with own convenient extensions using the best available option between Arrays, TypedArrays, NodeJS Buffers and DataViews.
-
-Now that `DataView` is natively available in all engines, **jDataView 3** acts as a layer on top of it with powerful methods for dealing with non-standard binary data types, such as strings and arbitrary-sized integers.
-
 ## Demos
 
 - [PhotoSynth WebGL Viewer](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/) by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
