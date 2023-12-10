@@ -1,52 +1,79 @@
-[![Build Status](https://travis-ci.org/jDataView/jDataView.png?branch=master)](https://travis-ci.org/jDataView/jDataView)
-[![NPM version](https://badge.fury.io/js/jdataview.png)](https://npmjs.org/package/jdataview)
-[jDataView](http://blog.vjeux.com/2011/javascript/jdataview-read-binary-file.html) - A unique way to work with a binary file in JavaScript.
-================================
+# jDataView - JS Binary data made easy
 
-jDataView provides a layer on top of `DataView` to make modifying binary data a pleasure.
+[![Tests Status](https://github.com/jdataview/jdataview/actions/workflows/run-tests.yml/badge.svg)](https://github.com/jDataView/jDataView/actions/workflows/run-tests.yml)
 
-jDataView is a drop-in replacement for the native `DataView`, adding methods for setting string, arbitrary-sized integers, and more.
+[npm](https://www.npmjs.com/package/jdataview) | [GitHub](https://github.com/jDataView/jDataView/) | [Docs](https://github.com/jDataView/jDataView/wiki) | [Website](https://jdataview.github.io/jDataView/) | [Changelog](https://github.com/jDataView/jDataView/blob/master/CHANGELOG.md)
+
+jDataView is a drop-in replacement for JavaScript's built-in `DataView` class,  adding methods for writing strings, individual bits, arbitrary-sized integers, and more.
+
+## Usage
+
+```bash
+npm i jdataview
+```
+> Note that TypeScript definitions are now included in the `jdataview` package automatically.
+```ts
+import { jDataView } from "jdataview";
+
+// jDataView maintains an internal byte-cursor, which lets you use the API in a much more ergonomic way
+const view = new jDataView(new ArrayBuffer(100));
+
+const msg = "Hello there";
+
+// jDataView's writeXXX methods are the same as the setXXX methods,
+// but the byte-cursor position is used instead of passing an offset
+view.writeString(msg);
+view.writeBigInt64(2011n);
+
+// seek(pos) changes the byte-position of jDataView's internal 'cursor' 
+view.seek(0);
+
+// You need to specify the byte-length for strings (which for ascii text is just the length)
+console.log(view.getString(msg.length)); // > Hello there
+
+// Passing an offset is optional - if you don't, jDataView uses the byte-cursor position
+// jDataView also has methods that let you use bigger Number's than JavaScript supports - you'll just lose precision
+console.log(view.getInt64()); // > 2011
+```
+More examples are in [the docs](https://github.com/jDataView/jDataView/wiki). Here's a good [starting point](https://github.com/jDataView/jDataView/wiki/Example).
+
+## [Documentation](https://github.com/jDataView/jDataView/wiki)
+jDataView extends the built-in JavaScript `DataView` class, so all of [it's documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView) is applicable here. 
+
+### API Reference
+
+  * [jDataView constructor](https://github.com/jDataView/jDataView/wiki/jDataView-constructor)
+  * jDataView Extensions
+    * [Operation control](https://github.com/jDataView/jDataView/wiki/Operation-control)
+    * [writeXXX methods](https://github.com/jDataView/jDataView/wiki/writeXXX-methods)
+    * [Strings and Blobs](https://github.com/jDataView/jDataView/wiki/Strings-and-Blobs)
+    * [Bitfields](https://github.com/jDataView/jDataView/wiki/Bitfields)
+    * [Internal utilities](https://github.com/jDataView/jDataView/wiki/Internal-utilities)
+
+## Demos
+
+- [PhotoSynth WebGL Viewer](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/) by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
+- [simple tar viewer](http://jdataview.github.io/jDataView/untar/). It is a "Hello World" demo of how easy it is to use the library.
+- [TrueTypeFont library demo](http://ynakajima.github.io/ttf.js/demo/glyflist/) which uses jDataView to read and display glyphs from TrueType file.
+- [jBinary.Repo](https://jdataview.github.io/jBinary.Repo) ready-to-use typesets and corresponding demos of using
+[jDataView](https://github.com/jDataView/jDataView)+[jBinary](https://github.com/jDataView/jBinary)
+for reading popular file formats like
+[GZIP archives](https://jdataview.github.io/jBinary.Repo/demo/#gzip),
+[TAR archives](https://jdataview.github.io/jBinary.Repo/demo/#tar),
+[ICO images](https://jdataview.github.io/jBinary.Repo/demo/#ico),
+[BMP images](https://jdataview.github.io/jBinary.Repo/demo/#bmp),
+[MP3 tags](https://jdataview.github.io/jBinary.Repo/demo/#mp3)
+etc.
+- [Talking image](http://hacksparrow.github.io/talking-image/) - animation and audio in one package powered by
+HTML5 Audio, [jDataView](https://github.com/jDataView/jDataView) and [jBinary](https://github.com/jDataView/jBinary).
+
+---
+
+*Please tell us if you made something with jDataView :)*
 
 
-Documentation
-=============
+## Also check out [jBinary](https://github.com/jDataView/jBinary)
 
-  * API
-    * [jDataView constructor](https://github.com/jDataView/jDataView/wiki/jDataView-constructor)
-    * [DataView documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView)
-    * Extensions
-      * [Operation control](https://github.com/jDataView/jDataView/wiki/Operation-control)
-      * [writeXXX methods](https://github.com/jDataView/jDataView/wiki/writeXXX-methods)
-      * [Strings and Blobs](https://github.com/jDataView/jDataView/wiki/Strings-and-Blobs)
-      * [Bitfields](https://github.com/jDataView/jDataView/wiki/Bitfields)
-      * [Internal utilities](https://github.com/jDataView/jDataView/wiki/Internal-utilities)
-  * [Example](https://github.com/jDataView/jDataView/wiki/Example)
-  * [Changelog](https://github.com/jDataView/jDataView/blob/master/CHANGELOG.md)
-
-
-History
-===========
-
-There are three ways to read a binary file from the browser.
-
-* The first one is to download the file through XHR with [charset=x-user-defined](https://developer.mozilla.org/en/using_xmlhttprequest#Receiving_binary_data). You get the file as a **String**, convert it to byte **Array** and you have to rewrite all the decoding and encoding functions (getUint16, getFloat32, ...). All the browsers support this.
-
-* Then browsers that implemented **Canvas** also added **CanvasPixelArray** as part of **ImageData**. It is fast byte array that is created and used internally by `<canvas />` element for manipulating low-level image data. We can create such host element and use it as factory for our own instances of this array.
-
-* Then browsers that implemented **WebGL** added **ArrayBuffer**. It is a plain buffer that can be read with views called **TypedArrays** (Int32Array, Float64Array, ...). You can use them to decode the file but this is not very handy. It has big drawback, it can't read non-aligned data (but we can actually hack that). So they replaced **CanvasPixelArray** with **Uint8ClampedArray** (same as Uint8Array, but cuts off numbers outside 0..255 range).
-
-* A new revision of the specification added **DataViews**. It is a view around your buffer that can read/write arbitrary data types directly through functions: getUint32, getFloat64 ...
-
-And one way to read a binary file from the server.
-
-* **NodeJS Buffers**. They appeared in [Node 0.4.0](http://nodejs.org/docs/v0.4.0/api/buffers.html). [Node 0.5.0](http://nodejs.org/docs/v0.5.0/api/buffers.html) added a DataView-like API. And [Node 0.6.0](http://nodejs.org/docs/v0.6.0/api/buffers.html) changed the API naming convention.
-
-**jDataView** provided a polyfill for the **DataView API** with own convenient extensions using the best available option between Arrays, TypedArrays, NodeJS Buffers and DataViews.
-
-Now that `DataView` is natively available in all engines, **jDataView 3** acts as a layer on top of it with powerful methods for dealing with non-standard binary data types, such as strings and arbitrary-sized integers.
-
-Also check out ([jBinary](https://github.com/jDataView/jBinary))
-========================
 
 For complicated binary structures, it may be hard enough to use only low-level get/set operations for parsing,
 processing and writing data.
@@ -58,48 +85,3 @@ or even as simple download link.
 
 If you faced any of these problems, you might want to check out new [jBinary](https://github.com/jDataView/jBinary)
 library that works on top of **jDataView** and allows to operate with binary data in structured and convenient way.
-
-Demos
-=====
-
-[HTTP Live Streaming realtime converter and player demo](http://rreverser.github.io/mpegts/) implemented using [jBinary](https://github.com/jDataView/jBinary) data structures.
-[![Screenshot](http://rreverser.github.io/mpegts/screenshot.png?)](http://rreverser.github.io/mpegts/)
-
----
-
-A [World of Warcraft Model Viewer](http://jdataview.github.io/jsWoWModelViewer/). It uses [jDataView](https://github.com/jDataView/jDataView)+[jBinary](https://github.com/jDataView/jBinary) to read the binary file and then WebGL to display it.
-[![Screenshot](http://jdataview.github.io/jsWoWModelViewer/images/modelviewer.png)](http://jdataview.github.io/jsWoWModelViewer/)
-
----
-
-A [PhotoSynth WebGL Viewer](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/) by Visual Experiments. It uses jDataView to read the binary file and then WebGL to display it.
-[![Screenshot](http://i.imgur.com/HRHXo.jpg)](http://www.visual-experiments.com/2011/04/05/photosynth-webgl-viewer/)
-
----
-
-A [simple tar viewer](http://jdataview.github.io/jDataView/untar/). It is a "Hello World" demo of how easy it is to use the library.
-
----
-
-JavaScript [TrueTypeFont library demo](http://ynakajima.github.io/ttf.js/demo/glyflist/) which uses jDataView to read and display glyphs from TrueType file.
-
---
-
-[jBinary.Repo](https://jdataview.github.io/jBinary.Repo) ready-to-use typesets and corresponding demos of using
-[jDataView](https://github.com/jDataView/jDataView)+[jBinary](https://github.com/jDataView/jBinary)
-for reading popular file formats like
-[GZIP archives](https://jdataview.github.io/jBinary.Repo/demo/#gzip),
-[TAR archives](https://jdataview.github.io/jBinary.Repo/demo/#tar),
-[ICO images](https://jdataview.github.io/jBinary.Repo/demo/#ico),
-[BMP images](https://jdataview.github.io/jBinary.Repo/demo/#bmp),
-[MP3 tags](https://jdataview.github.io/jBinary.Repo/demo/#mp3)
-etc.
-
----
-
-[Talking image](http://hacksparrow.github.io/talking-image/) - animation and audio in one package powered by
-HTML5 Audio, [jDataView](https://github.com/jDataView/jDataView) and [jBinary](https://github.com/jDataView/jBinary).
-
----
-
-*Please tell us if you made something with jDataView :)*
